@@ -6,7 +6,6 @@ import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/models/child_profile.dart';
 import 'package:kinder_world/core/providers/auth_controller.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
-import 'package:kinder_world/core/repositories/child_repository.dart';
 
 class ChildLoginScreen extends ConsumerStatefulWidget {
   const ChildLoginScreen({super.key});
@@ -165,8 +164,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
-    final isLoading = _isLoading || authState.isLoading;
+    debugPrint('ChildLoginScreen build -> selectedChildId=$_selectedChildId');
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -268,11 +266,18 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
           );
         }
 
-        if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+        if (snapshot.hasError) {
+          debugPrint('ChildLoginScreen: error fetching children -> ${snapshot.error}');
+          return _buildErrorState();
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          debugPrint('ChildLoginScreen: no children found');
           return _buildErrorState();
         }
 
         final children = snapshot.data!;
+        debugPrint('ChildLoginScreen: found ${children.length} children');
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -119,7 +119,7 @@ class _UserTypeSelectionScreenState extends ConsumerState<UserTypeSelectionScree
                     'Parent',
                     'Monitor progress, set controls, manage family',
                     Icons.family_restroom,
-                    AppColors.parentModeColor ?? AppColors.secondary,
+                    AppColors.parentModeColor,
                     'parent',
                   ),
                   const SizedBox(height: 24),

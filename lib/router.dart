@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:kinder_world/core/storage/secure_storage.dart';
 import 'package:kinder_world/app.dart';
 
 import 'package:kinder_world/features/app_core/splash_screen.dart';
@@ -99,6 +97,7 @@ bool _isAnyParentRoute(String path) => path.startsWith('/parent/');
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
+  final logger = ref.watch(loggerProvider);
 
   return GoRouter(
     initialLocation: Routes.splash,
@@ -115,6 +114,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authToken = await secureStorage.getAuthToken();
       final userRole = await secureStorage.getUserRole(); // expected: 'parent' | 'child' | null
       final childSession = await secureStorage.getChildSession(); // null if no selected child / guest not set
+
+      // Debugging logs to diagnose navigation issues
+      logger.d('Router redirect check -> path: $path | auth: ${authToken != null} | role: $userRole | childSession: $childSession');
 
       final isAuthenticated = authToken != null;
 

@@ -4,6 +4,8 @@ import 'package:kinder_world/core/repositories/auth_repository.dart';
 import 'package:kinder_world/app.dart';
 import 'package:logger/logger.dart';
 
+// ==================== AUTH STATE ====================
+
 /// Authentication state
 class AuthState {
   final User? user;
@@ -36,7 +38,9 @@ class AuthState {
   bool get isChild => user?.role == UserRoles.child;
 }
 
-/// Authentication controller using AuthRepository
+// ==================== AUTH CONTROLLER ====================
+
+/// Authentication controller - SINGLE SOURCE OF TRUTH
 class AuthController extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
   final Logger _logger;
@@ -62,7 +66,7 @@ class AuthController extends StateNotifier<AuthState> {
       user: user,
     );
     
-    _logger.d('Auth controller initialized: ${state.isAuthenticated}');
+    _logger.d('Auth initialized: authenticated=$isAuthenticated, user=${user?.id}');
   }
 
   // ==================== PARENT AUTHENTICATION ====================
@@ -96,7 +100,7 @@ class AuthController extends StateNotifier<AuthState> {
         );
         return false;
       }
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Parent login error: $e');
       state = state.copyWith(
         isLoading: false,
@@ -139,7 +143,7 @@ class AuthController extends StateNotifier<AuthState> {
         );
         return false;
       }
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Parent registration error: $e');
       state = state.copyWith(
         isLoading: false,
@@ -180,56 +184,13 @@ class AuthController extends StateNotifier<AuthState> {
         );
         return false;
       }
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Child login error: $e');
       state = state.copyWith(
         isLoading: false,
         error: 'Login failed. Please try again.',
       );
       return false;
-    }
-  }
-
-  // ==================== AUTHENTICATION STATE ====================
-
-  /// Check if user is authenticated
-  Future<bool> checkAuthentication() async {
-    try {
-      final isAuthenticated = await _authRepository.isAuthenticated();
-      
-      if (isAuthenticated && state.user == null) {
-        // Load user if authenticated but user not in state
-        final user = await _authRepository.getCurrentUser();
-        state = state.copyWith(
-          isAuthenticated: true,
-          user: user,
-        );
-      }
-      
-      return isAuthenticated;
-    } catch (e, stack) {
-      _logger.e('Error checking authentication: $e');
-      return false;
-    }
-  }
-
-  /// Get current user role
-  Future<String?> getUserRole() async {
-    try {
-      return await _authRepository.getUserRole();
-    } catch (e, stack) {
-      _logger.e('Error getting user role: $e');
-      return null;
-    }
-  }
-
-  /// Refresh user data
-  Future<void> refreshUser() async {
-    try {
-      final user = await _authRepository.getCurrentUser();
-      state = state.copyWith(user: user);
-    } catch (e, stack) {
-      _logger.e('Error refreshing user: $e');
     }
   }
 
@@ -250,7 +211,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       
       _logger.d('User logged out successfully');
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error during logout: $e');
       state = state.copyWith(
         isLoading: false,
@@ -265,7 +226,7 @@ class AuthController extends StateNotifier<AuthState> {
   Future<bool> setParentPin(String pin) async {
     try {
       return await _authRepository.setParentPin(pin);
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error setting parent PIN: $e');
       return false;
     }
@@ -275,7 +236,7 @@ class AuthController extends StateNotifier<AuthState> {
   Future<bool> verifyParentPin(String enteredPin) async {
     try {
       return await _authRepository.verifyParentPin(enteredPin);
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error verifying PIN: $e');
       return false;
     }
@@ -285,86 +246,43 @@ class AuthController extends StateNotifier<AuthState> {
   Future<bool> isPinRequired() async {
     try {
       return await _authRepository.isPinRequired();
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error checking PIN requirement: $e');
       return false;
     }
   }
 
-  // ==================== CHILD SESSION ====================
+  // ==================== UTILITIES ====================
 
-  /// Save child session
-  Future<bool> saveChildSession(String childId) async {
+  /// Refresh user data
+  Future<void> refreshUser() async {
     try {
-      return await _authRepository.saveChildSession(childId);
-    } catch (e, stack) {
-      _logger.e('Error saving child session: $e');
-      return false;
+      final user = await _authRepository.getCurrentUser();
+      state = state.copyWith(user: user);
+    } catch (e) {
+      _logger.e('Error refreshing user: $e');
     }
   }
-
-  /// Get current child session
-  Future<String?> getChildSession() async {
-    try {
-      return await _authRepository.getChildSession();
-    } catch (e, stack) {
-      _logger.e('Error getting child session: $e');
-      return null;
-    }
-  }
-
-  /// Clear child session
-  Future<bool> clearChildSession() async {
-    try {
-      return await _authRepository.clearChildSession();
-    } catch (e, stack) {
-      _logger.e('Error clearing child session: $e');
-      return false;
-    }
-  }
-
-  // ==================== ERROR HANDLING ====================
 
   /// Clear error state
   void clearError() {
     state = state.copyWith(error: null);
   }
 
-  // ==================== TOKEN MANAGEMENT ====================
-
-  /// Refresh authentication token
-  Future<String?> refreshToken() async {
-    try {
-      return await _authRepository.refreshToken();
-    } catch (e, stack) {
-      _logger.e('Error refreshing token: $e');
-      return null;
-    }
-  }
-
-  /// Validate authentication token
+  /// Validate token
   Future<bool> validateToken() async {
     try {
       return await _authRepository.validateToken();
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error validating token: $e');
       return false;
     }
   }
 }
 
-// Provider
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
-  final authRepository = ref.watch(authRepositoryProvider);
-  final logger = ref.watch(loggerProvider);
-  
-  return AuthController(
-    authRepository: authRepository,
-    logger: logger,
-  );
-});
+// ==================== PROVIDERS ====================
 
-// Repository provider
+/// Main auth repository provider
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
   final logger = ref.watch(loggerProvider);
@@ -375,19 +293,50 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   );
 });
 
-// Helper providers
+/// Main auth controller provider - SINGLE SOURCE OF TRUTH
+final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+  final logger = ref.watch(loggerProvider);
+  
+  return AuthController(
+    authRepository: authRepository,
+    logger: logger,
+  );
+});
+
+// ==================== HELPER PROVIDERS ====================
+
+/// Check if user is authenticated
 final isAuthenticatedProvider = Provider<bool>((ref) {
   return ref.watch(authControllerProvider).isAuthenticated;
 });
 
+/// Get current user
 final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authControllerProvider).user;
 });
 
+/// Check if current user is parent
 final isParentProvider = Provider<bool>((ref) {
   return ref.watch(authControllerProvider).isParent;
 });
 
+/// Check if current user is child
 final isChildProvider = Provider<bool>((ref) {
   return ref.watch(authControllerProvider).isChild;
+});
+
+/// Get user role
+final userRoleProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).user?.role;
+});
+
+/// Get auth loading state
+final authLoadingProvider = Provider<bool>((ref) {
+  return ref.watch(authControllerProvider).isLoading;
+});
+
+/// Get auth error
+final authErrorProvider = Provider<String?>((ref) {
+  return ref.watch(authControllerProvider).error;
 });

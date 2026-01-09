@@ -1,30 +1,32 @@
+// Workaround for analyzer: allow JsonKey on Freezed constructor params
+// (some analyzer versions report 'invalid_annotation_target')
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
 
 part 'screen_time_rule.freezed.dart';
 part 'screen_time_rule.g.dart';
 
 @freezed
 class ScreenTimeRule with _$ScreenTimeRule {
-  @HiveType(typeId: 5)
   const factory ScreenTimeRule({
-    @HiveField(0) required String id,
-    @HiveField(1) required String childId,
-    @HiveField(2) @JsonKey(name: 'daily_limit_minutes') required int dailyLimitMinutes,
-    @HiveField(3) @JsonKey(name: 'allowed_hours') required List<TimeSlot> allowedHours,
-    @HiveField(4) @JsonKey(name: 'sleep_mode_enabled') required bool sleepModeEnabled,
-    @HiveField(5) @JsonKey(name: 'sleep_start_time') String? sleepStartTime,
-    @HiveField(6) @JsonKey(name: 'sleep_end_time') String? sleepEndTime,
-    @HiveField(7) @JsonKey(name: 'break_reminders_enabled') required bool breakRemindersEnabled,
-    @HiveField(8) @JsonKey(name: 'break_interval_minutes') int? breakIntervalMinutes,
-    @HiveField(9) @JsonKey(name: 'break_duration_minutes') int? breakDurationMinutes,
-    @HiveField(10) @JsonKey(name: 'emergency_lock_enabled') required bool emergencyLockEnabled,
-    @HiveField(11) @JsonKey(name: 'smart_control_enabled') required bool smartControlEnabled,
-    @HiveField(12) @JsonKey(name: 'ai_recommendations_enabled') required bool aiRecommendationsEnabled,
-    @HiveField(13) @JsonKey(name: 'content_restrictions') required ContentRestrictions contentRestrictions,
-    @HiveField(14) @JsonKey(name: 'created_at') required DateTime createdAt,
-    @HiveField(15) @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    @HiveField(16) @JsonKey(name: 'is_active') required bool isActive,
+    required String id,
+    required String childId,
+    @JsonKey(name: 'daily_limit_minutes') required int dailyLimitMinutes,
+    @JsonKey(name: 'allowed_hours') required List<TimeSlot> allowedHours,
+    @JsonKey(name: 'sleep_mode_enabled') required bool sleepModeEnabled,
+    @JsonKey(name: 'sleep_start_time') String? sleepStartTime,
+    @JsonKey(name: 'sleep_end_time') String? sleepEndTime,
+    @JsonKey(name: 'break_reminders_enabled') required bool breakRemindersEnabled,
+    @JsonKey(name: 'break_interval_minutes') int? breakIntervalMinutes,
+    @JsonKey(name: 'break_duration_minutes') int? breakDurationMinutes,
+    @JsonKey(name: 'emergency_lock_enabled') required bool emergencyLockEnabled,
+    @JsonKey(name: 'smart_control_enabled') required bool smartControlEnabled,
+    @JsonKey(name: 'ai_recommendations_enabled') required bool aiRecommendationsEnabled,
+    @JsonKey(name: 'content_restrictions') required ContentRestrictions contentRestrictions,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'is_active') required bool isActive,
   }) = _ScreenTimeRule;
 
   const ScreenTimeRule._();
@@ -88,11 +90,10 @@ class ScreenTimeRule with _$ScreenTimeRule {
 
 @freezed
 class TimeSlot with _$TimeSlot {
-  @HiveType(typeId: 6)
   const factory TimeSlot({
-    @HiveField(0) required String start,
-    @HiveField(1) required String end,
-    @HiveField(2) required List<String> days,
+    required String start,
+    required String end,
+    required List<String> days,
   }) = _TimeSlot;
 
   const TimeSlot._();
@@ -123,15 +124,14 @@ class TimeSlot with _$TimeSlot {
 
 @freezed
 class ContentRestrictions with _$ContentRestrictions {
-  @HiveType(typeId: 7)
   const factory ContentRestrictions({
-    @HiveField(0) @JsonKey(name: 'blocked_categories') required List<String> blockedCategories,
-    @HiveField(1) @JsonKey(name: 'blocked_activities') required List<String> blockedActivities,
-    @HiveField(2) @JsonKey(name: 'allowed_categories') required List<String> allowedCategories,
-    @HiveField(3) @JsonKey(name: 'max_difficulty') String? maxDifficulty,
-    @HiveField(4) @JsonKey(name: 'require_approval_for') required List<String> requireApprovalFor,
-    @HiveField(5) @JsonKey(name: 'age_appropriate_only') required bool ageAppropriateOnly,
-    @HiveField(6) @JsonKey(name: 'educational_focus') bool? educationalFocus,
+    @JsonKey(name: 'blocked_categories') required List<String> blockedCategories,
+    @JsonKey(name: 'blocked_activities') required List<String> blockedActivities,
+    @JsonKey(name: 'allowed_categories') required List<String> allowedCategories,
+    @JsonKey(name: 'max_difficulty') String? maxDifficulty,
+    @JsonKey(name: 'require_approval_for') required List<String> requireApprovalFor,
+    @JsonKey(name: 'age_appropriate_only') required bool ageAppropriateOnly,
+    @JsonKey(name: 'educational_focus') bool? educationalFocus,
   }) = _ContentRestrictions;
 
   const ContentRestrictions._();

@@ -20,29 +20,19 @@ User _$UserFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$User {
-  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
-  @HiveField(1)
   String get email => throw _privateConstructorUsedError;
-  @HiveField(2)
   String get role => throw _privateConstructorUsedError;
-  @HiveField(3)
   String? get name => throw _privateConstructorUsedError;
-  @HiveField(4)
   String? get phone => throw _privateConstructorUsedError;
-  @HiveField(5)
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @HiveField(6)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
-  @HiveField(7)
   @JsonKey(name: 'is_active')
   bool get isActive => throw _privateConstructorUsedError;
-  @HiveField(8)
   @JsonKey(name: 'subscription_status')
   String? get subscriptionStatus => throw _privateConstructorUsedError;
-  @HiveField(9)
   @JsonKey(name: 'trial_end_date')
   DateTime? get trialEndDate => throw _privateConstructorUsedError;
 
@@ -61,18 +51,16 @@ abstract class $UserCopyWith<$Res> {
       _$UserCopyWithImpl<$Res, User>;
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String email,
-      @HiveField(2) String role,
-      @HiveField(3) String? name,
-      @HiveField(4) String? phone,
-      @HiveField(5) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(6) @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @HiveField(7) @JsonKey(name: 'is_active') bool isActive,
-      @HiveField(8)
-      @JsonKey(name: 'subscription_status')
-      String? subscriptionStatus,
-      @HiveField(9) @JsonKey(name: 'trial_end_date') DateTime? trialEndDate});
+      {String id,
+      String email,
+      String role,
+      String? name,
+      String? phone,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'is_active') bool isActive,
+      @JsonKey(name: 'subscription_status') String? subscriptionStatus,
+      @JsonKey(name: 'trial_end_date') DateTime? trialEndDate});
 }
 
 /// @nodoc
@@ -154,18 +142,16 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String email,
-      @HiveField(2) String role,
-      @HiveField(3) String? name,
-      @HiveField(4) String? phone,
-      @HiveField(5) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(6) @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @HiveField(7) @JsonKey(name: 'is_active') bool isActive,
-      @HiveField(8)
-      @JsonKey(name: 'subscription_status')
-      String? subscriptionStatus,
-      @HiveField(9) @JsonKey(name: 'trial_end_date') DateTime? trialEndDate});
+      {String id,
+      String email,
+      String role,
+      String? name,
+      String? phone,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'is_active') bool isActive,
+      @JsonKey(name: 'subscription_status') String? subscriptionStatus,
+      @JsonKey(name: 'trial_end_date') DateTime? trialEndDate});
 }
 
 /// @nodoc
@@ -238,59 +224,46 @@ class __$$UserImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 1)
 class _$UserImpl extends _User {
   const _$UserImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.email,
-      @HiveField(2) required this.role,
-      @HiveField(3) this.name,
-      @HiveField(4) this.phone,
-      @HiveField(5) @JsonKey(name: 'created_at') required this.createdAt,
-      @HiveField(6) @JsonKey(name: 'updated_at') required this.updatedAt,
-      @HiveField(7) @JsonKey(name: 'is_active') required this.isActive,
-      @HiveField(8)
-      @JsonKey(name: 'subscription_status')
-      this.subscriptionStatus,
-      @HiveField(9) @JsonKey(name: 'trial_end_date') this.trialEndDate})
+      {required this.id,
+      required this.email,
+      required this.role,
+      this.name,
+      this.phone,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'is_active') required this.isActive,
+      @JsonKey(name: 'subscription_status') this.subscriptionStatus,
+      @JsonKey(name: 'trial_end_date') this.trialEndDate})
       : super._();
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
 
   @override
-  @HiveField(0)
   final String id;
   @override
-  @HiveField(1)
   final String email;
   @override
-  @HiveField(2)
   final String role;
   @override
-  @HiveField(3)
   final String? name;
   @override
-  @HiveField(4)
   final String? phone;
   @override
-  @HiveField(5)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
-  @HiveField(6)
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   @override
-  @HiveField(7)
   @JsonKey(name: 'is_active')
   final bool isActive;
   @override
-  @HiveField(8)
   @JsonKey(name: 'subscription_status')
   final String? subscriptionStatus;
   @override
-  @HiveField(9)
   @JsonKey(name: 'trial_end_date')
   final DateTime? trialEndDate;
 
@@ -344,22 +317,15 @@ class _$UserImpl extends _User {
 
 abstract class _User extends User {
   const factory _User(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final String email,
-      @HiveField(2) required final String role,
-      @HiveField(3) final String? name,
-      @HiveField(4) final String? phone,
-      @HiveField(5)
-      @JsonKey(name: 'created_at')
-      required final DateTime createdAt,
-      @HiveField(6)
-      @JsonKey(name: 'updated_at')
-      required final DateTime updatedAt,
-      @HiveField(7) @JsonKey(name: 'is_active') required final bool isActive,
-      @HiveField(8)
-      @JsonKey(name: 'subscription_status')
-      final String? subscriptionStatus,
-      @HiveField(9)
+      {required final String id,
+      required final String email,
+      required final String role,
+      final String? name,
+      final String? phone,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      @JsonKey(name: 'is_active') required final bool isActive,
+      @JsonKey(name: 'subscription_status') final String? subscriptionStatus,
       @JsonKey(name: 'trial_end_date')
       final DateTime? trialEndDate}) = _$UserImpl;
   const _User._() : super._();
@@ -367,38 +333,28 @@ abstract class _User extends User {
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
-  @HiveField(0)
   String get id;
   @override
-  @HiveField(1)
   String get email;
   @override
-  @HiveField(2)
   String get role;
   @override
-  @HiveField(3)
   String? get name;
   @override
-  @HiveField(4)
   String? get phone;
   @override
-  @HiveField(5)
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
-  @HiveField(6)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
   @override
-  @HiveField(7)
   @JsonKey(name: 'is_active')
   bool get isActive;
   @override
-  @HiveField(8)
   @JsonKey(name: 'subscription_status')
   String? get subscriptionStatus;
   @override
-  @HiveField(9)
   @JsonKey(name: 'trial_end_date')
   DateTime? get trialEndDate;
 

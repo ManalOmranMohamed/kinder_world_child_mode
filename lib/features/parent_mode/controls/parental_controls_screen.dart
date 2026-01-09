@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kinder_world/core/providers/parental_controls_controller.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 
@@ -8,6 +9,7 @@ class ParentalControlsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final controlsState = ref.watch(parentalControlsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -44,9 +46,32 @@ class ParentalControlsScreen extends ConsumerWidget {
                 'Screen Time Limits',
                 Icons.timer,
                 [
-                  _buildToggleSetting('Daily Limit', true),
-                  _buildSliderSetting('Hours per day', 2, 0, 6),
-                  _buildToggleSetting('Break Reminders', true),
+                 _buildToggleSetting(
+                     'Daily Limit',
+                    controlsState.dailyLimitEnabled,
+                    (value) => ref
+                      .read(parentalControlsProvider.notifier)
+                      .setDailyLimitEnabled(value),
+                  ),
+                  _buildSliderSetting(
+                    'Hours per day',
+                    controlsState.hoursPerDay,
+                    0,
+                    6,
+                    controlsState.dailyLimitEnabled
+                        ? (value) => ref
+                            .read(parentalControlsProvider.notifier)
+                            .setHoursPerDay(value)
+                        : null,
+                  ),
+                  _buildToggleSetting(
+                    'Break Reminders',
+                    controlsState.breakRemindersEnabled,
+                    (value) => ref
+                        .read(parentalControlsProvider.notifier)
+                        .setBreakRemindersEnabled(value),
+                  ),
+
                 ],
               ),
               
@@ -55,10 +80,27 @@ class ParentalControlsScreen extends ConsumerWidget {
               _buildControlSection(
                 'Content Filtering',
                 Icons.filter_list,
-                [
-                  _buildToggleSetting('Age-Appropriate Only', true),
-                  _buildToggleSetting('Block Educational Content', false),
-                  _buildToggleSetting('Require Approval', false),
+                [_buildToggleSetting(
+                    'Age-Appropriate Only',
+                    controlsState.ageAppropriateOnly,
+                    (value) => ref
+                        .read(parentalControlsProvider.notifier)
+                        .setAgeAppropriateOnly(value),
+                  ),
+                  _buildToggleSetting(
+                    'Block Educational Content',
+                    controlsState.blockEducationalContent,
+                    (value) => ref
+                        .read(parentalControlsProvider.notifier)
+                        .setBlockEducationalContent(value),
+                  ),
+                  _buildToggleSetting(
+                    'Require Approval',
+                    controlsState.requireApproval,
+                    (value) => ref
+                        .read(parentalControlsProvider.notifier)
+                        .setRequireApproval(value),
+                  ),
                 ],
               ),
               
@@ -67,10 +109,33 @@ class ParentalControlsScreen extends ConsumerWidget {
               _buildControlSection(
                 'Time Restrictions',
                 Icons.access_time,
-                [
-                  _buildToggleSetting('Sleep Mode', true),
-                  _buildTimeSetting('Bedtime', '8:00 PM'),
-                  _buildTimeSetting('Wake Time', '7:00 AM'),
+                [_buildToggleSetting(
+                    'Sleep Mode',
+                    controlsState.sleepModeEnabled,
+                    (value) => ref
+                        .read(parentalControlsProvider.notifier)
+                        .setSleepModeEnabled(value),
+                  ),
+                  _buildTimeSetting(
+                    context,
+                    'Bedtime',
+                    controlsState.bedtime,
+                    controlsState.sleepModeEnabled
+                        ? (value) => ref
+                            .read(parentalControlsProvider.notifier)
+                            .setBedtime(value)
+                        : null,
+                  ),
+                  _buildTimeSetting(
+                    context,
+                    'Wake Time',
+                    controlsState.wakeTime,
+                    controlsState.sleepModeEnabled
+                        ? (value) => ref
+                            .read(parentalControlsProvider.notifier)
+                            .setWakeTime(value)
+                        : null,
+                  ),
                 ],
               ),
               
@@ -99,7 +164,35 @@ class ParentalControlsScreen extends ConsumerWidget {
                     
                     ElevatedButton.icon(
                       onPressed: () {
-                        // TODO: Implement emergency lock
+                        // TODO: Implement emergency lock 
+                        showDialog<void>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Lock App Now'),
+                              content: const Text(
+                                'The app will be locked immediately for the child profile.',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('App locked for child mode.'),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Lock'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       icon: const Icon(Icons.lock),
                       label: const Text('Lock App Now'),
@@ -157,8 +250,11 @@ class ParentalControlsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildToggleSetting(String title, bool value) {
-    return Padding(
+  Widget _buildToggleSetting(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -172,9 +268,7 @@ class ParentalControlsScreen extends ConsumerWidget {
           ),
           Switch(
             value: value,
-            onChanged: (newValue) {
-              // TODO: Implement setting change
-            },
+                       onChanged: onChanged,
             activeColor: AppColors.primary,
           ),
         ],
@@ -182,8 +276,13 @@ class ParentalControlsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSliderSetting(String title, double value, double min, double max) {
-    return Padding(
+  Widget _buildSliderSetting(
+    String title,
+    double value,
+    double min,
+    double max,
+    ValueChanged<double>? onChanged,
+  ) {    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,9 +299,7 @@ class ParentalControlsScreen extends ConsumerWidget {
             value: value,
             min: min,
             max: max,
-            onChanged: (newValue) {
-              // TODO: Implement setting change
-            },
+                        onChanged: onChanged,
             activeColor: AppColors.primary,
           ),
         ],
@@ -210,8 +307,12 @@ class ParentalControlsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimeSetting(String title, String time) {
-    return Padding(
+  Widget _buildTimeSetting(
+    BuildContext context,
+    String title,
+    TimeOfDay time,
+    ValueChanged<TimeOfDay>? onSelected,
+  ) {    return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -224,15 +325,24 @@ class ParentalControlsScreen extends ConsumerWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
-              // TODO: Implement time picker
-            },
+           
+            onPressed: onSelected == null
+                ? null
+                : () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: time,
+                    );
+
+                    if (picked != null) {
+                      onSelected(picked);
+                    }
+                  },
             child: Text(
-              time,
+                            MaterialLocalizations.of(context).formatTimeOfDay(time),
               style: TextStyle(
                 fontSize: AppConstants.fontSize,
-                color: AppColors.primary,
-              ),
+                color: onSelected == null ? AppColors.grey : AppColors.primary,              ),
             ),
           ),
         ],

@@ -5,6 +5,8 @@ import 'package:kinder_world/core/repositories/child_repository.dart';
 import 'package:kinder_world/app.dart';
 import 'package:logger/logger.dart';
 
+// ==================== CHILD SESSION STATE ====================
+
 /// Child session state
 class ChildSessionState {
   final String? childId;
@@ -37,7 +39,9 @@ class ChildSessionState {
   bool get hasProfile => childProfile != null;
 }
 
-/// Child session controller manages the active child session and profile
+// ==================== CHILD SESSION CONTROLLER ====================
+
+/// Child session controller - SINGLE SOURCE OF TRUTH
 class ChildSessionController extends StateNotifier<ChildSessionState> {
   final ChildRepository _childRepository;
   final Logger _logger;
@@ -47,79 +51,38 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
     required Logger logger,
   })  : _childRepository = childRepository,
         _logger = logger,
-        super(const ChildSessionState()) {
-    _initialize();
-  }
-
-  /// Initialize child session from storage
-  Future<void> _initialize() async {
-    _logger.d('Initializing child session controller');
-    
-    // In a real app, this would load from secure storage
-    // For now, we'll use mock initialization
-    await loadMockChildProfile();
-  }
-
-  /// Load mock child profile for development
-  Future<void> loadMockChildProfile() async {
-    try {
-      state = state.copyWith(isLoading: true);
-      
-      // Create mock child profile
-      final mockChild = ChildProfile(
-        id: 'child1',
-        name: 'Ahmed',
-        age: 8,
-        avatar: 'assets/images/avatars/boy1.png',
-        interests: ['math', 'science'],
-        level: 3,
-        xp: 2500,
-        streak: 5,
-        favorites: ['activity1', 'activity2'],
-        parentId: 'parent1',
-        picturePassword: ['apple', 'ball', 'cat'],
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
-        totalTimeSpent: 0,
-        activitiesCompleted: 0,
-        currentMood: 'happy',
-      );
-      
-      state = ChildSessionState(
-        childId: mockChild.id,
-        childProfile: mockChild,
-        isLoading: false,
-      );
-      
-      _logger.d('Mock child profile loaded: ${mockChild.name}');
-    } catch (e, stack) {
-      _logger.e('Error loading mock child profile: $e');
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to load child profile',
-      );
-    }
-  }
+        super(const ChildSessionState());
 
   // ==================== SESSION MANAGEMENT ====================
 
   /// Start child session
   Future<bool> startChildSession({
     required String childId,
-    required ChildProfile childProfile,
+    ChildProfile? childProfile,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
+      // Load profile if not provided
+      final profile = childProfile ?? await _childRepository.getChildProfile(childId);
+      
+      if (profile == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Child profile not found',
+        );
+        return false;
+      }
+
       state = ChildSessionState(
         childId: childId,
-        childProfile: childProfile,
+        childProfile: profile,
         isLoading: false,
       );
       
-      _logger.d('Child session started: ${childProfile.name}');
+      _logger.d('Child session started: ${profile.name}');
       return true;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error starting child session: $e');
       state = state.copyWith(
         isLoading: false,
@@ -142,7 +105,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       
       _logger.d('Child session ended');
       return true;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error ending child session: $e');
       state = state.copyWith(
         isLoading: false,
@@ -177,7 +140,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
         );
         return false;
       }
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error loading child profile: $childId, $e');
       state = state.copyWith(
         isLoading: false,
@@ -199,9 +162,23 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error updating child profile: $e');
       return false;
+    }
+  }
+
+  /// Refresh current profile
+  Future<void> refreshProfile() async {
+    if (state.childId == null) return;
+    
+    try {
+      final child = await _childRepository.getChildProfile(state.childId!);
+      if (child != null) {
+        state = state.copyWith(childProfile: child);
+      }
+    } catch (e) {
+      _logger.e('Error refreshing profile: $e');
     }
   }
 
@@ -224,7 +201,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error adding XP: $e');
       return false;
     }
@@ -247,7 +224,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error updating streak: $e');
       return false;
     }
@@ -277,7 +254,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error completing activity: $e');
       return false;
     }
@@ -287,10 +264,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
 
   /// Add activity to favorites
   Future<bool> addToFavorites(String activityId) async {
-    if (!state.hasActiveSession || state.childProfile == null) {
-      _logger.w('Cannot add to favorites: No active child session');
-      return false;
-    }
+    if (!state.hasActiveSession) return false;
     
     try {
       final updated = await _childRepository.addToFavorites(state.childId!, activityId);
@@ -302,7 +276,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error adding to favorites: $e');
       return false;
     }
@@ -310,10 +284,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
 
   /// Remove activity from favorites
   Future<bool> removeFromFavorites(String activityId) async {
-    if (!state.hasActiveSession || state.childProfile == null) {
-      _logger.w('Cannot remove from favorites: No active child session');
-      return false;
-    }
+    if (!state.hasActiveSession) return false;
     
     try {
       final updated = await _childRepository.removeFromFavorites(state.childId!, activityId);
@@ -325,7 +296,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error removing from favorites: $e');
       return false;
     }
@@ -333,10 +304,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
 
   /// Update child interests
   Future<bool> updateInterests(List<String> newInterests) async {
-    if (!state.hasActiveSession || state.childProfile == null) {
-      _logger.w('Cannot update interests: No active child session');
-      return false;
-    }
+    if (!state.hasActiveSession) return false;
     
     try {
       final updated = await _childRepository.updateInterests(state.childId!, newInterests);
@@ -348,7 +316,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error updating interests: $e');
       return false;
     }
@@ -358,10 +326,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
 
   /// Update child mood
   Future<bool> updateMood(String mood) async {
-    if (!state.hasActiveSession || state.childProfile == null) {
-      _logger.w('Cannot update mood: No active child session');
-      return false;
-    }
+    if (!state.hasActiveSession) return false;
     
     try {
       final updated = await _childRepository.updateMood(state.childId!, mood);
@@ -373,7 +338,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error updating mood: $e');
       return false;
     }
@@ -381,10 +346,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
 
   /// Update learning style
   Future<bool> updateLearningStyle(String learningStyle) async {
-    if (!state.hasActiveSession || state.childProfile == null) {
-      _logger.w('Cannot update learning style: No active child session');
-      return false;
-    }
+    if (!state.hasActiveSession) return false;
     
     try {
       final updated = await _childRepository.updateLearningStyle(state.childId!, learningStyle);
@@ -396,7 +358,7 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
       }
       
       return false;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error updating learning style: $e');
       return false;
     }
@@ -406,13 +368,11 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
 
   /// Get child statistics
   Future<Map<String, dynamic>> getChildStats() async {
-    if (!state.hasActiveSession) {
-      return {};
-    }
+    if (!state.hasActiveSession) return {};
     
     try {
       return await _childRepository.getChildStats(state.childId!);
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error getting child stats: $e');
       return {};
     }
@@ -424,44 +384,11 @@ class ChildSessionController extends StateNotifier<ChildSessionState> {
   void clearError() {
     state = state.copyWith(error: null);
   }
-
-  // ==================== MOCK DATA HELPERS ====================
-
-  /// Get mock child profile for development
-  ChildProfile getMockChildProfile() {
-    return ChildProfile(
-      id: 'child1',
-      name: 'Ahmed',
-      age: 8,
-      avatar: 'assets/images/avatars/boy1.png',
-      interests: ['math', 'science'],
-      level: 3,
-      xp: 2500,
-      streak: 5,
-      favorites: ['activity1', 'activity2'],
-      parentId: 'parent1',
-      picturePassword: ['apple', 'ball', 'cat'],
-      createdAt: DateTime(2024, 1, 1),
-      updatedAt: DateTime(2024, 1, 1),
-      totalTimeSpent: 0,
-      activitiesCompleted: 0,
-      currentMood: 'happy',
-    );
-  }
 }
 
-// Provider
-final childSessionControllerProvider = StateNotifierProvider<ChildSessionController, ChildSessionState>((ref) {
-  final childRepository = ref.watch(childRepositoryProvider);
-  final logger = ref.watch(loggerProvider);
-  
-  return ChildSessionController(
-    childRepository: childRepository,
-    logger: logger,
-  );
-});
+// ==================== PROVIDERS ====================
 
-// Repository provider
+/// Main child repository provider
 final childRepositoryProvider = Provider<ChildRepository>((ref) {
   final childBox = Hive.box('child_profiles');
   final logger = ref.watch(loggerProvider);
@@ -472,15 +399,46 @@ final childRepositoryProvider = Provider<ChildRepository>((ref) {
   );
 });
 
-// Helper providers
+/// Main child session controller provider - SINGLE SOURCE OF TRUTH
+final childSessionControllerProvider = 
+    StateNotifierProvider<ChildSessionController, ChildSessionState>((ref) {
+  final childRepository = ref.watch(childRepositoryProvider);
+  final logger = ref.watch(loggerProvider);
+  
+  return ChildSessionController(
+    childRepository: childRepository,
+    logger: logger,
+  );
+});
+
+// ==================== HELPER PROVIDERS ====================
+
+/// Check if there's an active child session
 final hasChildSessionProvider = Provider<bool>((ref) {
   return ref.watch(childSessionControllerProvider).hasActiveSession;
 });
 
+/// Get current child profile
 final currentChildProvider = Provider<ChildProfile?>((ref) {
   return ref.watch(childSessionControllerProvider).childProfile;
 });
 
+/// Get current child ID
+final currentChildIdProvider = Provider<String?>((ref) {
+  return ref.watch(childSessionControllerProvider).childId;
+});
+
+/// Get child loading state
+final childLoadingProvider = Provider<bool>((ref) {
+  return ref.watch(childSessionControllerProvider).isLoading;
+});
+
+/// Get child error
+final childErrorProvider = Provider<String?>((ref) {
+  return ref.watch(childSessionControllerProvider).error;
+});
+
+/// Get child statistics (async)
 final childStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   final controller = ref.watch(childSessionControllerProvider.notifier);
   return await controller.getChildStats();

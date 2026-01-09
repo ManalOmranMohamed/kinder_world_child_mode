@@ -75,7 +75,7 @@ class ContentController extends StateNotifier<ContentState> {
       );
       
       _logger.d('Loaded ${activities.length} activities');
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading activities: $e');
       state = state.copyWith(
         isLoading: false,
@@ -90,7 +90,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getActivitiesByCategory(category);
       _logger.d('Loaded ${activities.length} activities for category: $category');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading activities by category: $category, $e');
       return [];
     }
@@ -102,7 +102,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getActivitiesByType(type);
       _logger.d('Loaded ${activities.length} activities for type: $type');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading activities by type: $type, $e');
       return [];
     }
@@ -114,7 +114,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getActivitiesByAspect(aspect);
       _logger.d('Loaded ${activities.length} activities for aspect: $aspect');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading activities by aspect: $aspect, $e');
       return [];
     }
@@ -127,7 +127,7 @@ class ContentController extends StateNotifier<ContentState> {
       
       state = state.copyWith(popularActivities: activities);
       _logger.d('Loaded ${activities.length} popular activities');
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading popular activities: $e');
     }
   }
@@ -138,7 +138,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getRecentlyAddedActivities(limit: 10);
       _logger.d('Loaded ${activities.length} recently added activities');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading recently added activities: $e');
       return [];
     }
@@ -153,7 +153,7 @@ class ContentController extends StateNotifier<ContentState> {
       
       state = state.copyWith(recommendedActivities: activities);
       _logger.d('Loaded ${activities.length} recommended activities for ${child.name}');
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading recommended activities: $e');
     }
   }
@@ -164,7 +164,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getActivitiesForChild(child);
       _logger.d('Loaded ${activities.length} activities for child: ${child.name}');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error loading activities for child: ${child.name}, $e');
       return [];
     }
@@ -178,7 +178,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.searchActivities(query);
       _logger.d('Found ${activities.length} activities for query: $query');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error searching activities: $query, $e');
       return [];
     }
@@ -190,7 +190,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getActivitiesByDifficulty(difficulty);
       _logger.d('Filtered ${activities.length} activities by difficulty: $difficulty');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error filtering by difficulty: $difficulty, $e');
       return [];
     }
@@ -211,7 +211,7 @@ class ContentController extends StateNotifier<ContentState> {
       
       _logger.d('Filtered ${activities.length} activities for age range: $minAge-$maxAge');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error filtering by age range: $minAge-$maxAge, $e');
       return [];
     }
@@ -225,7 +225,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activities = await _contentRepository.getOfflineActivities();
       _logger.d('Found ${activities.length} offline activities');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error getting offline activities: $e');
       return [];
     }
@@ -237,7 +237,7 @@ class ContentController extends StateNotifier<ContentState> {
       final success = await _contentRepository.downloadForOffline(activityId);
       _logger.d('Download activity for offline: $activityId - $success');
       return success;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error downloading for offline: $activityId, $e');
       return false;
     }
@@ -251,7 +251,7 @@ class ContentController extends StateNotifier<ContentState> {
       final activity = await _contentRepository.getActivity(activityId);
       _logger.d('Retrieved activity: $activityId');
       return activity;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error getting activity: $activityId, $e');
       return null;
     }
@@ -275,7 +275,7 @@ class ContentController extends StateNotifier<ContentState> {
       }
       
       return success;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error incrementing play count: $activityId, $e');
       return false;
     }
@@ -292,7 +292,7 @@ class ContentController extends StateNotifier<ContentState> {
       
       _logger.d('Found ${activities.length} activities matching interests: $interests');
       return activities;
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error getting activities by interests: $interests, $e');
       return [];
     }
@@ -330,7 +330,7 @@ class ContentController extends StateNotifier<ContentState> {
       });
       
       return filtered.take(5).toList();
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error getting daily recommendations: $e');
       return [];
     }
@@ -342,7 +342,7 @@ class ContentController extends StateNotifier<ContentState> {
       // Get child's recent activities (would need progress data)
       // For now, return popular activities
       return state.popularActivities.take(3).toList();
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error getting continue learning activities: $e');
       return [];
     }
@@ -393,7 +393,7 @@ class ContentController extends StateNotifier<ContentState> {
   Future<bool> syncWithServer() async {
     try {
       return await _contentRepository.syncWithServer();
-    } catch (e, stack) {
+    } catch (e, _) {
       _logger.e('Error syncing content: $e');
       return false;
     }

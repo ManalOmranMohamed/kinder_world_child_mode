@@ -20,56 +20,38 @@ SubscriptionStatus _$SubscriptionStatusFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SubscriptionStatus {
-  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
-  @HiveField(1)
   String get userId => throw _privateConstructorUsedError;
-  @HiveField(2)
   @JsonKey(name: 'plan_type')
   String get planType => throw _privateConstructorUsedError;
-  @HiveField(3)
   @JsonKey(name: 'status')
   String get status => throw _privateConstructorUsedError;
-  @HiveField(4)
   @JsonKey(name: 'trial_start_date')
   DateTime? get trialStartDate => throw _privateConstructorUsedError;
-  @HiveField(5)
   @JsonKey(name: 'trial_end_date')
   DateTime? get trialEndDate => throw _privateConstructorUsedError;
-  @HiveField(6)
   @JsonKey(name: 'subscription_start_date')
   DateTime? get subscriptionStartDate => throw _privateConstructorUsedError;
-  @HiveField(7)
   @JsonKey(name: 'subscription_end_date')
   DateTime? get subscriptionEndDate => throw _privateConstructorUsedError;
-  @HiveField(8)
   @JsonKey(name: 'auto_renew')
   bool get autoRenew => throw _privateConstructorUsedError;
-  @HiveField(9)
   @JsonKey(name: 'payment_method')
   String? get paymentMethod => throw _privateConstructorUsedError;
-  @HiveField(10)
   @JsonKey(name: 'last_payment_date')
   DateTime? get lastPaymentDate => throw _privateConstructorUsedError;
-  @HiveField(11)
   @JsonKey(name: 'next_payment_date')
   DateTime? get nextPaymentDate => throw _privateConstructorUsedError;
-  @HiveField(12)
   @JsonKey(name: 'payment_amount')
   double? get paymentAmount => throw _privateConstructorUsedError;
-  @HiveField(13)
   @JsonKey(name: 'currency')
   String? get currency => throw _privateConstructorUsedError;
-  @HiveField(14)
   @JsonKey(name: 'child_profiles_limit')
   int get childProfilesLimit => throw _privateConstructorUsedError;
-  @HiveField(15)
   @JsonKey(name: 'features')
   List<String> get features => throw _privateConstructorUsedError;
-  @HiveField(16)
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @HiveField(17)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -90,34 +72,24 @@ abstract class $SubscriptionStatusCopyWith<$Res> {
       _$SubscriptionStatusCopyWithImpl<$Res, SubscriptionStatus>;
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String userId,
-      @HiveField(2) @JsonKey(name: 'plan_type') String planType,
-      @HiveField(3) @JsonKey(name: 'status') String status,
-      @HiveField(4) @JsonKey(name: 'trial_start_date') DateTime? trialStartDate,
-      @HiveField(5) @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
-      @HiveField(6)
-      @JsonKey(name: 'subscription_start_date')
-      DateTime? subscriptionStartDate,
-      @HiveField(7)
-      @JsonKey(name: 'subscription_end_date')
-      DateTime? subscriptionEndDate,
-      @HiveField(8) @JsonKey(name: 'auto_renew') bool autoRenew,
-      @HiveField(9) @JsonKey(name: 'payment_method') String? paymentMethod,
-      @HiveField(10)
-      @JsonKey(name: 'last_payment_date')
-      DateTime? lastPaymentDate,
-      @HiveField(11)
-      @JsonKey(name: 'next_payment_date')
-      DateTime? nextPaymentDate,
-      @HiveField(12) @JsonKey(name: 'payment_amount') double? paymentAmount,
-      @HiveField(13) @JsonKey(name: 'currency') String? currency,
-      @HiveField(14)
-      @JsonKey(name: 'child_profiles_limit')
-      int childProfilesLimit,
-      @HiveField(15) @JsonKey(name: 'features') List<String> features,
-      @HiveField(16) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(17) @JsonKey(name: 'updated_at') DateTime updatedAt});
+      {String id,
+      String userId,
+      @JsonKey(name: 'plan_type') String planType,
+      @JsonKey(name: 'status') String status,
+      @JsonKey(name: 'trial_start_date') DateTime? trialStartDate,
+      @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
+      @JsonKey(name: 'subscription_start_date') DateTime? subscriptionStartDate,
+      @JsonKey(name: 'subscription_end_date') DateTime? subscriptionEndDate,
+      @JsonKey(name: 'auto_renew') bool autoRenew,
+      @JsonKey(name: 'payment_method') String? paymentMethod,
+      @JsonKey(name: 'last_payment_date') DateTime? lastPaymentDate,
+      @JsonKey(name: 'next_payment_date') DateTime? nextPaymentDate,
+      @JsonKey(name: 'payment_amount') double? paymentAmount,
+      @JsonKey(name: 'currency') String? currency,
+      @JsonKey(name: 'child_profiles_limit') int childProfilesLimit,
+      @JsonKey(name: 'features') List<String> features,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
 }
 
 /// @nodoc
@@ -240,34 +212,24 @@ abstract class _$$SubscriptionStatusImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String userId,
-      @HiveField(2) @JsonKey(name: 'plan_type') String planType,
-      @HiveField(3) @JsonKey(name: 'status') String status,
-      @HiveField(4) @JsonKey(name: 'trial_start_date') DateTime? trialStartDate,
-      @HiveField(5) @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
-      @HiveField(6)
-      @JsonKey(name: 'subscription_start_date')
-      DateTime? subscriptionStartDate,
-      @HiveField(7)
-      @JsonKey(name: 'subscription_end_date')
-      DateTime? subscriptionEndDate,
-      @HiveField(8) @JsonKey(name: 'auto_renew') bool autoRenew,
-      @HiveField(9) @JsonKey(name: 'payment_method') String? paymentMethod,
-      @HiveField(10)
-      @JsonKey(name: 'last_payment_date')
-      DateTime? lastPaymentDate,
-      @HiveField(11)
-      @JsonKey(name: 'next_payment_date')
-      DateTime? nextPaymentDate,
-      @HiveField(12) @JsonKey(name: 'payment_amount') double? paymentAmount,
-      @HiveField(13) @JsonKey(name: 'currency') String? currency,
-      @HiveField(14)
-      @JsonKey(name: 'child_profiles_limit')
-      int childProfilesLimit,
-      @HiveField(15) @JsonKey(name: 'features') List<String> features,
-      @HiveField(16) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(17) @JsonKey(name: 'updated_at') DateTime updatedAt});
+      {String id,
+      String userId,
+      @JsonKey(name: 'plan_type') String planType,
+      @JsonKey(name: 'status') String status,
+      @JsonKey(name: 'trial_start_date') DateTime? trialStartDate,
+      @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
+      @JsonKey(name: 'subscription_start_date') DateTime? subscriptionStartDate,
+      @JsonKey(name: 'subscription_end_date') DateTime? subscriptionEndDate,
+      @JsonKey(name: 'auto_renew') bool autoRenew,
+      @JsonKey(name: 'payment_method') String? paymentMethod,
+      @JsonKey(name: 'last_payment_date') DateTime? lastPaymentDate,
+      @JsonKey(name: 'next_payment_date') DateTime? nextPaymentDate,
+      @JsonKey(name: 'payment_amount') double? paymentAmount,
+      @JsonKey(name: 'currency') String? currency,
+      @JsonKey(name: 'child_profiles_limit') int childProfilesLimit,
+      @JsonKey(name: 'features') List<String> features,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
 }
 
 /// @nodoc
@@ -381,35 +343,26 @@ class __$$SubscriptionStatusImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 9)
 class _$SubscriptionStatusImpl extends _SubscriptionStatus {
   const _$SubscriptionStatusImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.userId,
-      @HiveField(2) @JsonKey(name: 'plan_type') required this.planType,
-      @HiveField(3) @JsonKey(name: 'status') required this.status,
-      @HiveField(4) @JsonKey(name: 'trial_start_date') this.trialStartDate,
-      @HiveField(5) @JsonKey(name: 'trial_end_date') this.trialEndDate,
-      @HiveField(6)
-      @JsonKey(name: 'subscription_start_date')
-      this.subscriptionStartDate,
-      @HiveField(7)
-      @JsonKey(name: 'subscription_end_date')
-      this.subscriptionEndDate,
-      @HiveField(8) @JsonKey(name: 'auto_renew') required this.autoRenew,
-      @HiveField(9) @JsonKey(name: 'payment_method') this.paymentMethod,
-      @HiveField(10) @JsonKey(name: 'last_payment_date') this.lastPaymentDate,
-      @HiveField(11) @JsonKey(name: 'next_payment_date') this.nextPaymentDate,
-      @HiveField(12) @JsonKey(name: 'payment_amount') this.paymentAmount,
-      @HiveField(13) @JsonKey(name: 'currency') this.currency,
-      @HiveField(14)
-      @JsonKey(name: 'child_profiles_limit')
-      required this.childProfilesLimit,
-      @HiveField(15)
-      @JsonKey(name: 'features')
-      required final List<String> features,
-      @HiveField(16) @JsonKey(name: 'created_at') required this.createdAt,
-      @HiveField(17) @JsonKey(name: 'updated_at') required this.updatedAt})
+      {required this.id,
+      required this.userId,
+      @JsonKey(name: 'plan_type') required this.planType,
+      @JsonKey(name: 'status') required this.status,
+      @JsonKey(name: 'trial_start_date') this.trialStartDate,
+      @JsonKey(name: 'trial_end_date') this.trialEndDate,
+      @JsonKey(name: 'subscription_start_date') this.subscriptionStartDate,
+      @JsonKey(name: 'subscription_end_date') this.subscriptionEndDate,
+      @JsonKey(name: 'auto_renew') required this.autoRenew,
+      @JsonKey(name: 'payment_method') this.paymentMethod,
+      @JsonKey(name: 'last_payment_date') this.lastPaymentDate,
+      @JsonKey(name: 'next_payment_date') this.nextPaymentDate,
+      @JsonKey(name: 'payment_amount') this.paymentAmount,
+      @JsonKey(name: 'currency') this.currency,
+      @JsonKey(name: 'child_profiles_limit') required this.childProfilesLimit,
+      @JsonKey(name: 'features') required final List<String> features,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt})
       : _features = features,
         super._();
 
@@ -417,66 +370,50 @@ class _$SubscriptionStatusImpl extends _SubscriptionStatus {
       _$$SubscriptionStatusImplFromJson(json);
 
   @override
-  @HiveField(0)
   final String id;
   @override
-  @HiveField(1)
   final String userId;
   @override
-  @HiveField(2)
   @JsonKey(name: 'plan_type')
   final String planType;
   @override
-  @HiveField(3)
   @JsonKey(name: 'status')
   final String status;
   @override
-  @HiveField(4)
   @JsonKey(name: 'trial_start_date')
   final DateTime? trialStartDate;
   @override
-  @HiveField(5)
   @JsonKey(name: 'trial_end_date')
   final DateTime? trialEndDate;
   @override
-  @HiveField(6)
   @JsonKey(name: 'subscription_start_date')
   final DateTime? subscriptionStartDate;
   @override
-  @HiveField(7)
   @JsonKey(name: 'subscription_end_date')
   final DateTime? subscriptionEndDate;
   @override
-  @HiveField(8)
   @JsonKey(name: 'auto_renew')
   final bool autoRenew;
   @override
-  @HiveField(9)
   @JsonKey(name: 'payment_method')
   final String? paymentMethod;
   @override
-  @HiveField(10)
   @JsonKey(name: 'last_payment_date')
   final DateTime? lastPaymentDate;
   @override
-  @HiveField(11)
   @JsonKey(name: 'next_payment_date')
   final DateTime? nextPaymentDate;
   @override
-  @HiveField(12)
   @JsonKey(name: 'payment_amount')
   final double? paymentAmount;
   @override
-  @HiveField(13)
   @JsonKey(name: 'currency')
   final String? currency;
   @override
-  @HiveField(14)
   @JsonKey(name: 'child_profiles_limit')
   final int childProfilesLimit;
   final List<String> _features;
   @override
-  @HiveField(15)
   @JsonKey(name: 'features')
   List<String> get features {
     if (_features is EqualUnmodifiableListView) return _features;
@@ -485,11 +422,9 @@ class _$SubscriptionStatusImpl extends _SubscriptionStatus {
   }
 
   @override
-  @HiveField(16)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
-  @HiveField(17)
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
 
@@ -579,121 +514,83 @@ class _$SubscriptionStatusImpl extends _SubscriptionStatus {
 
 abstract class _SubscriptionStatus extends SubscriptionStatus {
   const factory _SubscriptionStatus(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final String userId,
-      @HiveField(2) @JsonKey(name: 'plan_type') required final String planType,
-      @HiveField(3) @JsonKey(name: 'status') required final String status,
-      @HiveField(4)
-      @JsonKey(name: 'trial_start_date')
-      final DateTime? trialStartDate,
-      @HiveField(5)
-      @JsonKey(name: 'trial_end_date')
-      final DateTime? trialEndDate,
-      @HiveField(6)
-      @JsonKey(name: 'subscription_start_date')
-      final DateTime? subscriptionStartDate,
-      @HiveField(7)
-      @JsonKey(name: 'subscription_end_date')
-      final DateTime? subscriptionEndDate,
-      @HiveField(8) @JsonKey(name: 'auto_renew') required final bool autoRenew,
-      @HiveField(9)
-      @JsonKey(name: 'payment_method')
-      final String? paymentMethod,
-      @HiveField(10)
-      @JsonKey(name: 'last_payment_date')
-      final DateTime? lastPaymentDate,
-      @HiveField(11)
-      @JsonKey(name: 'next_payment_date')
-      final DateTime? nextPaymentDate,
-      @HiveField(12)
-      @JsonKey(name: 'payment_amount')
-      final double? paymentAmount,
-      @HiveField(13) @JsonKey(name: 'currency') final String? currency,
-      @HiveField(14)
-      @JsonKey(name: 'child_profiles_limit')
-      required final int childProfilesLimit,
-      @HiveField(15)
-      @JsonKey(name: 'features')
-      required final List<String> features,
-      @HiveField(16)
-      @JsonKey(name: 'created_at')
-      required final DateTime createdAt,
-      @HiveField(17)
-      @JsonKey(name: 'updated_at')
-      required final DateTime updatedAt}) = _$SubscriptionStatusImpl;
+          {required final String id,
+          required final String userId,
+          @JsonKey(name: 'plan_type') required final String planType,
+          @JsonKey(name: 'status') required final String status,
+          @JsonKey(name: 'trial_start_date') final DateTime? trialStartDate,
+          @JsonKey(name: 'trial_end_date') final DateTime? trialEndDate,
+          @JsonKey(name: 'subscription_start_date')
+          final DateTime? subscriptionStartDate,
+          @JsonKey(name: 'subscription_end_date')
+          final DateTime? subscriptionEndDate,
+          @JsonKey(name: 'auto_renew') required final bool autoRenew,
+          @JsonKey(name: 'payment_method') final String? paymentMethod,
+          @JsonKey(name: 'last_payment_date') final DateTime? lastPaymentDate,
+          @JsonKey(name: 'next_payment_date') final DateTime? nextPaymentDate,
+          @JsonKey(name: 'payment_amount') final double? paymentAmount,
+          @JsonKey(name: 'currency') final String? currency,
+          @JsonKey(name: 'child_profiles_limit')
+          required final int childProfilesLimit,
+          @JsonKey(name: 'features') required final List<String> features,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
+      _$SubscriptionStatusImpl;
   const _SubscriptionStatus._() : super._();
 
   factory _SubscriptionStatus.fromJson(Map<String, dynamic> json) =
       _$SubscriptionStatusImpl.fromJson;
 
   @override
-  @HiveField(0)
   String get id;
   @override
-  @HiveField(1)
   String get userId;
   @override
-  @HiveField(2)
   @JsonKey(name: 'plan_type')
   String get planType;
   @override
-  @HiveField(3)
   @JsonKey(name: 'status')
   String get status;
   @override
-  @HiveField(4)
   @JsonKey(name: 'trial_start_date')
   DateTime? get trialStartDate;
   @override
-  @HiveField(5)
   @JsonKey(name: 'trial_end_date')
   DateTime? get trialEndDate;
   @override
-  @HiveField(6)
   @JsonKey(name: 'subscription_start_date')
   DateTime? get subscriptionStartDate;
   @override
-  @HiveField(7)
   @JsonKey(name: 'subscription_end_date')
   DateTime? get subscriptionEndDate;
   @override
-  @HiveField(8)
   @JsonKey(name: 'auto_renew')
   bool get autoRenew;
   @override
-  @HiveField(9)
   @JsonKey(name: 'payment_method')
   String? get paymentMethod;
   @override
-  @HiveField(10)
   @JsonKey(name: 'last_payment_date')
   DateTime? get lastPaymentDate;
   @override
-  @HiveField(11)
   @JsonKey(name: 'next_payment_date')
   DateTime? get nextPaymentDate;
   @override
-  @HiveField(12)
   @JsonKey(name: 'payment_amount')
   double? get paymentAmount;
   @override
-  @HiveField(13)
   @JsonKey(name: 'currency')
   String? get currency;
   @override
-  @HiveField(14)
   @JsonKey(name: 'child_profiles_limit')
   int get childProfilesLimit;
   @override
-  @HiveField(15)
   @JsonKey(name: 'features')
   List<String> get features;
   @override
-  @HiveField(16)
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
-  @HiveField(17)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
 

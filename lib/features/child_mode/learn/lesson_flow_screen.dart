@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
-import 'package:kinder_world/core/providers/child_session_provider.dart';
+import 'package:kinder_world/core/providers/child_session_controller.dart';
 
 class LessonFlowScreen extends ConsumerStatefulWidget {
   final String lessonId;
@@ -73,7 +73,7 @@ class _LessonFlowScreenState extends ConsumerState<LessonFlowScreen>
         activitiesCompleted: childProfile.activitiesCompleted + 1,
       );
       
-      await ref.read(childSessionProvider.notifier).updateChildProfile(updatedProfile);
+      await ref.read(childSessionControllerProvider.notifier).updateChildProfile(updatedProfile);
     }
     
     if (mounted) {

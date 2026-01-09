@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
-import 'package:lottie/lottie.dart';
 
 class MaintenanceScreen extends ConsumerStatefulWidget {
   const MaintenanceScreen({super.key});

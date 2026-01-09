@@ -20,54 +20,35 @@ ProgressRecord _$ProgressRecordFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ProgressRecord {
-  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
-  @HiveField(1)
   String get childId => throw _privateConstructorUsedError;
-  @HiveField(2)
   String get activityId => throw _privateConstructorUsedError;
-  @HiveField(3)
   DateTime get date => throw _privateConstructorUsedError;
-  @HiveField(4)
   int get score => throw _privateConstructorUsedError;
-  @HiveField(5)
   int get duration => throw _privateConstructorUsedError;
-  @HiveField(6)
   int get xpEarned => throw _privateConstructorUsedError;
-  @HiveField(7)
   String? get notes => throw _privateConstructorUsedError;
-  @HiveField(8)
   @JsonKey(name: 'completion_status')
   String get completionStatus => throw _privateConstructorUsedError;
-  @HiveField(9)
   @JsonKey(name: 'performance_metrics')
   Map<String, dynamic>? get performanceMetrics =>
       throw _privateConstructorUsedError;
-  @HiveField(10)
   @JsonKey(name: 'ai_feedback')
   String? get aiFeedback => throw _privateConstructorUsedError;
-  @HiveField(11)
   @JsonKey(name: 'mood_before')
   String? get moodBefore => throw _privateConstructorUsedError;
-  @HiveField(12)
   @JsonKey(name: 'mood_after')
   String? get moodAfter => throw _privateConstructorUsedError;
-  @HiveField(13)
   @JsonKey(name: 'difficulty_adjusted')
   bool? get difficultyAdjusted => throw _privateConstructorUsedError;
-  @HiveField(14)
   @JsonKey(name: 'help_requested')
   bool? get helpRequested => throw _privateConstructorUsedError;
-  @HiveField(15)
   @JsonKey(name: 'parent_approved')
   bool? get parentApproved => throw _privateConstructorUsedError;
-  @HiveField(16)
   @JsonKey(name: 'sync_status')
   String get syncStatus => throw _privateConstructorUsedError;
-  @HiveField(17)
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @HiveField(18)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -88,29 +69,26 @@ abstract class $ProgressRecordCopyWith<$Res> {
       _$ProgressRecordCopyWithImpl<$Res, ProgressRecord>;
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String childId,
-      @HiveField(2) String activityId,
-      @HiveField(3) DateTime date,
-      @HiveField(4) int score,
-      @HiveField(5) int duration,
-      @HiveField(6) int xpEarned,
-      @HiveField(7) String? notes,
-      @HiveField(8) @JsonKey(name: 'completion_status') String completionStatus,
-      @HiveField(9)
+      {String id,
+      String childId,
+      String activityId,
+      DateTime date,
+      int score,
+      int duration,
+      int xpEarned,
+      String? notes,
+      @JsonKey(name: 'completion_status') String completionStatus,
       @JsonKey(name: 'performance_metrics')
       Map<String, dynamic>? performanceMetrics,
-      @HiveField(10) @JsonKey(name: 'ai_feedback') String? aiFeedback,
-      @HiveField(11) @JsonKey(name: 'mood_before') String? moodBefore,
-      @HiveField(12) @JsonKey(name: 'mood_after') String? moodAfter,
-      @HiveField(13)
-      @JsonKey(name: 'difficulty_adjusted')
-      bool? difficultyAdjusted,
-      @HiveField(14) @JsonKey(name: 'help_requested') bool? helpRequested,
-      @HiveField(15) @JsonKey(name: 'parent_approved') bool? parentApproved,
-      @HiveField(16) @JsonKey(name: 'sync_status') String syncStatus,
-      @HiveField(17) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(18) @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'ai_feedback') String? aiFeedback,
+      @JsonKey(name: 'mood_before') String? moodBefore,
+      @JsonKey(name: 'mood_after') String? moodAfter,
+      @JsonKey(name: 'difficulty_adjusted') bool? difficultyAdjusted,
+      @JsonKey(name: 'help_requested') bool? helpRequested,
+      @JsonKey(name: 'parent_approved') bool? parentApproved,
+      @JsonKey(name: 'sync_status') String syncStatus,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
 }
 
 /// @nodoc
@@ -238,29 +216,26 @@ abstract class _$$ProgressRecordImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String childId,
-      @HiveField(2) String activityId,
-      @HiveField(3) DateTime date,
-      @HiveField(4) int score,
-      @HiveField(5) int duration,
-      @HiveField(6) int xpEarned,
-      @HiveField(7) String? notes,
-      @HiveField(8) @JsonKey(name: 'completion_status') String completionStatus,
-      @HiveField(9)
+      {String id,
+      String childId,
+      String activityId,
+      DateTime date,
+      int score,
+      int duration,
+      int xpEarned,
+      String? notes,
+      @JsonKey(name: 'completion_status') String completionStatus,
       @JsonKey(name: 'performance_metrics')
       Map<String, dynamic>? performanceMetrics,
-      @HiveField(10) @JsonKey(name: 'ai_feedback') String? aiFeedback,
-      @HiveField(11) @JsonKey(name: 'mood_before') String? moodBefore,
-      @HiveField(12) @JsonKey(name: 'mood_after') String? moodAfter,
-      @HiveField(13)
-      @JsonKey(name: 'difficulty_adjusted')
-      bool? difficultyAdjusted,
-      @HiveField(14) @JsonKey(name: 'help_requested') bool? helpRequested,
-      @HiveField(15) @JsonKey(name: 'parent_approved') bool? parentApproved,
-      @HiveField(16) @JsonKey(name: 'sync_status') String syncStatus,
-      @HiveField(17) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(18) @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'ai_feedback') String? aiFeedback,
+      @JsonKey(name: 'mood_before') String? moodBefore,
+      @JsonKey(name: 'mood_after') String? moodAfter,
+      @JsonKey(name: 'difficulty_adjusted') bool? difficultyAdjusted,
+      @JsonKey(name: 'help_requested') bool? helpRequested,
+      @JsonKey(name: 'parent_approved') bool? parentApproved,
+      @JsonKey(name: 'sync_status') String syncStatus,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
 }
 
 /// @nodoc
@@ -379,34 +354,28 @@ class __$$ProgressRecordImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 4)
 class _$ProgressRecordImpl extends _ProgressRecord {
   const _$ProgressRecordImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.childId,
-      @HiveField(2) required this.activityId,
-      @HiveField(3) required this.date,
-      @HiveField(4) required this.score,
-      @HiveField(5) required this.duration,
-      @HiveField(6) required this.xpEarned,
-      @HiveField(7) this.notes,
-      @HiveField(8)
-      @JsonKey(name: 'completion_status')
-      required this.completionStatus,
-      @HiveField(9)
+      {required this.id,
+      required this.childId,
+      required this.activityId,
+      required this.date,
+      required this.score,
+      required this.duration,
+      required this.xpEarned,
+      this.notes,
+      @JsonKey(name: 'completion_status') required this.completionStatus,
       @JsonKey(name: 'performance_metrics')
       final Map<String, dynamic>? performanceMetrics,
-      @HiveField(10) @JsonKey(name: 'ai_feedback') this.aiFeedback,
-      @HiveField(11) @JsonKey(name: 'mood_before') this.moodBefore,
-      @HiveField(12) @JsonKey(name: 'mood_after') this.moodAfter,
-      @HiveField(13)
-      @JsonKey(name: 'difficulty_adjusted')
-      this.difficultyAdjusted,
-      @HiveField(14) @JsonKey(name: 'help_requested') this.helpRequested,
-      @HiveField(15) @JsonKey(name: 'parent_approved') this.parentApproved,
-      @HiveField(16) @JsonKey(name: 'sync_status') required this.syncStatus,
-      @HiveField(17) @JsonKey(name: 'created_at') required this.createdAt,
-      @HiveField(18) @JsonKey(name: 'updated_at') required this.updatedAt})
+      @JsonKey(name: 'ai_feedback') this.aiFeedback,
+      @JsonKey(name: 'mood_before') this.moodBefore,
+      @JsonKey(name: 'mood_after') this.moodAfter,
+      @JsonKey(name: 'difficulty_adjusted') this.difficultyAdjusted,
+      @JsonKey(name: 'help_requested') this.helpRequested,
+      @JsonKey(name: 'parent_approved') this.parentApproved,
+      @JsonKey(name: 'sync_status') required this.syncStatus,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt})
       : _performanceMetrics = performanceMetrics,
         super._();
 
@@ -414,36 +383,26 @@ class _$ProgressRecordImpl extends _ProgressRecord {
       _$$ProgressRecordImplFromJson(json);
 
   @override
-  @HiveField(0)
   final String id;
   @override
-  @HiveField(1)
   final String childId;
   @override
-  @HiveField(2)
   final String activityId;
   @override
-  @HiveField(3)
   final DateTime date;
   @override
-  @HiveField(4)
   final int score;
   @override
-  @HiveField(5)
   final int duration;
   @override
-  @HiveField(6)
   final int xpEarned;
   @override
-  @HiveField(7)
   final String? notes;
   @override
-  @HiveField(8)
   @JsonKey(name: 'completion_status')
   final String completionStatus;
   final Map<String, dynamic>? _performanceMetrics;
   @override
-  @HiveField(9)
   @JsonKey(name: 'performance_metrics')
   Map<String, dynamic>? get performanceMetrics {
     final value = _performanceMetrics;
@@ -455,39 +414,30 @@ class _$ProgressRecordImpl extends _ProgressRecord {
   }
 
   @override
-  @HiveField(10)
   @JsonKey(name: 'ai_feedback')
   final String? aiFeedback;
   @override
-  @HiveField(11)
   @JsonKey(name: 'mood_before')
   final String? moodBefore;
   @override
-  @HiveField(12)
   @JsonKey(name: 'mood_after')
   final String? moodAfter;
   @override
-  @HiveField(13)
   @JsonKey(name: 'difficulty_adjusted')
   final bool? difficultyAdjusted;
   @override
-  @HiveField(14)
   @JsonKey(name: 'help_requested')
   final bool? helpRequested;
   @override
-  @HiveField(15)
   @JsonKey(name: 'parent_approved')
   final bool? parentApproved;
   @override
-  @HiveField(16)
   @JsonKey(name: 'sync_status')
   final String syncStatus;
   @override
-  @HiveField(17)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
-  @HiveField(18)
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
 
@@ -580,110 +530,80 @@ class _$ProgressRecordImpl extends _ProgressRecord {
 
 abstract class _ProgressRecord extends ProgressRecord {
   const factory _ProgressRecord(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final String childId,
-      @HiveField(2) required final String activityId,
-      @HiveField(3) required final DateTime date,
-      @HiveField(4) required final int score,
-      @HiveField(5) required final int duration,
-      @HiveField(6) required final int xpEarned,
-      @HiveField(7) final String? notes,
-      @HiveField(8)
-      @JsonKey(name: 'completion_status')
-      required final String completionStatus,
-      @HiveField(9)
-      @JsonKey(name: 'performance_metrics')
-      final Map<String, dynamic>? performanceMetrics,
-      @HiveField(10) @JsonKey(name: 'ai_feedback') final String? aiFeedback,
-      @HiveField(11) @JsonKey(name: 'mood_before') final String? moodBefore,
-      @HiveField(12) @JsonKey(name: 'mood_after') final String? moodAfter,
-      @HiveField(13)
-      @JsonKey(name: 'difficulty_adjusted')
-      final bool? difficultyAdjusted,
-      @HiveField(14) @JsonKey(name: 'help_requested') final bool? helpRequested,
-      @HiveField(15)
-      @JsonKey(name: 'parent_approved')
-      final bool? parentApproved,
-      @HiveField(16)
-      @JsonKey(name: 'sync_status')
-      required final String syncStatus,
-      @HiveField(17)
-      @JsonKey(name: 'created_at')
-      required final DateTime createdAt,
-      @HiveField(18)
-      @JsonKey(name: 'updated_at')
-      required final DateTime updatedAt}) = _$ProgressRecordImpl;
+          {required final String id,
+          required final String childId,
+          required final String activityId,
+          required final DateTime date,
+          required final int score,
+          required final int duration,
+          required final int xpEarned,
+          final String? notes,
+          @JsonKey(name: 'completion_status')
+          required final String completionStatus,
+          @JsonKey(name: 'performance_metrics')
+          final Map<String, dynamic>? performanceMetrics,
+          @JsonKey(name: 'ai_feedback') final String? aiFeedback,
+          @JsonKey(name: 'mood_before') final String? moodBefore,
+          @JsonKey(name: 'mood_after') final String? moodAfter,
+          @JsonKey(name: 'difficulty_adjusted') final bool? difficultyAdjusted,
+          @JsonKey(name: 'help_requested') final bool? helpRequested,
+          @JsonKey(name: 'parent_approved') final bool? parentApproved,
+          @JsonKey(name: 'sync_status') required final String syncStatus,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
+      _$ProgressRecordImpl;
   const _ProgressRecord._() : super._();
 
   factory _ProgressRecord.fromJson(Map<String, dynamic> json) =
       _$ProgressRecordImpl.fromJson;
 
   @override
-  @HiveField(0)
   String get id;
   @override
-  @HiveField(1)
   String get childId;
   @override
-  @HiveField(2)
   String get activityId;
   @override
-  @HiveField(3)
   DateTime get date;
   @override
-  @HiveField(4)
   int get score;
   @override
-  @HiveField(5)
   int get duration;
   @override
-  @HiveField(6)
   int get xpEarned;
   @override
-  @HiveField(7)
   String? get notes;
   @override
-  @HiveField(8)
   @JsonKey(name: 'completion_status')
   String get completionStatus;
   @override
-  @HiveField(9)
   @JsonKey(name: 'performance_metrics')
   Map<String, dynamic>? get performanceMetrics;
   @override
-  @HiveField(10)
   @JsonKey(name: 'ai_feedback')
   String? get aiFeedback;
   @override
-  @HiveField(11)
   @JsonKey(name: 'mood_before')
   String? get moodBefore;
   @override
-  @HiveField(12)
   @JsonKey(name: 'mood_after')
   String? get moodAfter;
   @override
-  @HiveField(13)
   @JsonKey(name: 'difficulty_adjusted')
   bool? get difficultyAdjusted;
   @override
-  @HiveField(14)
   @JsonKey(name: 'help_requested')
   bool? get helpRequested;
   @override
-  @HiveField(15)
   @JsonKey(name: 'parent_approved')
   bool? get parentApproved;
   @override
-  @HiveField(16)
   @JsonKey(name: 'sync_status')
   String get syncStatus;
   @override
-  @HiveField(17)
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
-  @HiveField(18)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
 

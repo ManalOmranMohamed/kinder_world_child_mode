@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'l10n/app_localizations_en.dart';
 import 'l10n/app_localizations_ar.dart';
 

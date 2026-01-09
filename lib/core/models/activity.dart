@@ -1,37 +1,39 @@
+// Workaround for analyzer: allow JsonKey on Freezed constructor params
+// (some analyzer versions report 'invalid_annotation_target')
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
 
 part 'activity.freezed.dart';
 part 'activity.g.dart';
 
 @freezed
 class Activity with _$Activity {
-  @HiveType(typeId: 3)
   const factory Activity({
-    @HiveField(0) required String id,
-    @HiveField(1) required String title,
-    @HiveField(2) required String description,
-    @HiveField(3) required String category,
-    @HiveField(4) required String type,
-    @HiveField(5) required String aspect,
-    @HiveField(6) required List<String> ageRange,
-    @HiveField(7) required String difficulty,
-    @HiveField(8) required int duration,
-    @HiveField(9) required int xpReward,
-    @HiveField(10) required String thumbnailUrl,
-    @HiveField(11) String? contentUrl,
-    @HiveField(12) required List<String> tags,
-    @HiveField(13) required List<String> learningObjectives,
-    @HiveField(14) String? instructions,
-    @HiveField(15) List<String>? materialsNeeded,
-    @HiveField(16) @JsonKey(name: 'is_offline_available') required bool isOfflineAvailable,
-    @HiveField(17) @JsonKey(name: 'is_premium') required bool isPremium,
-    @HiveField(18) @JsonKey(name: 'parent_approval_required') required bool parentApprovalRequired,
-    @HiveField(19) @JsonKey(name: 'created_at') required DateTime createdAt,
-    @HiveField(20) @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    @HiveField(21) @JsonKey(name: 'completion_rate') double? completionRate,
-    @HiveField(22) @JsonKey(name: 'average_rating') double? averageRating,
-    @HiveField(23) @JsonKey(name: 'play_count') required int playCount,
+    required String id,
+    required String title,
+    required String description,
+    required String category,
+    required String type,
+    required String aspect,
+    required List<String> ageRange,
+    required String difficulty,
+    required int duration,
+    required int xpReward,
+    required String thumbnailUrl,
+    String? contentUrl,
+    required List<String> tags,
+    required List<String> learningObjectives,
+    String? instructions,
+    List<String>? materialsNeeded,
+    @JsonKey(name: 'is_offline_available') required bool isOfflineAvailable,
+    @JsonKey(name: 'is_premium') required bool isPremium,
+    @JsonKey(name: 'parent_approval_required') required bool parentApprovalRequired,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'completion_rate') double? completionRate,
+    @JsonKey(name: 'average_rating') double? averageRating,
+    @JsonKey(name: 'play_count') required int playCount,
   }) = _Activity;
 
   const Activity._();

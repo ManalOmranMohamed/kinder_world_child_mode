@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:kinder_world/core/constants/app_constants.dart';
-import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/storage/secure_storage.dart';
-import 'package:kinder_world/core/theme/app_theme.dart';
+
 import 'package:kinder_world/app.dart';
 import 'package:logger/logger.dart';
 

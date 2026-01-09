@@ -20,45 +20,29 @@ NotificationItem _$NotificationItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$NotificationItem {
-  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
-  @HiveField(1)
   String get type => throw _privateConstructorUsedError;
-  @HiveField(2)
   String get title => throw _privateConstructorUsedError;
-  @HiveField(3)
   String get body => throw _privateConstructorUsedError;
-  @HiveField(4)
   String get recipientId => throw _privateConstructorUsedError;
-  @HiveField(5)
   String get recipientRole => throw _privateConstructorUsedError;
-  @HiveField(6)
   @JsonKey(name: 'related_child_id')
   String? get relatedChildId => throw _privateConstructorUsedError;
-  @HiveField(7)
   @JsonKey(name: 'related_activity_id')
   String? get relatedActivityId => throw _privateConstructorUsedError;
-  @HiveField(8)
   @JsonKey(name: 'is_read')
   bool get isRead => throw _privateConstructorUsedError;
-  @HiveField(9)
   @JsonKey(name: 'is_sent')
   bool get isSent => throw _privateConstructorUsedError;
-  @HiveField(10)
   @JsonKey(name: 'sent_at')
   DateTime? get sentAt => throw _privateConstructorUsedError;
-  @HiveField(11)
   @JsonKey(name: 'read_at')
   DateTime? get readAt => throw _privateConstructorUsedError;
-  @HiveField(12)
   @JsonKey(name: 'priority')
   String get priority => throw _privateConstructorUsedError;
-  @HiveField(13)
   Map<String, dynamic>? get data => throw _privateConstructorUsedError;
-  @HiveField(14)
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @HiveField(15)
   @JsonKey(name: 'expires_at')
   DateTime? get expiresAt => throw _privateConstructorUsedError;
 
@@ -79,24 +63,22 @@ abstract class $NotificationItemCopyWith<$Res> {
       _$NotificationItemCopyWithImpl<$Res, NotificationItem>;
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String type,
-      @HiveField(2) String title,
-      @HiveField(3) String body,
-      @HiveField(4) String recipientId,
-      @HiveField(5) String recipientRole,
-      @HiveField(6) @JsonKey(name: 'related_child_id') String? relatedChildId,
-      @HiveField(7)
-      @JsonKey(name: 'related_activity_id')
-      String? relatedActivityId,
-      @HiveField(8) @JsonKey(name: 'is_read') bool isRead,
-      @HiveField(9) @JsonKey(name: 'is_sent') bool isSent,
-      @HiveField(10) @JsonKey(name: 'sent_at') DateTime? sentAt,
-      @HiveField(11) @JsonKey(name: 'read_at') DateTime? readAt,
-      @HiveField(12) @JsonKey(name: 'priority') String priority,
-      @HiveField(13) Map<String, dynamic>? data,
-      @HiveField(14) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(15) @JsonKey(name: 'expires_at') DateTime? expiresAt});
+      {String id,
+      String type,
+      String title,
+      String body,
+      String recipientId,
+      String recipientRole,
+      @JsonKey(name: 'related_child_id') String? relatedChildId,
+      @JsonKey(name: 'related_activity_id') String? relatedActivityId,
+      @JsonKey(name: 'is_read') bool isRead,
+      @JsonKey(name: 'is_sent') bool isSent,
+      @JsonKey(name: 'sent_at') DateTime? sentAt,
+      @JsonKey(name: 'read_at') DateTime? readAt,
+      @JsonKey(name: 'priority') String priority,
+      Map<String, dynamic>? data,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'expires_at') DateTime? expiresAt});
 }
 
 /// @nodoc
@@ -209,24 +191,22 @@ abstract class _$$NotificationItemImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String type,
-      @HiveField(2) String title,
-      @HiveField(3) String body,
-      @HiveField(4) String recipientId,
-      @HiveField(5) String recipientRole,
-      @HiveField(6) @JsonKey(name: 'related_child_id') String? relatedChildId,
-      @HiveField(7)
-      @JsonKey(name: 'related_activity_id')
-      String? relatedActivityId,
-      @HiveField(8) @JsonKey(name: 'is_read') bool isRead,
-      @HiveField(9) @JsonKey(name: 'is_sent') bool isSent,
-      @HiveField(10) @JsonKey(name: 'sent_at') DateTime? sentAt,
-      @HiveField(11) @JsonKey(name: 'read_at') DateTime? readAt,
-      @HiveField(12) @JsonKey(name: 'priority') String priority,
-      @HiveField(13) Map<String, dynamic>? data,
-      @HiveField(14) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(15) @JsonKey(name: 'expires_at') DateTime? expiresAt});
+      {String id,
+      String type,
+      String title,
+      String body,
+      String recipientId,
+      String recipientRole,
+      @JsonKey(name: 'related_child_id') String? relatedChildId,
+      @JsonKey(name: 'related_activity_id') String? relatedActivityId,
+      @JsonKey(name: 'is_read') bool isRead,
+      @JsonKey(name: 'is_sent') bool isSent,
+      @JsonKey(name: 'sent_at') DateTime? sentAt,
+      @JsonKey(name: 'read_at') DateTime? readAt,
+      @JsonKey(name: 'priority') String priority,
+      Map<String, dynamic>? data,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'expires_at') DateTime? expiresAt});
 }
 
 /// @nodoc
@@ -330,27 +310,24 @@ class __$$NotificationItemImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 8)
 class _$NotificationItemImpl extends _NotificationItem {
   const _$NotificationItemImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.type,
-      @HiveField(2) required this.title,
-      @HiveField(3) required this.body,
-      @HiveField(4) required this.recipientId,
-      @HiveField(5) required this.recipientRole,
-      @HiveField(6) @JsonKey(name: 'related_child_id') this.relatedChildId,
-      @HiveField(7)
-      @JsonKey(name: 'related_activity_id')
-      this.relatedActivityId,
-      @HiveField(8) @JsonKey(name: 'is_read') required this.isRead,
-      @HiveField(9) @JsonKey(name: 'is_sent') required this.isSent,
-      @HiveField(10) @JsonKey(name: 'sent_at') this.sentAt,
-      @HiveField(11) @JsonKey(name: 'read_at') this.readAt,
-      @HiveField(12) @JsonKey(name: 'priority') required this.priority,
-      @HiveField(13) final Map<String, dynamic>? data,
-      @HiveField(14) @JsonKey(name: 'created_at') required this.createdAt,
-      @HiveField(15) @JsonKey(name: 'expires_at') this.expiresAt})
+      {required this.id,
+      required this.type,
+      required this.title,
+      required this.body,
+      required this.recipientId,
+      required this.recipientRole,
+      @JsonKey(name: 'related_child_id') this.relatedChildId,
+      @JsonKey(name: 'related_activity_id') this.relatedActivityId,
+      @JsonKey(name: 'is_read') required this.isRead,
+      @JsonKey(name: 'is_sent') required this.isSent,
+      @JsonKey(name: 'sent_at') this.sentAt,
+      @JsonKey(name: 'read_at') this.readAt,
+      @JsonKey(name: 'priority') required this.priority,
+      final Map<String, dynamic>? data,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'expires_at') this.expiresAt})
       : _data = data,
         super._();
 
@@ -358,54 +335,40 @@ class _$NotificationItemImpl extends _NotificationItem {
       _$$NotificationItemImplFromJson(json);
 
   @override
-  @HiveField(0)
   final String id;
   @override
-  @HiveField(1)
   final String type;
   @override
-  @HiveField(2)
   final String title;
   @override
-  @HiveField(3)
   final String body;
   @override
-  @HiveField(4)
   final String recipientId;
   @override
-  @HiveField(5)
   final String recipientRole;
   @override
-  @HiveField(6)
   @JsonKey(name: 'related_child_id')
   final String? relatedChildId;
   @override
-  @HiveField(7)
   @JsonKey(name: 'related_activity_id')
   final String? relatedActivityId;
   @override
-  @HiveField(8)
   @JsonKey(name: 'is_read')
   final bool isRead;
   @override
-  @HiveField(9)
   @JsonKey(name: 'is_sent')
   final bool isSent;
   @override
-  @HiveField(10)
   @JsonKey(name: 'sent_at')
   final DateTime? sentAt;
   @override
-  @HiveField(11)
   @JsonKey(name: 'read_at')
   final DateTime? readAt;
   @override
-  @HiveField(12)
   @JsonKey(name: 'priority')
   final String priority;
   final Map<String, dynamic>? _data;
   @override
-  @HiveField(13)
   Map<String, dynamic>? get data {
     final value = _data;
     if (value == null) return null;
@@ -415,11 +378,9 @@ class _$NotificationItemImpl extends _NotificationItem {
   }
 
   @override
-  @HiveField(14)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
-  @HiveField(15)
   @JsonKey(name: 'expires_at')
   final DateTime? expiresAt;
 
@@ -498,90 +459,67 @@ class _$NotificationItemImpl extends _NotificationItem {
 
 abstract class _NotificationItem extends NotificationItem {
   const factory _NotificationItem(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final String type,
-      @HiveField(2) required final String title,
-      @HiveField(3) required final String body,
-      @HiveField(4) required final String recipientId,
-      @HiveField(5) required final String recipientRole,
-      @HiveField(6)
-      @JsonKey(name: 'related_child_id')
-      final String? relatedChildId,
-      @HiveField(7)
-      @JsonKey(name: 'related_activity_id')
-      final String? relatedActivityId,
-      @HiveField(8) @JsonKey(name: 'is_read') required final bool isRead,
-      @HiveField(9) @JsonKey(name: 'is_sent') required final bool isSent,
-      @HiveField(10) @JsonKey(name: 'sent_at') final DateTime? sentAt,
-      @HiveField(11) @JsonKey(name: 'read_at') final DateTime? readAt,
-      @HiveField(12) @JsonKey(name: 'priority') required final String priority,
-      @HiveField(13) final Map<String, dynamic>? data,
-      @HiveField(14)
-      @JsonKey(name: 'created_at')
-      required final DateTime createdAt,
-      @HiveField(15)
-      @JsonKey(name: 'expires_at')
-      final DateTime? expiresAt}) = _$NotificationItemImpl;
+          {required final String id,
+          required final String type,
+          required final String title,
+          required final String body,
+          required final String recipientId,
+          required final String recipientRole,
+          @JsonKey(name: 'related_child_id') final String? relatedChildId,
+          @JsonKey(name: 'related_activity_id') final String? relatedActivityId,
+          @JsonKey(name: 'is_read') required final bool isRead,
+          @JsonKey(name: 'is_sent') required final bool isSent,
+          @JsonKey(name: 'sent_at') final DateTime? sentAt,
+          @JsonKey(name: 'read_at') final DateTime? readAt,
+          @JsonKey(name: 'priority') required final String priority,
+          final Map<String, dynamic>? data,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'expires_at') final DateTime? expiresAt}) =
+      _$NotificationItemImpl;
   const _NotificationItem._() : super._();
 
   factory _NotificationItem.fromJson(Map<String, dynamic> json) =
       _$NotificationItemImpl.fromJson;
 
   @override
-  @HiveField(0)
   String get id;
   @override
-  @HiveField(1)
   String get type;
   @override
-  @HiveField(2)
   String get title;
   @override
-  @HiveField(3)
   String get body;
   @override
-  @HiveField(4)
   String get recipientId;
   @override
-  @HiveField(5)
   String get recipientRole;
   @override
-  @HiveField(6)
   @JsonKey(name: 'related_child_id')
   String? get relatedChildId;
   @override
-  @HiveField(7)
   @JsonKey(name: 'related_activity_id')
   String? get relatedActivityId;
   @override
-  @HiveField(8)
   @JsonKey(name: 'is_read')
   bool get isRead;
   @override
-  @HiveField(9)
   @JsonKey(name: 'is_sent')
   bool get isSent;
   @override
-  @HiveField(10)
   @JsonKey(name: 'sent_at')
   DateTime? get sentAt;
   @override
-  @HiveField(11)
   @JsonKey(name: 'read_at')
   DateTime? get readAt;
   @override
-  @HiveField(12)
   @JsonKey(name: 'priority')
   String get priority;
   @override
-  @HiveField(13)
   Map<String, dynamic>? get data;
   @override
-  @HiveField(14)
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
-  @HiveField(15)
   @JsonKey(name: 'expires_at')
   DateTime? get expiresAt;
 

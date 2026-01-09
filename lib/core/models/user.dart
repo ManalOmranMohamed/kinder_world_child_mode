@@ -1,23 +1,25 @@
+// Workaround for analyzer: allow JsonKey on Freezed constructor params
+// (some analyzer versions report 'invalid_annotation_target')
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
 
 @freezed
 class User with _$User {
-  @HiveType(typeId: 1)
   const factory User({
-    @HiveField(0) required String id,
-    @HiveField(1) required String email,
-    @HiveField(2) required String role,
-    @HiveField(3) String? name,
-    @HiveField(4) String? phone,
-    @HiveField(5) @JsonKey(name: 'created_at') required DateTime createdAt,
-    @HiveField(6) @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    @HiveField(7) @JsonKey(name: 'is_active') required bool isActive,
-    @HiveField(8) @JsonKey(name: 'subscription_status') String? subscriptionStatus,
-    @HiveField(9) @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
+    required String id,
+    required String email,
+    required String role,
+    String? name,
+    String? phone,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'is_active') required bool isActive,
+    @JsonKey(name: 'subscription_status') String? subscriptionStatus,
+    @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
   }) = _User;
 
   const User._();

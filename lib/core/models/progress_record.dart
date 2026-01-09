@@ -1,32 +1,34 @@
+// Workaround for analyzer: allow JsonKey on Freezed constructor params
+// (some analyzer versions report 'invalid_annotation_target')
+// ignore_for_file: invalid_annotation_target
+
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
 
 part 'progress_record.freezed.dart';
 part 'progress_record.g.dart';
 
 @freezed
 class ProgressRecord with _$ProgressRecord {
-  @HiveType(typeId: 4)
   const factory ProgressRecord({
-    @HiveField(0) required String id,
-    @HiveField(1) required String childId,
-    @HiveField(2) required String activityId,
-    @HiveField(3) required DateTime date,
-    @HiveField(4) required int score,
-    @HiveField(5) required int duration,
-    @HiveField(6) required int xpEarned,
-    @HiveField(7) String? notes,
-    @HiveField(8) @JsonKey(name: 'completion_status') required String completionStatus,
-    @HiveField(9) @JsonKey(name: 'performance_metrics') Map<String, dynamic>? performanceMetrics,
-    @HiveField(10) @JsonKey(name: 'ai_feedback') String? aiFeedback,
-    @HiveField(11) @JsonKey(name: 'mood_before') String? moodBefore,
-    @HiveField(12) @JsonKey(name: 'mood_after') String? moodAfter,
-    @HiveField(13) @JsonKey(name: 'difficulty_adjusted') bool? difficultyAdjusted,
-    @HiveField(14) @JsonKey(name: 'help_requested') bool? helpRequested,
-    @HiveField(15) @JsonKey(name: 'parent_approved') bool? parentApproved,
-    @HiveField(16) @JsonKey(name: 'sync_status') required String syncStatus,
-    @HiveField(17) @JsonKey(name: 'created_at') required DateTime createdAt,
-    @HiveField(18) @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    required String id,
+    required String childId,
+    required String activityId,
+    required DateTime date,
+    required int score,
+    required int duration,
+    required int xpEarned,
+    String? notes,
+    @JsonKey(name: 'completion_status') required String completionStatus,
+    @JsonKey(name: 'performance_metrics') Map<String, dynamic>? performanceMetrics,
+    @JsonKey(name: 'ai_feedback') String? aiFeedback,
+    @JsonKey(name: 'mood_before') String? moodBefore,
+    @JsonKey(name: 'mood_after') String? moodAfter,
+    @JsonKey(name: 'difficulty_adjusted') bool? difficultyAdjusted,
+    @JsonKey(name: 'help_requested') bool? helpRequested,
+    @JsonKey(name: 'parent_approved') bool? parentApproved,
+    @JsonKey(name: 'sync_status') required String syncStatus,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
   }) = _ProgressRecord;
 
   const ProgressRecord._();

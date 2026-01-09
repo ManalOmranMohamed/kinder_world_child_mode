@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/app.dart';
@@ -74,8 +73,6 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
 
   @override
   Widget build(BuildContext context) {
-    final isRTL = ref.watch(localeProvider).languageCode == 'ar';
-    
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -89,86 +86,94 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
           },
           child: Padding(
             padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Header
-                const SizedBox(height: 40),
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.vertical - 48,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Header
+                    const SizedBox(height: 40),
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.language,
-                    size: 60,
-                    color: AppColors.white,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                
-                // Title
-                Text(
-                  'Choose Your Language',
-                  style: TextStyle(
-                    fontSize: AppConstants.largeFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                
-                // Subtitle
-                Text(
-                  'اختر لغتك',
-                  style: TextStyle(
-                    fontSize: AppConstants.fontSize,
-                    color: AppColors.textSecondary,
-                  ),
-                  textDirection: TextDirection.rtl,
-                ),
-                const SizedBox(height: 48),
-                
-                // Language Options
-                ...languages.map((language) => _buildLanguageCard(language)),
-                
-                const SizedBox(height: 40),
-                
-                // Continue Button
-                ElevatedButton(
-                  onPressed: () {
-                    // Use current locale or default to English
-                    final currentLocale = ref.read(localeProvider);
-                    _selectLanguage(currentLocale.languageCode);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.white,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      child: const Icon(
+                        Icons.language,
+                        size: 60,
+                        color: AppColors.white,
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    'Continue',
-                    style: TextStyle(
-                      fontSize: AppConstants.fontSize,
-                      fontWeight: FontWeight.w600,
+                    const SizedBox(height: 32),
+                    
+                    // Title
+                    Text(
+                      'Choose Your Language',
+                      style: TextStyle(
+                        fontSize: AppConstants.largeFontSize,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    
+                    // Subtitle
+                    Text(
+                      'اختر لغتك',
+                      style: TextStyle(
+                        fontSize: AppConstants.fontSize,
+                        color: AppColors.textSecondary,
+                      ),
+                      textDirection: TextDirection.rtl,
+                    ),
+                    const SizedBox(height: 48),
+                    
+                    // Language Options
+                    ...languages.map((language) => _buildLanguageCard(language)),
+                    
+                    const SizedBox(height: 40),
+                    
+                    // Continue Button
+                    ElevatedButton(
+                      onPressed: () {
+                        // Use current locale or default to English
+                        final currentLocale = ref.read(localeProvider);
+                        _selectLanguage(currentLocale.languageCode);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.white,
+                        minimumSize: const Size(double.infinity, 56),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSize,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                  ],
                 ),
-                
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
           ),
         ),

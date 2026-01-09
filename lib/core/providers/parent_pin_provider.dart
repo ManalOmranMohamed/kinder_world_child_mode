@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kinder_world/app.dart';
 import 'package:kinder_world/core/storage/secure_storage.dart';
 import 'package:logger/logger.dart';
 
@@ -104,7 +105,8 @@ class ParentPinNotifier extends StateNotifier<ParentPinState> {
     state = state.copyWith(isLoading: true, error: null);
     
     try {
-      final isValid = await _secureStorage.verifyParentPin(enteredPin);
+      final storedPin = await _secureStorage.getParentPin();
+      final isValid = storedPin != null && storedPin == enteredPin;
       
       if (isValid) {
         state = state.copyWith(

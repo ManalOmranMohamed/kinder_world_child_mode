@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +6,7 @@ import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/models/activity.dart';
 import 'package:kinder_world/core/providers/content_controller.dart';
-import 'package:kinder_world/core/providers/child_session_controller.dart';
+import 'package:kinder_world/core/providers/activity_filter_controller.dart';
 
 class LearnScreen extends ConsumerStatefulWidget {
   const LearnScreen({super.key});
@@ -19,8 +20,6 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
   late AnimationController _controller;
   late Animation<double> _slideAnimation;
   
-  String _selectedAspect = ActivityAspects.educational;
-
   @override
   void initState() {
     super.initState();
@@ -54,10 +53,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
   @override
   Widget build(BuildContext context) {
     final contentState = ref.watch(contentControllerProvider);
-    final activities = contentState.activities;
-    final filteredActivities = activities.where(
-      (activity) => activity.aspect == _selectedAspect
-    ).toList();
+    final filteredActivities = ref.watch(filteredActivitiesProvider);
+    final filters = ref.watch(activityFilterControllerProvider);
     
     return AnimatedBuilder(
       animation: _controller,
@@ -78,13 +75,28 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Learn',
-                      style: TextStyle(
-                        fontSize: AppConstants.largeFontSize * 1.5,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Learn',
+                          style: TextStyle(
+                            fontSize: AppConstants.largeFontSize * 1.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => _showFiltersSheet(context),
+                          icon: Icon(
+                            Icons.filter_list,
+                            color: filters.hasActiveFilters
+                                ? AppColors.primary
+                                : AppColors.textSecondary,
+                          ),
+                          tooltip: 'Filters',
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -108,14 +120,12 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                   separatorBuilder: (context, index) => const SizedBox(width: 12),
                   itemBuilder: (context, index) {
                     final aspect = ActivityAspects.all[index];
-                    final isSelected = aspect == _selectedAspect;
-                    final color = _getAspectColor(aspect);
+                    final isSelected = aspect == filters.selectedAspect;                    final color = _getAspectColor(aspect);
                     
                     return InkWell(
-                      onTap: () {
-                        setState(() {
-                          _selectedAspect = aspect;
-                        });
+                      onTap: () {                        ref
+                            .read(activityFilterControllerProvider.notifier)
+                            .selectAspect(aspect);
                       },
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
@@ -206,6 +216,14 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                         color: AppColors.textSecondary,
                                       ),
                                     ),
+                                     const SizedBox(height: 8),
+                                    Text(
+                                      'Try adjusting your filters.',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               )
@@ -230,121 +248,151 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
       ),
     );
   }
-
-  Widget _buildActivityCard(Activity activity) {
-    final color = _getAspectColor(activity.aspect);
-    
-    return GestureDetector(
-      onTap: () {
-        context.go('/child/learn/lesson/${activity.id}');
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Activity thumbnail
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Center(
-                child: Icon(
-                  _getCategoryIcon(activity.category),
-                  size: 50,
-                  color: color,
-                ),
-              ),
-            ),
-            
-            // Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
-                      activity.title,
-                      style: TextStyle(
-                        fontSize: AppConstants.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    
-                    // Description
-                    Text(
-                      activity.description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    
-                    // Footer
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // XP
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.xpColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.star, size: 12, color: AppColors.xpColor),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${activity.xpReward} XP',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.xpColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        
-                        // Duration
-                        Text(
-                          '${activity.duration} min',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+  void _showFiltersSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final filters = ref.watch(activityFilterControllerProvider);
+            return DraggableScrollableSheet(
+              initialChildSize: 0.7,
+              minChildSize: 0.4,
+              maxChildSize: 0.9,
+              expand: false,
+              builder: (context, scrollController) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Filters',
+                            style: TextStyle(
+                              fontSize: AppConstants.largeFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              ref
+                                  .read(activityFilterControllerProvider.notifier)
+                                  .clearFilters();
+                            },
+                            child: const Text('Reset'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Category',
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ChoiceChip(
+                            label: const Text('All'),
+                            selected: filters.selectedCategory == null,
+                            onSelected: (_) {
+                              ref
+                                  .read(activityFilterControllerProvider.notifier)
+                                  .selectCategory(null);
+                            },
+                          ),
+                          ...ActivityCategories.all.map((category) {
+                            return ChoiceChip(
+                              label: Text(
+                                ActivityCategories.getDisplayName(category),
+                              ),
+                              selected: filters.selectedCategory == category,
+                              onSelected: (_) {
+                                ref
+                                    .read(activityFilterControllerProvider.notifier)
+                                    .selectCategory(category);
+                              },
+                            );
+                          }),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Difficulty',
+                        style: TextStyle(
+                          fontSize: AppConstants.fontSize,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ChoiceChip(
+                            label: const Text('All'),
+                            selected: filters.selectedDifficulty == null,
+                            onSelected: (_) {
+                              ref
+                                  .read(activityFilterControllerProvider.notifier)
+                                  .selectDifficulty(null);
+                            },
+                          ),
+                          ...DifficultyLevels.all.map((difficulty) {
+                            return ChoiceChip(
+                              label: Text(
+                                DifficultyLevels.getDisplayName(difficulty),
+                              ),
+                              selected: filters.selectedDifficulty == difficulty,
+                              onSelected: (_) {
+                                ref
+                                    .read(activityFilterControllerProvider.notifier)
+                                    .selectDifficulty(difficulty);
+                              },
+                            );
+                          }),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('Apply Filters'),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 
@@ -366,34 +414,108 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
   IconData _getAspectIcon(String aspect) {
     switch (aspect) {
       case ActivityAspects.behavioral:
-        return Icons.psychology;
+        return Icons.emoji_people;
       case ActivityAspects.skillful:
         return Icons.handyman;
       case ActivityAspects.educational:
         return Icons.school;
       case ActivityAspects.entertaining:
-        return Icons.games;
+        return Icons.videogame_asset;
       default:
-        return Icons.star;
+        return Icons.extension;
     }
   }
 
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case ActivityCategories.mathematics:
-        return Icons.calculate;
-      case ActivityCategories.science:
-        return Icons.science;
-      case ActivityCategories.reading:
-        return Icons.book;
-      case ActivityCategories.socialSkills:
-        return Icons.people;
-      case ActivityCategories.creativity:
-        return Icons.palette;
-      case ActivityCategories.music:
-        return Icons.music_note;
-      default:
-        return Icons.star;
-    }
+  Widget _buildActivityCard(Activity activity) {
+    return InkWell(
+      onTap: () => context.go('/child/learn/lesson/${activity.id}'),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Thumbnail
+            SizedBox(
+              height: 110,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                  image: activity.thumbnailUrl.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(activity.thumbnailUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: activity.thumbnailUrl.isEmpty
+                    ? Center(
+                        child: Icon(
+                          _getAspectIcon(activity.aspect),
+                          size: 40,
+                          color: _getAspectColor(activity.aspect),
+                        ),
+                      )
+                    : null,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Title
+            Text(
+              activity.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: AppConstants.fontSize,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            // Meta row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 14, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
+                    Text(
+                      activity.estimatedTime,
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.star, size: 14, color: AppColors.xpColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${activity.xpReward} XP',
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

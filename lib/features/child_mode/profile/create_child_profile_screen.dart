@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/models/child_profile.dart';
-import 'package:kinder_world/core/providers/auth_provider.dart';
-import 'package:kinder_world/core/providers/child_session_provider.dart';
+import 'package:kinder_world/core/providers/auth_controller.dart';
+import 'package:kinder_world/core/providers/child_session_controller.dart';
 
 class CreateChildProfileScreen extends ConsumerStatefulWidget {
   const CreateChildProfileScreen({super.key});
@@ -119,13 +119,13 @@ class _CreateChildProfileScreenState extends ConsumerState<CreateChildProfileScr
       );
       
       // Authenticate and start session
-      final authSuccess = await ref.read(authProvider.notifier).loginChild(
+      final authSuccess = await ref.read(authControllerProvider.notifier).loginChild(
         childId: newProfile.id,
         picturePassword: _picturePassword,
       );
       
       if (authSuccess) {
-        await ref.read(childSessionProvider.notifier).startChildSession(
+        await ref.read(childSessionControllerProvider.notifier).startChildSession(
           childId: newProfile.id,
           childProfile: newProfile,
         );

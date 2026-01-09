@@ -20,54 +20,34 @@ ChildProfile _$ChildProfileFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ChildProfile {
-  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
-  @HiveField(1)
   String get name => throw _privateConstructorUsedError;
-  @HiveField(2)
   int get age => throw _privateConstructorUsedError;
-  @HiveField(3)
   String get avatar => throw _privateConstructorUsedError;
-  @HiveField(4)
   List<String> get interests => throw _privateConstructorUsedError;
-  @HiveField(5)
   int get level => throw _privateConstructorUsedError;
-  @HiveField(6)
   int get xp => throw _privateConstructorUsedError;
-  @HiveField(7)
   int get streak => throw _privateConstructorUsedError;
-  @HiveField(8)
   List<String> get favorites => throw _privateConstructorUsedError;
-  @HiveField(9)
   String get parentId => throw _privateConstructorUsedError;
-  @HiveField(10)
   @JsonKey(name: 'picture_password')
   List<String> get picturePassword => throw _privateConstructorUsedError;
-  @HiveField(11)
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @HiveField(12)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
-  @HiveField(13)
   @JsonKey(name: 'last_session')
   DateTime? get lastSession => throw _privateConstructorUsedError;
-  @HiveField(14)
   @JsonKey(name: 'total_time_spent')
   int get totalTimeSpent => throw _privateConstructorUsedError;
-  @HiveField(15)
   @JsonKey(name: 'activities_completed')
   int get activitiesCompleted => throw _privateConstructorUsedError;
-  @HiveField(16)
   @JsonKey(name: 'current_mood')
   String? get currentMood => throw _privateConstructorUsedError;
-  @HiveField(17)
   @JsonKey(name: 'learning_style')
   String? get learningStyle => throw _privateConstructorUsedError;
-  @HiveField(18)
   @JsonKey(name: 'special_needs')
   List<String>? get specialNeeds => throw _privateConstructorUsedError;
-  @HiveField(19)
   @JsonKey(name: 'accessibility_needs')
   List<String>? get accessibilityNeeds => throw _privateConstructorUsedError;
 
@@ -88,32 +68,26 @@ abstract class $ChildProfileCopyWith<$Res> {
       _$ChildProfileCopyWithImpl<$Res, ChildProfile>;
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String name,
-      @HiveField(2) int age,
-      @HiveField(3) String avatar,
-      @HiveField(4) List<String> interests,
-      @HiveField(5) int level,
-      @HiveField(6) int xp,
-      @HiveField(7) int streak,
-      @HiveField(8) List<String> favorites,
-      @HiveField(9) String parentId,
-      @HiveField(10)
-      @JsonKey(name: 'picture_password')
-      List<String> picturePassword,
-      @HiveField(11) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(12) @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @HiveField(13) @JsonKey(name: 'last_session') DateTime? lastSession,
-      @HiveField(14) @JsonKey(name: 'total_time_spent') int totalTimeSpent,
-      @HiveField(15)
-      @JsonKey(name: 'activities_completed')
-      int activitiesCompleted,
-      @HiveField(16) @JsonKey(name: 'current_mood') String? currentMood,
-      @HiveField(17) @JsonKey(name: 'learning_style') String? learningStyle,
-      @HiveField(18) @JsonKey(name: 'special_needs') List<String>? specialNeeds,
-      @HiveField(19)
-      @JsonKey(name: 'accessibility_needs')
-      List<String>? accessibilityNeeds});
+      {String id,
+      String name,
+      int age,
+      String avatar,
+      List<String> interests,
+      int level,
+      int xp,
+      int streak,
+      List<String> favorites,
+      String parentId,
+      @JsonKey(name: 'picture_password') List<String> picturePassword,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'last_session') DateTime? lastSession,
+      @JsonKey(name: 'total_time_spent') int totalTimeSpent,
+      @JsonKey(name: 'activities_completed') int activitiesCompleted,
+      @JsonKey(name: 'current_mood') String? currentMood,
+      @JsonKey(name: 'learning_style') String? learningStyle,
+      @JsonKey(name: 'special_needs') List<String>? specialNeeds,
+      @JsonKey(name: 'accessibility_needs') List<String>? accessibilityNeeds});
 }
 
 /// @nodoc
@@ -246,30 +220,26 @@ abstract class _$$ChildProfileImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String name,
-      @HiveField(2) int age,
-      @HiveField(3) String avatar,
-      @HiveField(4) List<String> interests,
-      @HiveField(5) int level,
-      @HiveField(6) int xp,
-      @HiveField(7) int streak,
-      @HiveField(8) List<String> favorites,
-      @HiveField(9) String parentId,
-      @HiveField(10)
-      @JsonKey(name: 'picture_password')
-      List<String> picturePassword,
-      @HiveField(11) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(12) @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @HiveField(13) @JsonKey(name: 'last_session') DateTime? lastSession,
-      @HiveField(14) @JsonKey(name: 'total_time_spent') int totalTimeSpent,
-      @HiveField(15)
+      {String id,
+      String name,
+      int age,
+      String avatar,
+      List<String> interests,
+      int level,
+      int xp,
+      int streak,
+      List<String> favorites,
+      String parentId,
+      @JsonKey(name: 'picture_password') List<String> picturePassword,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'last_session') DateTime? lastSession,
+      @JsonKey(name: 'total_time_spent') int totalTimeSpent,
       @JsonKey(name: 'activities_completed')
       int activitiesCompleted,
-      @HiveField(16) @JsonKey(name: 'current_mood') String? currentMood,
-      @HiveField(17) @JsonKey(name: 'learning_style') String? learningStyle,
-      @HiveField(18) @JsonKey(name: 'special_needs') List<String>? specialNeeds,
-      @HiveField(19)
+      @JsonKey(name: 'current_mood') String? currentMood,
+      @JsonKey(name: 'learning_style') String? learningStyle,
+      @JsonKey(name: 'special_needs') List<String>? specialNeeds,
       @JsonKey(name: 'accessibility_needs')
       List<String>? accessibilityNeeds});
 }
@@ -395,39 +365,28 @@ class __$$ChildProfileImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 2)
 class _$ChildProfileImpl extends _ChildProfile {
   const _$ChildProfileImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.name,
-      @HiveField(2) required this.age,
-      @HiveField(3) required this.avatar,
-      @HiveField(4) required final List<String> interests,
-      @HiveField(5) required this.level,
-      @HiveField(6) required this.xp,
-      @HiveField(7) required this.streak,
-      @HiveField(8) required final List<String> favorites,
-      @HiveField(9) required this.parentId,
-      @HiveField(10)
-      @JsonKey(name: 'picture_password')
-      required final List<String> picturePassword,
-      @HiveField(11) @JsonKey(name: 'created_at') required this.createdAt,
-      @HiveField(12) @JsonKey(name: 'updated_at') required this.updatedAt,
-      @HiveField(13) @JsonKey(name: 'last_session') this.lastSession,
-      @HiveField(14)
-      @JsonKey(name: 'total_time_spent')
-      required this.totalTimeSpent,
-      @HiveField(15)
-      @JsonKey(name: 'activities_completed')
-      required this.activitiesCompleted,
-      @HiveField(16) @JsonKey(name: 'current_mood') this.currentMood,
-      @HiveField(17) @JsonKey(name: 'learning_style') this.learningStyle,
-      @HiveField(18)
-      @JsonKey(name: 'special_needs')
-      final List<String>? specialNeeds,
-      @HiveField(19)
-      @JsonKey(name: 'accessibility_needs')
-      final List<String>? accessibilityNeeds})
+      {required this.id,
+      required this.name,
+      required this.age,
+      required this.avatar,
+      required final List<String> interests,
+      required this.level,
+      required this.xp,
+      required this.streak,
+      required final List<String> favorites,
+      required this.parentId,
+      @JsonKey(name: 'picture_password') required final List<String> picturePassword,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'last_session') this.lastSession,
+      @JsonKey(name: 'total_time_spent') required this.totalTimeSpent,
+      @JsonKey(name: 'activities_completed') required this.activitiesCompleted,
+      @JsonKey(name: 'current_mood') this.currentMood,
+      @JsonKey(name: 'learning_style') this.learningStyle,
+      @JsonKey(name: 'special_needs') final List<String>? specialNeeds,
+      @JsonKey(name: 'accessibility_needs') final List<String>? accessibilityNeeds})
       : _interests = interests,
         _favorites = favorites,
         _picturePassword = picturePassword,
@@ -439,20 +398,15 @@ class _$ChildProfileImpl extends _ChildProfile {
       _$$ChildProfileImplFromJson(json);
 
   @override
-  @HiveField(0)
   final String id;
   @override
-  @HiveField(1)
   final String name;
   @override
-  @HiveField(2)
   final int age;
   @override
-  @HiveField(3)
   final String avatar;
   final List<String> _interests;
   @override
-  @HiveField(4)
   List<String> get interests {
     if (_interests is EqualUnmodifiableListView) return _interests;
     // ignore: implicit_dynamic_type
@@ -460,17 +414,13 @@ class _$ChildProfileImpl extends _ChildProfile {
   }
 
   @override
-  @HiveField(5)
   final int level;
   @override
-  @HiveField(6)
   final int xp;
   @override
-  @HiveField(7)
   final int streak;
   final List<String> _favorites;
   @override
-  @HiveField(8)
   List<String> get favorites {
     if (_favorites is EqualUnmodifiableListView) return _favorites;
     // ignore: implicit_dynamic_type
@@ -478,11 +428,9 @@ class _$ChildProfileImpl extends _ChildProfile {
   }
 
   @override
-  @HiveField(9)
   final String parentId;
   final List<String> _picturePassword;
   @override
-  @HiveField(10)
   @JsonKey(name: 'picture_password')
   List<String> get picturePassword {
     if (_picturePassword is EqualUnmodifiableListView) return _picturePassword;
@@ -491,36 +439,28 @@ class _$ChildProfileImpl extends _ChildProfile {
   }
 
   @override
-  @HiveField(11)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
-  @HiveField(12)
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   @override
-  @HiveField(13)
   @JsonKey(name: 'last_session')
   final DateTime? lastSession;
   @override
-  @HiveField(14)
   @JsonKey(name: 'total_time_spent')
   final int totalTimeSpent;
   @override
-  @HiveField(15)
   @JsonKey(name: 'activities_completed')
   final int activitiesCompleted;
   @override
-  @HiveField(16)
   @JsonKey(name: 'current_mood')
   final String? currentMood;
   @override
-  @HiveField(17)
   @JsonKey(name: 'learning_style')
   final String? learningStyle;
   final List<String>? _specialNeeds;
   @override
-  @HiveField(18)
   @JsonKey(name: 'special_needs')
   List<String>? get specialNeeds {
     final value = _specialNeeds;
@@ -532,7 +472,6 @@ class _$ChildProfileImpl extends _ChildProfile {
 
   final List<String>? _accessibilityNeeds;
   @override
-  @HiveField(19)
   @JsonKey(name: 'accessibility_needs')
   List<String>? get accessibilityNeeds {
     final value = _accessibilityNeeds;
@@ -632,115 +571,79 @@ class _$ChildProfileImpl extends _ChildProfile {
 
 abstract class _ChildProfile extends ChildProfile {
   const factory _ChildProfile(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final String name,
-      @HiveField(2) required final int age,
-      @HiveField(3) required final String avatar,
-      @HiveField(4) required final List<String> interests,
-      @HiveField(5) required final int level,
-      @HiveField(6) required final int xp,
-      @HiveField(7) required final int streak,
-      @HiveField(8) required final List<String> favorites,
-      @HiveField(9) required final String parentId,
-      @HiveField(10)
-      @JsonKey(name: 'picture_password')
-      required final List<String> picturePassword,
-      @HiveField(11)
-      @JsonKey(name: 'created_at')
-      required final DateTime createdAt,
-      @HiveField(12)
-      @JsonKey(name: 'updated_at')
-      required final DateTime updatedAt,
-      @HiveField(13) @JsonKey(name: 'last_session') final DateTime? lastSession,
-      @HiveField(14)
-      @JsonKey(name: 'total_time_spent')
-      required final int totalTimeSpent,
-      @HiveField(15)
-      @JsonKey(name: 'activities_completed')
-      required final int activitiesCompleted,
-      @HiveField(16) @JsonKey(name: 'current_mood') final String? currentMood,
-      @HiveField(17)
-      @JsonKey(name: 'learning_style')
-      final String? learningStyle,
-      @HiveField(18)
-      @JsonKey(name: 'special_needs')
-      final List<String>? specialNeeds,
-      @HiveField(19)
-      @JsonKey(name: 'accessibility_needs')
-      final List<String>? accessibilityNeeds}) = _$ChildProfileImpl;
+      {required final String id,
+      required final String name,
+      required final int age,
+      required final String avatar,
+      required final List<String> interests,
+      required final int level,
+      required final int xp,
+      required final int streak,
+      required final List<String> favorites,
+      required final String parentId,
+      @JsonKey(name: 'picture_password') required final List<String> picturePassword,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      @JsonKey(name: 'last_session') final DateTime? lastSession,
+      @JsonKey(name: 'total_time_spent') required final int totalTimeSpent,
+      @JsonKey(name: 'activities_completed') required final int activitiesCompleted,
+      @JsonKey(name: 'current_mood') final String? currentMood,
+      @JsonKey(name: 'learning_style') final String? learningStyle,
+      @JsonKey(name: 'special_needs') final List<String>? specialNeeds,
+      @JsonKey(name: 'accessibility_needs') final List<String>? accessibilityNeeds}) = _$ChildProfileImpl;
   const _ChildProfile._() : super._();
 
   factory _ChildProfile.fromJson(Map<String, dynamic> json) =
       _$ChildProfileImpl.fromJson;
 
   @override
-  @HiveField(0)
   String get id;
   @override
-  @HiveField(1)
   String get name;
   @override
-  @HiveField(2)
   int get age;
   @override
-  @HiveField(3)
   String get avatar;
   @override
-  @HiveField(4)
   List<String> get interests;
   @override
-  @HiveField(5)
   int get level;
   @override
-  @HiveField(6)
   int get xp;
   @override
-  @HiveField(7)
   int get streak;
   @override
-  @HiveField(8)
   List<String> get favorites;
   @override
-  @HiveField(9)
   String get parentId;
   @override
-  @HiveField(10)
   @JsonKey(name: 'picture_password')
   List<String> get picturePassword;
   @override
-  @HiveField(11)
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
-  @HiveField(12)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
   @override
-  @HiveField(13)
   @JsonKey(name: 'last_session')
   DateTime? get lastSession;
   @override
-  @HiveField(14)
   @JsonKey(name: 'total_time_spent')
   int get totalTimeSpent;
   @override
-  @HiveField(15)
   @JsonKey(name: 'activities_completed')
   int get activitiesCompleted;
   @override
-  @HiveField(16)
   @JsonKey(name: 'current_mood')
   String? get currentMood;
   @override
-  @HiveField(17)
   @JsonKey(name: 'learning_style')
   String? get learningStyle;
   @override
-  @HiveField(18)
   @JsonKey(name: 'special_needs')
   List<String>? get specialNeeds;
   @override
-  @HiveField(19)
   @JsonKey(name: 'accessibility_needs')
   List<String>? get accessibilityNeeds;
 

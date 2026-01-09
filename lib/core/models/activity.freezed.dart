@@ -20,60 +20,36 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Activity {
-  @HiveField(0)
   String get id => throw _privateConstructorUsedError;
-  @HiveField(1)
   String get title => throw _privateConstructorUsedError;
-  @HiveField(2)
   String get description => throw _privateConstructorUsedError;
-  @HiveField(3)
   String get category => throw _privateConstructorUsedError;
-  @HiveField(4)
   String get type => throw _privateConstructorUsedError;
-  @HiveField(5)
   String get aspect => throw _privateConstructorUsedError;
-  @HiveField(6)
   List<String> get ageRange => throw _privateConstructorUsedError;
-  @HiveField(7)
   String get difficulty => throw _privateConstructorUsedError;
-  @HiveField(8)
   int get duration => throw _privateConstructorUsedError;
-  @HiveField(9)
   int get xpReward => throw _privateConstructorUsedError;
-  @HiveField(10)
   String get thumbnailUrl => throw _privateConstructorUsedError;
-  @HiveField(11)
   String? get contentUrl => throw _privateConstructorUsedError;
-  @HiveField(12)
   List<String> get tags => throw _privateConstructorUsedError;
-  @HiveField(13)
   List<String> get learningObjectives => throw _privateConstructorUsedError;
-  @HiveField(14)
   String? get instructions => throw _privateConstructorUsedError;
-  @HiveField(15)
   List<String>? get materialsNeeded => throw _privateConstructorUsedError;
-  @HiveField(16)
   @JsonKey(name: 'is_offline_available')
   bool get isOfflineAvailable => throw _privateConstructorUsedError;
-  @HiveField(17)
   @JsonKey(name: 'is_premium')
   bool get isPremium => throw _privateConstructorUsedError;
-  @HiveField(18)
   @JsonKey(name: 'parent_approval_required')
   bool get parentApprovalRequired => throw _privateConstructorUsedError;
-  @HiveField(19)
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
-  @HiveField(20)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
-  @HiveField(21)
   @JsonKey(name: 'completion_rate')
   double? get completionRate => throw _privateConstructorUsedError;
-  @HiveField(22)
   @JsonKey(name: 'average_rating')
   double? get averageRating => throw _privateConstructorUsedError;
-  @HiveField(23)
   @JsonKey(name: 'play_count')
   int get playCount => throw _privateConstructorUsedError;
 
@@ -93,34 +69,30 @@ abstract class $ActivityCopyWith<$Res> {
       _$ActivityCopyWithImpl<$Res, Activity>;
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String title,
-      @HiveField(2) String description,
-      @HiveField(3) String category,
-      @HiveField(4) String type,
-      @HiveField(5) String aspect,
-      @HiveField(6) List<String> ageRange,
-      @HiveField(7) String difficulty,
-      @HiveField(8) int duration,
-      @HiveField(9) int xpReward,
-      @HiveField(10) String thumbnailUrl,
-      @HiveField(11) String? contentUrl,
-      @HiveField(12) List<String> tags,
-      @HiveField(13) List<String> learningObjectives,
-      @HiveField(14) String? instructions,
-      @HiveField(15) List<String>? materialsNeeded,
-      @HiveField(16)
-      @JsonKey(name: 'is_offline_available')
-      bool isOfflineAvailable,
-      @HiveField(17) @JsonKey(name: 'is_premium') bool isPremium,
-      @HiveField(18)
-      @JsonKey(name: 'parent_approval_required')
-      bool parentApprovalRequired,
-      @HiveField(19) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(20) @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @HiveField(21) @JsonKey(name: 'completion_rate') double? completionRate,
-      @HiveField(22) @JsonKey(name: 'average_rating') double? averageRating,
-      @HiveField(23) @JsonKey(name: 'play_count') int playCount});
+      {String id,
+      String title,
+      String description,
+      String category,
+      String type,
+      String aspect,
+      List<String> ageRange,
+      String difficulty,
+      int duration,
+      int xpReward,
+      String thumbnailUrl,
+      String? contentUrl,
+      List<String> tags,
+      List<String> learningObjectives,
+      String? instructions,
+      List<String>? materialsNeeded,
+      @JsonKey(name: 'is_offline_available') bool isOfflineAvailable,
+      @JsonKey(name: 'is_premium') bool isPremium,
+      @JsonKey(name: 'parent_approval_required') bool parentApprovalRequired,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'completion_rate') double? completionRate,
+      @JsonKey(name: 'average_rating') double? averageRating,
+      @JsonKey(name: 'play_count') int playCount});
 }
 
 /// @nodoc
@@ -273,34 +245,30 @@ abstract class _$$ActivityImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@HiveField(0) String id,
-      @HiveField(1) String title,
-      @HiveField(2) String description,
-      @HiveField(3) String category,
-      @HiveField(4) String type,
-      @HiveField(5) String aspect,
-      @HiveField(6) List<String> ageRange,
-      @HiveField(7) String difficulty,
-      @HiveField(8) int duration,
-      @HiveField(9) int xpReward,
-      @HiveField(10) String thumbnailUrl,
-      @HiveField(11) String? contentUrl,
-      @HiveField(12) List<String> tags,
-      @HiveField(13) List<String> learningObjectives,
-      @HiveField(14) String? instructions,
-      @HiveField(15) List<String>? materialsNeeded,
-      @HiveField(16)
-      @JsonKey(name: 'is_offline_available')
-      bool isOfflineAvailable,
-      @HiveField(17) @JsonKey(name: 'is_premium') bool isPremium,
-      @HiveField(18)
-      @JsonKey(name: 'parent_approval_required')
-      bool parentApprovalRequired,
-      @HiveField(19) @JsonKey(name: 'created_at') DateTime createdAt,
-      @HiveField(20) @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @HiveField(21) @JsonKey(name: 'completion_rate') double? completionRate,
-      @HiveField(22) @JsonKey(name: 'average_rating') double? averageRating,
-      @HiveField(23) @JsonKey(name: 'play_count') int playCount});
+      {String id,
+      String title,
+      String description,
+      String category,
+      String type,
+      String aspect,
+      List<String> ageRange,
+      String difficulty,
+      int duration,
+      int xpReward,
+      String thumbnailUrl,
+      String? contentUrl,
+      List<String> tags,
+      List<String> learningObjectives,
+      String? instructions,
+      List<String>? materialsNeeded,
+      @JsonKey(name: 'is_offline_available') bool isOfflineAvailable,
+      @JsonKey(name: 'is_premium') bool isPremium,
+      @JsonKey(name: 'parent_approval_required') bool parentApprovalRequired,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'completion_rate') double? completionRate,
+      @JsonKey(name: 'average_rating') double? averageRating,
+      @JsonKey(name: 'play_count') int playCount});
 }
 
 /// @nodoc
@@ -444,37 +412,33 @@ class __$$ActivityImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-@HiveType(typeId: 3)
 class _$ActivityImpl extends _Activity {
   const _$ActivityImpl(
-      {@HiveField(0) required this.id,
-      @HiveField(1) required this.title,
-      @HiveField(2) required this.description,
-      @HiveField(3) required this.category,
-      @HiveField(4) required this.type,
-      @HiveField(5) required this.aspect,
-      @HiveField(6) required final List<String> ageRange,
-      @HiveField(7) required this.difficulty,
-      @HiveField(8) required this.duration,
-      @HiveField(9) required this.xpReward,
-      @HiveField(10) required this.thumbnailUrl,
-      @HiveField(11) this.contentUrl,
-      @HiveField(12) required final List<String> tags,
-      @HiveField(13) required final List<String> learningObjectives,
-      @HiveField(14) this.instructions,
-      @HiveField(15) final List<String>? materialsNeeded,
-      @HiveField(16)
-      @JsonKey(name: 'is_offline_available')
-      required this.isOfflineAvailable,
-      @HiveField(17) @JsonKey(name: 'is_premium') required this.isPremium,
-      @HiveField(18)
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.category,
+      required this.type,
+      required this.aspect,
+      required final List<String> ageRange,
+      required this.difficulty,
+      required this.duration,
+      required this.xpReward,
+      required this.thumbnailUrl,
+      this.contentUrl,
+      required final List<String> tags,
+      required final List<String> learningObjectives,
+      this.instructions,
+      final List<String>? materialsNeeded,
+      @JsonKey(name: 'is_offline_available') required this.isOfflineAvailable,
+      @JsonKey(name: 'is_premium') required this.isPremium,
       @JsonKey(name: 'parent_approval_required')
       required this.parentApprovalRequired,
-      @HiveField(19) @JsonKey(name: 'created_at') required this.createdAt,
-      @HiveField(20) @JsonKey(name: 'updated_at') required this.updatedAt,
-      @HiveField(21) @JsonKey(name: 'completion_rate') this.completionRate,
-      @HiveField(22) @JsonKey(name: 'average_rating') this.averageRating,
-      @HiveField(23) @JsonKey(name: 'play_count') required this.playCount})
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'completion_rate') this.completionRate,
+      @JsonKey(name: 'average_rating') this.averageRating,
+      @JsonKey(name: 'play_count') required this.playCount})
       : _ageRange = ageRange,
         _tags = tags,
         _learningObjectives = learningObjectives,
@@ -485,26 +449,19 @@ class _$ActivityImpl extends _Activity {
       _$$ActivityImplFromJson(json);
 
   @override
-  @HiveField(0)
   final String id;
   @override
-  @HiveField(1)
   final String title;
   @override
-  @HiveField(2)
   final String description;
   @override
-  @HiveField(3)
   final String category;
   @override
-  @HiveField(4)
   final String type;
   @override
-  @HiveField(5)
   final String aspect;
   final List<String> _ageRange;
   @override
-  @HiveField(6)
   List<String> get ageRange {
     if (_ageRange is EqualUnmodifiableListView) return _ageRange;
     // ignore: implicit_dynamic_type
@@ -512,23 +469,17 @@ class _$ActivityImpl extends _Activity {
   }
 
   @override
-  @HiveField(7)
   final String difficulty;
   @override
-  @HiveField(8)
   final int duration;
   @override
-  @HiveField(9)
   final int xpReward;
   @override
-  @HiveField(10)
   final String thumbnailUrl;
   @override
-  @HiveField(11)
   final String? contentUrl;
   final List<String> _tags;
   @override
-  @HiveField(12)
   List<String> get tags {
     if (_tags is EqualUnmodifiableListView) return _tags;
     // ignore: implicit_dynamic_type
@@ -537,7 +488,6 @@ class _$ActivityImpl extends _Activity {
 
   final List<String> _learningObjectives;
   @override
-  @HiveField(13)
   List<String> get learningObjectives {
     if (_learningObjectives is EqualUnmodifiableListView)
       return _learningObjectives;
@@ -546,11 +496,9 @@ class _$ActivityImpl extends _Activity {
   }
 
   @override
-  @HiveField(14)
   final String? instructions;
   final List<String>? _materialsNeeded;
   @override
-  @HiveField(15)
   List<String>? get materialsNeeded {
     final value = _materialsNeeded;
     if (value == null) return null;
@@ -560,35 +508,27 @@ class _$ActivityImpl extends _Activity {
   }
 
   @override
-  @HiveField(16)
   @JsonKey(name: 'is_offline_available')
   final bool isOfflineAvailable;
   @override
-  @HiveField(17)
   @JsonKey(name: 'is_premium')
   final bool isPremium;
   @override
-  @HiveField(18)
   @JsonKey(name: 'parent_approval_required')
   final bool parentApprovalRequired;
   @override
-  @HiveField(19)
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
-  @HiveField(20)
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   @override
-  @HiveField(21)
   @JsonKey(name: 'completion_rate')
   final double? completionRate;
   @override
-  @HiveField(22)
   @JsonKey(name: 'average_rating')
   final double? averageRating;
   @override
-  @HiveField(23)
   @JsonKey(name: 'play_count')
   final int playCount;
 
@@ -694,127 +634,92 @@ class _$ActivityImpl extends _Activity {
 
 abstract class _Activity extends Activity {
   const factory _Activity(
-      {@HiveField(0) required final String id,
-      @HiveField(1) required final String title,
-      @HiveField(2) required final String description,
-      @HiveField(3) required final String category,
-      @HiveField(4) required final String type,
-      @HiveField(5) required final String aspect,
-      @HiveField(6) required final List<String> ageRange,
-      @HiveField(7) required final String difficulty,
-      @HiveField(8) required final int duration,
-      @HiveField(9) required final int xpReward,
-      @HiveField(10) required final String thumbnailUrl,
-      @HiveField(11) final String? contentUrl,
-      @HiveField(12) required final List<String> tags,
-      @HiveField(13) required final List<String> learningObjectives,
-      @HiveField(14) final String? instructions,
-      @HiveField(15) final List<String>? materialsNeeded,
-      @HiveField(16)
-      @JsonKey(name: 'is_offline_available')
-      required final bool isOfflineAvailable,
-      @HiveField(17) @JsonKey(name: 'is_premium') required final bool isPremium,
-      @HiveField(18)
-      @JsonKey(name: 'parent_approval_required')
-      required final bool parentApprovalRequired,
-      @HiveField(19)
-      @JsonKey(name: 'created_at')
-      required final DateTime createdAt,
-      @HiveField(20)
-      @JsonKey(name: 'updated_at')
-      required final DateTime updatedAt,
-      @HiveField(21)
-      @JsonKey(name: 'completion_rate')
-      final double? completionRate,
-      @HiveField(22)
-      @JsonKey(name: 'average_rating')
-      final double? averageRating,
-      @HiveField(23)
-      @JsonKey(name: 'play_count')
-      required final int playCount}) = _$ActivityImpl;
+          {required final String id,
+          required final String title,
+          required final String description,
+          required final String category,
+          required final String type,
+          required final String aspect,
+          required final List<String> ageRange,
+          required final String difficulty,
+          required final int duration,
+          required final int xpReward,
+          required final String thumbnailUrl,
+          final String? contentUrl,
+          required final List<String> tags,
+          required final List<String> learningObjectives,
+          final String? instructions,
+          final List<String>? materialsNeeded,
+          @JsonKey(name: 'is_offline_available')
+          required final bool isOfflineAvailable,
+          @JsonKey(name: 'is_premium') required final bool isPremium,
+          @JsonKey(name: 'parent_approval_required')
+          required final bool parentApprovalRequired,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+          @JsonKey(name: 'completion_rate') final double? completionRate,
+          @JsonKey(name: 'average_rating') final double? averageRating,
+          @JsonKey(name: 'play_count') required final int playCount}) =
+      _$ActivityImpl;
   const _Activity._() : super._();
 
   factory _Activity.fromJson(Map<String, dynamic> json) =
       _$ActivityImpl.fromJson;
 
   @override
-  @HiveField(0)
   String get id;
   @override
-  @HiveField(1)
   String get title;
   @override
-  @HiveField(2)
   String get description;
   @override
-  @HiveField(3)
   String get category;
   @override
-  @HiveField(4)
   String get type;
   @override
-  @HiveField(5)
   String get aspect;
   @override
-  @HiveField(6)
   List<String> get ageRange;
   @override
-  @HiveField(7)
   String get difficulty;
   @override
-  @HiveField(8)
   int get duration;
   @override
-  @HiveField(9)
   int get xpReward;
   @override
-  @HiveField(10)
   String get thumbnailUrl;
   @override
-  @HiveField(11)
   String? get contentUrl;
   @override
-  @HiveField(12)
   List<String> get tags;
   @override
-  @HiveField(13)
   List<String> get learningObjectives;
   @override
-  @HiveField(14)
   String? get instructions;
   @override
-  @HiveField(15)
   List<String>? get materialsNeeded;
   @override
-  @HiveField(16)
   @JsonKey(name: 'is_offline_available')
   bool get isOfflineAvailable;
   @override
-  @HiveField(17)
   @JsonKey(name: 'is_premium')
   bool get isPremium;
   @override
-  @HiveField(18)
   @JsonKey(name: 'parent_approval_required')
   bool get parentApprovalRequired;
   @override
-  @HiveField(19)
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
-  @HiveField(20)
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
   @override
-  @HiveField(21)
   @JsonKey(name: 'completion_rate')
   double? get completionRate;
   @override
-  @HiveField(22)
   @JsonKey(name: 'average_rating')
   double? get averageRating;
   @override
-  @HiveField(23)
   @JsonKey(name: 'play_count')
   int get playCount;
 

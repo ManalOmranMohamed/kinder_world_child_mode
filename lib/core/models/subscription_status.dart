@@ -1,31 +1,34 @@
+// Workaround for analyzer: allow JsonKey on Freezed constructor params
+// (some analyzer versions report 'invalid_annotation_target')
+// ignore_for_file: invalid_annotation_target
+
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
 
 part 'subscription_status.freezed.dart';
 part 'subscription_status.g.dart';
 
 @freezed
 class SubscriptionStatus with _$SubscriptionStatus {
-  @HiveType(typeId: 9)
   const factory SubscriptionStatus({
-    @HiveField(0) required String id,
-    @HiveField(1) required String userId,
-    @HiveField(2) @JsonKey(name: 'plan_type') required String planType,
-    @HiveField(3) @JsonKey(name: 'status') required String status,
-    @HiveField(4) @JsonKey(name: 'trial_start_date') DateTime? trialStartDate,
-    @HiveField(5) @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
-    @HiveField(6) @JsonKey(name: 'subscription_start_date') DateTime? subscriptionStartDate,
-    @HiveField(7) @JsonKey(name: 'subscription_end_date') DateTime? subscriptionEndDate,
-    @HiveField(8) @JsonKey(name: 'auto_renew') required bool autoRenew,
-    @HiveField(9) @JsonKey(name: 'payment_method') String? paymentMethod,
-    @HiveField(10) @JsonKey(name: 'last_payment_date') DateTime? lastPaymentDate,
-    @HiveField(11) @JsonKey(name: 'next_payment_date') DateTime? nextPaymentDate,
-    @HiveField(12) @JsonKey(name: 'payment_amount') double? paymentAmount,
-    @HiveField(13) @JsonKey(name: 'currency') String? currency,
-    @HiveField(14) @JsonKey(name: 'child_profiles_limit') required int childProfilesLimit,
-    @HiveField(15) @JsonKey(name: 'features') required List<String> features,
-    @HiveField(16) @JsonKey(name: 'created_at') required DateTime createdAt,
-    @HiveField(17) @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    required String id,
+    required String userId,
+    @JsonKey(name: 'plan_type') required String planType,
+    @JsonKey(name: 'status') required String status,
+    @JsonKey(name: 'trial_start_date') DateTime? trialStartDate,
+    @JsonKey(name: 'trial_end_date') DateTime? trialEndDate,
+    @JsonKey(name: 'subscription_start_date') DateTime? subscriptionStartDate,
+    @JsonKey(name: 'subscription_end_date') DateTime? subscriptionEndDate,
+    @JsonKey(name: 'auto_renew') required bool autoRenew,
+    @JsonKey(name: 'payment_method') String? paymentMethod,
+    @JsonKey(name: 'last_payment_date') DateTime? lastPaymentDate,
+    @JsonKey(name: 'next_payment_date') DateTime? nextPaymentDate,
+    @JsonKey(name: 'payment_amount') double? paymentAmount,
+    @JsonKey(name: 'currency') String? currency,
+    @JsonKey(name: 'child_profiles_limit') required int childProfilesLimit,
+    @JsonKey(name: 'features') required List<String> features,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
   }) = _SubscriptionStatus;
 
   const SubscriptionStatus._();

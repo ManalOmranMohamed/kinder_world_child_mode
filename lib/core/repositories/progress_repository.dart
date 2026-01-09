@@ -1,14 +1,14 @@
-import 'dart:async';
+import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:kinder_world/core/models/progress_record.dart';
 import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 
-/// Repository for progress tracking
-/// Manages XP, levels, streaks, and activity completion records
-/// Stores data as JSON maps since Freezed models don't support Hive TypeAdapters
+/// Repository for progress tracking and analytics
 class ProgressRepository {
   final Box _progressBox;
   final Logger _logger;
+  final _uuid = const Uuid();
 
   ProgressRepository({
     required Box progressBox,
@@ -16,46 +16,9 @@ class ProgressRepository {
   })  : _progressBox = progressBox,
         _logger = logger;
 
-  // Helper methods for JSON serialization
-  ProgressRecord? _getProgressFromBox(String recordId) {
-    final data = _progressBox.get(recordId);
-    if (data == null) return null;
-    try {
-      final map = data as Map<String, dynamic>;
-      return ProgressRecord.fromJson(map);
-    } catch (e) {
-      _logger.e('Error deserializing progress record: $recordId, $e');
-      return null;
-    }
-  }
+  // ==================== CRUD OPERATIONS ====================
 
-  Future<void> _saveProgressToBox(String recordId, ProgressRecord record) async {
-    await _progressBox.put(recordId, record.toJson());
-  }
-
-  List<ProgressRecord> _getAllProgressFromBox() {
-    try {
-      return _progressBox.values
-          .map((data) {
-            try {
-              final map = data as Map<String, dynamic>;
-              return ProgressRecord.fromJson(map);
-            } catch (e) {
-              _logger.e('Error deserializing progress record from box: $e');
-              return null;
-            }
-          })
-          .whereType<ProgressRecord>()
-          .toList();
-    } catch (e) {
-      _logger.e('Error getting all progress records from box: $e');
-      return [];
-    }
-  }
-
-  // ==================== PROGRESS RECORDS ====================
-
-  /// Create progress record for completed activity
+  /// Create progress record
   Future<ProgressRecord?> createProgressRecord({
     required String childId,
     required String activityId,
@@ -73,15 +36,12 @@ class ProgressRepository {
     bool? parentApproved,
   }) async {
     try {
-      _logger.d('Creating progress record for child: $childId, activity: $activityId');
-      
-      final recordId = 'progress_${DateTime.now().millisecondsSinceEpoch}';
-      
+      final now = DateTime.now();
       final record = ProgressRecord(
-        id: recordId,
+        id: _uuid.v4(),
         childId: childId,
         activityId: activityId,
-        date: DateTime.now(),
+        date: now,
         score: score,
         duration: duration,
         xpEarned: xpEarned,
@@ -95,14 +55,16 @@ class ProgressRepository {
         helpRequested: helpRequested,
         parentApproved: parentApproved,
         syncStatus: SyncStatus.pending,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: now,
+        updatedAt: now,
       );
+
+      final json = record.toJson();
+      await _progressBox.put(record.id, json);
       
-      await _saveProgressToBox(recordId, record);
-      _logger.d('Progress record created: $recordId');
+      _logger.d('Progress record created: ${record.id}');
       return record;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error creating progress record: $e');
       return null;
     }
@@ -111,77 +73,129 @@ class ProgressRepository {
   /// Get progress record by ID
   Future<ProgressRecord?> getProgressRecord(String recordId) async {
     try {
-      return _getProgressFromBox(recordId);
-    } catch (e, stack) {
+      final data = _progressBox.get(recordId);
+      
+      if (data == null) {
+        _logger.w('Progress record not found: $recordId');
+        return null;
+      }
+
+      final json = data is String
+          ? jsonDecode(data)
+          : Map<String, dynamic>.from(data);
+
+      return ProgressRecord.fromJson(json);
+    } catch (e) {
       _logger.e('Error getting progress record: $recordId, $e');
       return null;
     }
   }
 
+  /// Update progress record
+  Future<ProgressRecord?> updateProgressRecord(ProgressRecord record) async {
+    try {
+      final updated = record.copyWith(
+        updatedAt: DateTime.now(),
+      );
+      
+      final json = updated.toJson();
+      await _progressBox.put(updated.id, json);
+      
+      _logger.d('Progress record updated: ${updated.id}');
+      return updated;
+    } catch (e) {
+      _logger.e('Error updating progress record: $e');
+      return null;
+    }
+  }
+
+  /// Delete progress record
+  Future<bool> deleteProgressRecord(String recordId) async {
+    try {
+      await _progressBox.delete(recordId);
+      _logger.d('Progress record deleted: $recordId');
+      return true;
+    } catch (e) {
+      _logger.e('Error deleting progress record: $recordId, $e');
+      return false;
+    }
+  }
+
+  // ==================== QUERIES ====================
+
   /// Get all progress records for a child
   Future<List<ProgressRecord>> getProgressForChild(String childId) async {
     try {
-      final records = _getAllProgressFromBox()
-          .where((record) => record.childId == childId)
-          .toList();
+      final records = <ProgressRecord>[];
+
+      for (var key in _progressBox.keys) {
+        final data = _progressBox.get(key);
+        if (data != null) {
+          try {
+            final json = data is String
+                ? jsonDecode(data)
+                : Map<String, dynamic>.from(data);
+            
+            final record = ProgressRecord.fromJson(json);
+            
+            if (record.childId == childId) {
+              records.add(record);
+            }
+          } catch (e) {
+            _logger.e('Error parsing progress record: $key, $e');
+          }
+        }
+      }
+
+      // Sort by date descending
       records.sort((a, b) => b.date.compareTo(a.date));
+      
+      _logger.d('Retrieved ${records.length} records for child: $childId');
       return records;
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error getting progress for child: $childId, $e');
       return [];
     }
   }
 
-  /// Get progress records for specific activity
-  Future<List<ProgressRecord>> getProgressForActivity(String activityId) async {
+  /// Get today's progress for a child
+  Future<List<ProgressRecord>> getTodayProgress(String childId) async {
     try {
-      final records = _getAllProgressFromBox()
-          .where((record) => record.activityId == activityId)
-          .toList();
-      records.sort((a, b) => b.date.compareTo(a.date));
-      return records;
-    } catch (e, stack) {
-      _logger.e('Error getting progress for activity: $activityId, $e');
+      final allRecords = await getProgressForChild(childId);
+      final today = DateTime.now();
+      
+      final todayRecords = allRecords.where((record) {
+        return record.date.year == today.year &&
+               record.date.month == today.month &&
+               record.date.day == today.day;
+      }).toList();
+      
+      _logger.d('Found ${todayRecords.length} records for today');
+      return todayRecords;
+    } catch (e) {
+      _logger.e('Error getting today\'s progress: $childId, $e');
       return [];
     }
   }
 
-  /// Get progress records for date range
+  /// Get progress for date range
   Future<List<ProgressRecord>> getProgressForDateRange({
     required String childId,
     required DateTime startDate,
     required DateTime endDate,
   }) async {
     try {
-      final records = _getAllProgressFromBox()
-          .where((record) => 
-              record.childId == childId &&
-              record.date.isAfter(startDate) &&
-              record.date.isBefore(endDate))
-          .toList();
-      records.sort((a, b) => b.date.compareTo(a.date));
-      return records;
-    } catch (e, stack) {
-      _logger.e('Error getting progress for date range: $e');
-      return [];
-    }
-  }
-
-  /// Get today's progress
-  Future<List<ProgressRecord>> getTodayProgress(String childId) async {
-    try {
-      final today = DateTime.now();
-      final startOfDay = DateTime(today.year, today.month, today.day);
-      final endOfDay = startOfDay.add(const Duration(days: 1));
+      final allRecords = await getProgressForChild(childId);
       
-      return _getAllProgressFromBox()
-          .where((record) => 
-              record.childId == childId &&
-              record.date.isAfter(startOfDay) &&
-              record.date.isBefore(endOfDay))
-          .toList();
-    } catch (e, stack) {
-      _logger.e('Error getting today\'s progress for child: $childId, $e');
+      final filtered = allRecords.where((record) {
+        return record.date.isAfter(startDate) &&
+               record.date.isBefore(endDate.add(const Duration(days: 1)));
+      }).toList();
+      
+      _logger.d('Found ${filtered.length} records for date range');
+      return filtered;
+    } catch (e) {
+      _logger.e('Error getting progress for date range: $e');
       return [];
     }
   }
@@ -195,240 +209,144 @@ class ProgressRepository {
       
       if (records.isEmpty) {
         return {
-          'totalActivities': 0,
           'totalXP': 0,
-          'totalTime': 0,
+          'totalActivities': 0,
           'averageScore': 0,
+          'totalTimeSpent': 0,
           'completionRate': 0,
-          'favoriteCategory': null,
-          'streakDays': 0,
-          'lastActivity': null,
         };
       }
+
+      final totalXP = records.fold<int>(0, (sum, record) => sum + record.xpEarned);
+      final totalScore = records.fold<int>(0, (sum, record) => sum + record.score);
+      final totalTime = records.fold<int>(0, (sum, record) => sum + record.duration);
       
-      // Calculate totals
-      final totalActivities = records.length;
-      final totalXP = records.fold(0, (sum, record) => sum + record.xpEarned);
-      final totalTime = records.fold(0, (sum, record) => sum + record.duration);
-      final totalScore = records.fold(0, (sum, record) => sum + record.score);
-      final averageScore = totalScore / totalActivities;
+      final completedCount = records
+          .where((r) => r.completionStatus == CompletionStatus.completed)
+          .length;
       
-      // Calculate completion rate
-      final completed = records.where((r) => r.completionStatus == CompletionStatus.completed).length;
-      final completionRate = completed / totalActivities * 100;
-      
-      // Find favorite category (would need activity data)
-      String? favoriteCategory;
-      
-      // Calculate streak
-      final streakDays = await calculateStreakDays(records);
-      
-      // Last activity
-      final lastActivity = records.isNotEmpty ? records.first.date : null;
-      
+      final completionRate = completedCount / records.length;
+
       return {
-        'totalActivities': totalActivities,
         'totalXP': totalXP,
-        'totalTime': totalTime,
-        'averageScore': averageScore,
+        'totalActivities': records.length,
+        'averageScore': totalScore / records.length,
+        'totalTimeSpent': totalTime,
         'completionRate': completionRate,
-        'favoriteCategory': favoriteCategory,
-        'streakDays': streakDays,
-        'lastActivity': lastActivity,
+        'completedActivities': completedCount,
+        'averageDuration': totalTime / records.length,
       };
-    } catch (e, stack) {
+    } catch (e) {
       _logger.e('Error getting child stats: $childId, $e');
       return {};
     }
   }
 
-  /// Calculate streak days from progress records
-  Future<int> calculateStreakDays(List<ProgressRecord> records) async {
-    if (records.isEmpty) return 0;
-    
-    // Group by date
-    final datesByDay = <DateTime, List<ProgressRecord>>{};
-    
-    for (final record in records) {
-      final day = DateTime(record.date.year, record.date.month, record.date.day);
-      datesByDay.putIfAbsent(day, () => []).add(record);
-    }
-    
-    final uniqueDays = datesByDay.keys.toList()..sort();
-    if (uniqueDays.isEmpty) return 0;
-    
-    // Calculate consecutive days from today
-    final today = DateTime.now();
-    int streak = 0;
-    DateTime? lastDay;
-    
-    for (int i = uniqueDays.length - 1; i >= 0; i--) {
-      final day = uniqueDays[i];
-      
-      if (lastDay == null) {
-        // First day in streak
-        final daysDiff = today.difference(day).inDays;
-        if (daysDiff <= 1) {
-          streak = 1;
-          lastDay = day;
-        } else {
-          break;
-        }
-      } else {
-        // Check if consecutive
-        final daysDiff = lastDay!.difference(day).inDays;
-        if (daysDiff == 1) {
-          streak++;
-          lastDay = day;
-        } else {
-          break;
-        }
-      }
-    }
-    
-    return streak;
-  }
-
-  /// Get weekly progress summary
+  /// Get weekly summary
   Future<Map<String, dynamic>> getWeeklySummary(String childId) async {
     try {
       final now = DateTime.now();
-      final weekAgo = now.subtract(const Duration(days: 7));
+      final weekStart = now.subtract(Duration(days: now.weekday - 1));
+      final weekEnd = weekStart.add(const Duration(days: 6));
       
-      final records = await getProgressForDateRange(
+      final weekRecords = await getProgressForDateRange(
         childId: childId,
-        startDate: weekAgo,
-        endDate: now,
+        startDate: weekStart,
+        endDate: weekEnd,
       );
+
+      final dailyStats = <String, Map<String, dynamic>>{};
       
-      // Group by day
-      final dailyProgress = <String, List<ProgressRecord>>{};
-      
-      for (final record in records) {
-        final dayKey = '${record.date.year}-${record.date.month}-${record.date.day}';
-        dailyProgress.putIfAbsent(dayKey, () => []).add(record);
-      }
-      
-      // Calculate daily stats
-      final dailyStats = dailyProgress.map((day, dayRecords) {
-        final totalXP = dayRecords.fold(0, (sum, r) => sum + r.xpEarned);
-        final totalTime = dayRecords.fold(0, (sum, r) => sum + r.duration);
-        final completed = dayRecords.where((r) => r.completionStatus == CompletionStatus.completed).length;
+      for (var i = 0; i < 7; i++) {
+        final day = weekStart.add(Duration(days: i));
+        final dayKey = '${day.year}-${day.month}-${day.day}';
         
-        return MapEntry(day, {
-          'activities': dayRecords.length,
-          'xp': totalXP,
-          'time': totalTime,
-          'completed': completed,
-        });
-      });
-      
+        final dayRecords = weekRecords.where((record) {
+          return record.date.year == day.year &&
+                 record.date.month == day.month &&
+                 record.date.day == day.day;
+        }).toList();
+        
+        dailyStats[dayKey] = {
+          'date': day,
+          'activitiesCompleted': dayRecords.length,
+          'xpEarned': dayRecords.fold<int>(0, (sum, r) => sum + r.xpEarned),
+          'timeSpent': dayRecords.fold<int>(0, (sum, r) => sum + r.duration),
+        };
+      }
+
       return {
+        'weekStart': weekStart,
+        'weekEnd': weekEnd,
+        'totalActivities': weekRecords.length,
+        'totalXP': weekRecords.fold<int>(0, (sum, r) => sum + r.xpEarned),
+        'totalTime': weekRecords.fold<int>(0, (sum, r) => sum + r.duration),
         'dailyStats': dailyStats,
-        'totalActivities': records.length,
-        'totalXP': records.fold(0, (sum, r) => sum + r.xpEarned),
-        'totalTime': records.fold(0, (sum, r) => sum + r.duration),
       };
-    } catch (e, stack) {
-      _logger.e('Error getting weekly summary for child: $childId, $e');
+    } catch (e) {
+      _logger.e('Error getting weekly summary: $childId, $e');
       return {};
     }
   }
 
-  /// Get monthly progress summary
+  /// Get monthly summary
   Future<Map<String, dynamic>> getMonthlySummary(String childId) async {
     try {
       final now = DateTime.now();
-      final monthAgo = now.subtract(const Duration(days: 30));
+      final monthStart = DateTime(now.year, now.month, 1);
+      final monthEnd = DateTime(now.year, now.month + 1, 0);
       
-      final records = await getProgressForDateRange(
+      final monthRecords = await getProgressForDateRange(
         childId: childId,
-        startDate: monthAgo,
-        endDate: now,
+        startDate: monthStart,
+        endDate: monthEnd,
       );
-      
-      // Group by week
-      final weeklyProgress = <int, List<ProgressRecord>>{};
-      
-      for (final record in records) {
-        final week = ((now.difference(record.date).inDays) / 7).floor();
-        weeklyProgress.putIfAbsent(week, () => []).add(record);
-      }
-      
-      // Calculate weekly stats
-      final weeklyStats = weeklyProgress.map((week, weekRecords) {
-        final totalXP = weekRecords.fold(0, (sum, r) => sum + r.xpEarned);
-        final totalTime = weekRecords.fold(0, (sum, r) => sum + r.duration);
-        
-        return MapEntry(week, {
-          'activities': weekRecords.length,
-          'xp': totalXP,
-          'time': totalTime,
-        });
-      });
-      
+
       return {
-        'weeklyStats': weeklyStats,
-        'totalActivities': records.length,
-        'totalXP': records.fold(0, (sum, r) => sum + r.xpEarned),
-        'totalTime': records.fold(0, (sum, r) => sum + r.duration),
+        'monthStart': monthStart,
+        'monthEnd': monthEnd,
+        'totalActivities': monthRecords.length,
+        'totalXP': monthRecords.fold<int>(0, (sum, r) => sum + r.xpEarned),
+        'totalTime': monthRecords.fold<int>(0, (sum, r) => sum + r.duration),
+        'averageScore': monthRecords.isEmpty 
+            ? 0 
+            : monthRecords.fold<int>(0, (sum, r) => sum + r.score) / monthRecords.length,
       };
-    } catch (e, stack) {
-      _logger.e('Error getting monthly summary for child: $childId, $e');
+    } catch (e) {
+      _logger.e('Error getting monthly summary: $childId, $e');
       return {};
     }
   }
 
-  // ==================== PERFORMANCE ANALYTICS ====================
+  // ==================== ANALYTICS ====================
 
   /// Get performance trends
   Future<Map<String, dynamic>> getPerformanceTrends(String childId) async {
     try {
       final records = await getProgressForChild(childId);
       
-      if (records.isEmpty) {
-        return {
-          'improvement': 0,
-          'trend': 'stable',
-          'strongestArea': null,
-          'needsWork': null,
-        };
-      }
+      if (records.isEmpty) return {};
+
+      // Last 7 days trend
+      final last7Days = records.take(7).toList();
+      final avgScoreLast7 = last7Days.fold<int>(0, (sum, r) => sum + r.score) / last7Days.length;
       
-      // Group by category (would need activity data)
-      final recentRecords = records.take(10).toList();
-      final olderRecords = records.skip(10).take(10).toList();
+      // Previous 7 days
+      final previous7Days = records.skip(7).take(7).toList();
+      final avgScorePrevious7 = previous7Days.isEmpty 
+          ? 0 
+          : previous7Days.fold<int>(0, (sum, r) => sum + r.score) / previous7Days.length;
       
-      double recentAverage = 0;
-      double olderAverage = 0;
-      
-      if (recentRecords.isNotEmpty) {
-        recentAverage = recentRecords.fold(0, (sum, r) => sum + r.score) / recentRecords.length;
-      }
-      
-      if (olderRecords.isNotEmpty) {
-        olderAverage = olderRecords.fold(0, (sum, r) => sum + r.score) / olderRecords.length;
-      }
-      
-      final improvement = recentAverage - olderAverage;
-      String trend;
-      
-      if (improvement > 5) {
-        trend = 'improving';
-      } else if (improvement < -5) {
-        trend = 'declining';
-      } else {
-        trend = 'stable';
-      }
-      
+      final trend = avgScoreLast7 - avgScorePrevious7;
+
       return {
-        'improvement': improvement,
-        'trend': trend,
-        'recentAverage': recentAverage,
-        'olderAverage': olderAverage,
+        'currentAverageScore': avgScoreLast7,
+        'previousAverageScore': avgScorePrevious7,
+        'trend': trend > 0 ? 'improving' : trend < 0 ? 'declining' : 'stable',
+        'trendValue': trend,
       };
-    } catch (e, stack) {
-      _logger.e('Error getting performance trends for child: $childId, $e');
+    } catch (e) {
+      _logger.e('Error getting performance trends: $childId, $e');
       return {};
     }
   }
@@ -438,100 +356,144 @@ class ProgressRepository {
     try {
       final records = await getProgressForChild(childId);
       
-      final moodBeforeCounts = <String, int>{};
-      final moodAfterCounts = <String, int>{};
-      int moodImprovements = 0;
+      final moodCounts = <String, int>{};
+      var moodImprovedCount = 0;
       
-      for (final record in records) {
-        if (record.moodBefore != null) {
-          moodBeforeCounts[record.moodBefore!] = 
-              (moodBeforeCounts[record.moodBefore!] ?? 0) + 1;
-        }
-        
+      for (var record in records) {
         if (record.moodAfter != null) {
-          moodAfterCounts[record.moodAfter!] = 
-              (moodAfterCounts[record.moodAfter!] ?? 0) + 1;
+          moodCounts[record.moodAfter!] = (moodCounts[record.moodAfter!] ?? 0) + 1;
         }
         
         if (record.moodImproved) {
-          moodImprovements++;
+          moodImprovedCount++;
         }
       }
-      
-      final totalRecords = records.length;
-      final improvementRate = totalRecords > 0 ? moodImprovements / totalRecords * 100 : 0;
-      
+
       return {
-        'moodBeforeCounts': moodBeforeCounts,
-        'moodAfterCounts': moodAfterCounts,
-        'moodImprovementRate': improvementRate,
-        'mostCommonBefore': _getMostCommonMood(moodBeforeCounts),
-        'mostCommonAfter': _getMostCommonMood(moodAfterCounts),
+        'moodCounts': moodCounts,
+        'moodImprovedCount': moodImprovedCount,
+        'moodImprovementRate': records.isEmpty 
+            ? 0 
+            : moodImprovedCount / records.length,
       };
-    } catch (e, stack) {
-      _logger.e('Error getting mood analysis for child: $childId, $e');
+    } catch (e) {
+      _logger.e('Error getting mood analysis: $childId, $e');
       return {};
     }
   }
 
-  String? _getMostCommonMood(Map<String, int> moodCounts) {
-    if (moodCounts.isEmpty) return null;
-    
-    String? mostCommon;
-    int maxCount = 0;
-    
-    moodCounts.forEach((mood, count) {
-      if (count > maxCount) {
-        maxCount = count;
-        mostCommon = mood;
+  // ==================== STREAK CALCULATION ====================
+
+  /// Calculate streak days
+  Future<int> calculateStreakDays(List<ProgressRecord> records) async {
+    try {
+      if (records.isEmpty) return 0;
+
+      // Sort by date descending
+      final sorted = [...records];
+      sorted.sort((a, b) => b.date.compareTo(a.date));
+
+      var streak = 0;
+      var currentDate = DateTime.now();
+      
+      // Check if there's activity today
+      final hasToday = sorted.any((record) {
+        return record.date.year == currentDate.year &&
+               record.date.month == currentDate.month &&
+               record.date.day == currentDate.day;
+      });
+
+      if (!hasToday) {
+        // Check if there's activity yesterday
+        final yesterday = currentDate.subtract(const Duration(days: 1));
+        final hasYesterday = sorted.any((record) {
+          return record.date.year == yesterday.year &&
+                 record.date.month == yesterday.month &&
+                 record.date.day == yesterday.day;
+        });
+        
+        if (!hasYesterday) return 0;
+        
+        currentDate = yesterday;
       }
-    });
-    
-    return mostCommon;
+
+      // Count consecutive days
+      for (var i = 0; i < 365; i++) {
+        final checkDate = currentDate.subtract(Duration(days: i));
+        
+        final hasActivity = sorted.any((record) {
+          return record.date.year == checkDate.year &&
+                 record.date.month == checkDate.month &&
+                 record.date.day == checkDate.day;
+        });
+
+        if (hasActivity) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      return streak;
+    } catch (e) {
+      _logger.e('Error calculating streak: $e');
+      return 0;
+    }
   }
 
-  // ==================== SYNC OPERATIONS ====================
+  // ==================== SYNC ====================
 
-  /// Get records that need sync
+  /// Get records needing sync
   Future<List<ProgressRecord>> getRecordsNeedingSync() async {
     try {
-      return _getAllProgressFromBox()
-          .where((record) => record.needsSync)
-          .toList();
-    } catch (e, stack) {
+      final allRecords = <ProgressRecord>[];
+
+      for (var key in _progressBox.keys) {
+        final data = _progressBox.get(key);
+        if (data != null) {
+          try {
+            final json = data is String
+                ? jsonDecode(data)
+                : Map<String, dynamic>.from(data);
+            
+            final record = ProgressRecord.fromJson(json);
+            
+            if (record.needsSync) {
+              allRecords.add(record);
+            }
+          } catch (e) {
+            _logger.e('Error parsing progress record: $key, $e');
+          }
+        }
+      }
+
+      _logger.d('Found ${allRecords.length} records needing sync');
+      return allRecords;
+    } catch (e) {
       _logger.e('Error getting records needing sync: $e');
       return [];
     }
   }
 
-  /// Mark record as synced
-  Future<bool> markAsSynced(String recordId) async {
-    try {
-      final record = _getProgressFromBox(recordId);
-      if (record == null) return false;
-      
-      final updated = record.copyWith(
-        syncStatus: SyncStatus.synced,
-        updatedAt: DateTime.now(),
-      );
-      
-      await _saveProgressToBox(recordId, updated);
-      return true;
-    } catch (e, stack) {
-      _logger.e('Error marking record as synced: $recordId, $e');
-      return false;
-    }
-  }
-
-  /// Sync with server (placeholder)
+  /// Sync with server
   Future<bool> syncWithServer() async {
     try {
-      _logger.d('Syncing progress with server');
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      // TODO: Implement actual server sync
+      final needsSync = await getRecordsNeedingSync();
+      
+      for (var record in needsSync) {
+        // Mark as synced
+        final updated = record.copyWith(
+          syncStatus: SyncStatus.synced,
+          updatedAt: DateTime.now(),
+        );
+        await updateProgressRecord(updated);
+      }
+      
+      _logger.d('Synced ${needsSync.length} records');
       return true;
-    } catch (e, stack) {
-      _logger.e('Error syncing progress with server: $e');
+    } catch (e) {
+      _logger.e('Error syncing with server: $e');
       return false;
     }
   }
