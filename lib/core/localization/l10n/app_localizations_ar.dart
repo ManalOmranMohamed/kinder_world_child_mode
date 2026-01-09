@@ -633,4 +633,38 @@ class AppLocalizationsAr extends AppLocalizations {
   
   @override
   String get switchAccess => 'الوصول بالمفتاح';
+  
+    // Child Login Screen (NEW)
+  @override
+  String get chooseProfileToContinue => 'اختر ملفك للمتابعة.';
+
+  @override
+  String get chooseYourProfile => 'اختر ملفك:';
+
+  @override
+  String get clearSelection => 'مسح الاختيار';
+
+  @override
+  String get goBack => 'رجوع';
+
+  @override
+  String get noChildProfilesFound => 'لا توجد ملفات أطفال.';
+
+  @override
+  String get childProfileNotFound => 'لم يتم العثور على ملف الطفل.';
+
+  @override
+  String get failedToStartSession => 'فشل بدء الجلسة. حاول مرة أخرى.';
+
+  @override
+  String get incorrectPicturePassword => 'كلمة المرور بالصور غير صحيحة. حاول مرة أخرى.';
+
+  // parameterized strings (NEW)
+  @override
+  String yearsOld(int age) => '$age سنة';
+
+  @override
+  String levelXp(int level, int xp) => 'المستوى $level • $xp نقطة';
+
+
 }

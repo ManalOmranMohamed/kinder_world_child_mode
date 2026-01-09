@@ -6,6 +6,8 @@ import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/models/child_profile.dart';
 import 'package:kinder_world/core/providers/auth_controller.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
+import 'package:kinder_world/core/localization/app_localizations.dart';
+import 'package:kinder_world/core/repositories/child_repository.dart';
 
 class ChildLoginScreen extends ConsumerStatefulWidget {
   const ChildLoginScreen({super.key});
@@ -15,13 +17,16 @@ class ChildLoginScreen extends ConsumerStatefulWidget {
 }
 
 class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
+  static const int _passwordLength = 3;
+  static const bool _enableDemoLogin = true;
+
   final List<String> _selectedPictures = [];
   String? _selectedChildId;
+  ChildProfile? _selectedChildProfile; // ✅ cache selected child (supports demo)
   bool _isLoading = false;
   String? _error;
 
-  // Available picture options for password
-  final List<Map<String, dynamic>> _pictureOptions = [
+  final List<Map<String, dynamic>> _pictureOptions = const [
     {'id': 'apple', 'icon': '🍎', 'name': 'Apple'},
     {'id': 'ball', 'icon': '⚽', 'name': 'Ball'},
     {'id': 'cat', 'icon': '🐱', 'name': 'Cat'},
@@ -36,9 +41,61 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     {'id': 'lion', 'icon': '🦁', 'name': 'Lion'},
   ];
 
+  void _showError(String message) {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+      _error = message;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+      ),
+    );
+  }
+
+  void _resetSelection() {
+    setState(() {
+      _selectedChildId = null;
+      _selectedChildProfile = null;
+      _selectedPictures.clear();
+      _error = null;
+    });
+  }
+
+  ChildProfile _demoChild() {
+    final now = DateTime.now();
+    return ChildProfile(
+      id: 'demo',
+      name: 'Demo Kid',
+      age: 7,
+      avatar: 'default',
+      interests: const ['games', 'music'],
+      level: 1,
+      xp: 120,
+      streak: 0,
+      favorites: const [],
+      parentId: 'demo-parent',
+      picturePassword: const ['apple', 'ball', 'cat'],
+      createdAt: now,
+      updatedAt: now,
+      lastSession: null,
+      totalTimeSpent: 0,
+      activitiesCompleted: 0,
+      currentMood: null,
+      learningStyle: null,
+      specialNeeds: null,
+      accessibilityNeeds: null,
+    );
+  }
 
   Future<void> _login() async {
-    if (_selectedChildId == null || _selectedPictures.length != 3) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_selectedChildId == null || _selectedPictures.length != _passwordLength) {
       return;
     }
 
@@ -48,42 +105,34 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     });
 
     try {
-      final childRepository = ref.read(childRepositoryProvider);
-      final child = await childRepository.getChildProfile(_selectedChildId!);
+      // ✅ Use cached profile if available (demo or normal)
+      ChildProfile? child = _selectedChildProfile;
+
+      // If not cached (rare), fetch it (except demo)
+      if (child == null) {
+        if (_selectedChildId == 'demo') {
+          child = _demoChild();
+        } else {
+          final childRepository = ref.read(childRepositoryProvider);
+          child = await childRepository.getChildProfile(_selectedChildId!);
+        }
+      }
 
       if (child == null) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _error = 'Child profile not found';
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Child profile not found'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+        _showError(l10n.childProfileNotFound);
         return;
       }
 
       // Verify picture password
       final storedPassword = child.picturePassword;
-      if (storedPassword.length != 3 || 
-          !_listsEqual(_selectedPictures, storedPassword)) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _error = 'Incorrect picture password';
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Incorrect picture password. Please try again.'),
-              backgroundColor: AppColors.error,
-            ),
-          );
+      final isValidPassword = storedPassword.length == _passwordLength &&
+          _listsEqual(_selectedPictures, storedPassword);
+
+      if (!isValidPassword) {
+        _showError(l10n.incorrectPicturePassword);
+        setState(() {
           _selectedPictures.clear();
-        }
+        });
         return;
       }
 
@@ -96,18 +145,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
 
       if (!authSuccess) {
         final authError = ref.read(authControllerProvider).error;
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _error = authError ?? 'Authentication failed';
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(authError ?? 'Authentication failed. Please try again.'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+        _showError(authError ?? l10n.loginError);
         return;
       }
 
@@ -119,38 +157,15 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       );
 
       if (!sessionSuccess) {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _error = 'Failed to start session';
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to start session. Please try again.'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+        _showError(l10n.failedToStartSession);
         return;
       }
 
-      // Navigate to child home
       if (mounted) {
         context.go('/child/home');
       }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _error = 'Login failed. Please try again.';
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login failed. Please try again.'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+    } catch (_) {
+      _showError(l10n.loginError);
     }
   }
 
@@ -164,7 +179,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('ChildLoginScreen build -> selectedChildId=$_selectedChildId');
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -173,87 +188,88 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => context.go('/select-user-type'),
+          onPressed: _isLoading ? null : () => context.go('/select-user-type'),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header
-                        const SizedBox(height: 20),
-                        Text(
-                          'Child Login',
-                          style: TextStyle(
-                            fontSize: AppConstants.largeFontSize * 1.2,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _selectedChildId == null
-                              ? 'Choose your profile to continue'
-                              : 'Select your picture password',
-                          style: TextStyle(
-                            fontSize: AppConstants.fontSize,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 40),
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
 
-                        // Child Selection
-                        if (_selectedChildId == null) _buildChildSelection(),
-                        if (_selectedChildId != null) _buildPasswordSelection(),
-                      ],
-                    ),
-                  ),
-      ),
-    );
-  }
+              Text(
+                l10n.childLogin,
+                style: TextStyle(
+                  fontSize: AppConstants.largeFontSize * 1.2,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _selectedChildId == null
+                    ? l10n.chooseProfileToContinue
+                    : l10n.selectPicturePassword,
+                style: TextStyle(
+                  fontSize: AppConstants.fontSize,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 40),
 
-  Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.child_care_outlined,
-              size: 80,
-              color: AppColors.grey,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              _error ?? 'No child profiles found',
-              style: TextStyle(
-                fontSize: AppConstants.fontSize,
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                context.go('/select-user-type');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              ),
-              child: const Text('Go Back'),
-            ),
-          ],
+              if (_selectedChildId == null) _buildChildSelection(l10n),
+              if (_selectedChildId != null) _buildPasswordSelection(l10n),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildChildSelection() {
+  Widget _buildErrorState(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 32.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.child_care_outlined,
+            size: 80,
+            color: AppColors.grey,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _error ?? l10n.noChildProfilesFound,
+            style: TextStyle(
+              fontSize: AppConstants.fontSize,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 220,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : () => context.go('/select-user-type'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(l10n.goBack),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChildSelection(AppLocalizations l10n) {
     return FutureBuilder<List<ChildProfile>>(
       future: ref.read(childRepositoryProvider).getAllChildProfiles(),
       builder: (context, snapshot) {
@@ -267,23 +283,24 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         }
 
         if (snapshot.hasError) {
-          debugPrint('ChildLoginScreen: error fetching children -> ${snapshot.error}');
-          return _buildErrorState();
+          return _buildErrorState(l10n);
         }
 
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          debugPrint('ChildLoginScreen: no children found');
-          return _buildErrorState();
-        }
+        final repoChildren = snapshot.data ?? const <ChildProfile>[];
 
-        final children = snapshot.data!;
-        debugPrint('ChildLoginScreen: found ${children.length} children');
+        final children = (repoChildren.isEmpty && _enableDemoLogin)
+            ? <ChildProfile>[_demoChild()]
+            : repoChildren;
+
+        if (children.isEmpty) {
+          return _buildErrorState(l10n);
+        }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Choose Your Profile:',
+              l10n.chooseYourProfile,
               style: TextStyle(
                 fontSize: AppConstants.fontSize,
                 fontWeight: FontWeight.w600,
@@ -295,7 +312,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               spacing: 16,
               runSpacing: 16,
               alignment: WrapAlignment.center,
-              children: children.map((child) => _buildChildCard(child)).toList(),
+              children: children.map((child) => _buildChildCard(child, l10n)).toList(),
             ),
           ],
         );
@@ -303,11 +320,13 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     );
   }
 
-  Widget _buildPasswordSelection() {
+  Widget _buildPasswordSelection(AppLocalizations l10n) {
+    // ✅ Use cached profile for UI (works with demo)
+    final child = _selectedChildProfile;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Selected child info
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -315,12 +334,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.primary.withOpacity(0.3)),
           ),
-          child: FutureBuilder<ChildProfile?>(
-            future: ref.read(childRepositoryProvider).getChildProfile(_selectedChildId!),
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data != null) {
-                final child = snapshot.data!;
-                return Row(
+          child: child == null
+              ? const SizedBox()
+              : Row(
                   children: [
                     Container(
                       width: 50,
@@ -331,7 +347,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                       ),
                       child: Center(
                         child: Text(
-                          child.name[0],
+                          child.name.isNotEmpty ? child.name[0] : '?',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -354,7 +370,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                             ),
                           ),
                           Text(
-                            'Level ${child.level} • ${child.xp} XP',
+                            l10n.levelXp(child.level, child.xp),
                             style: TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
@@ -365,34 +381,32 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: AppColors.textSecondary),
-                      onPressed: () {
-                        setState(() {
-                          _selectedChildId = null;
-                          _selectedPictures.clear();
-                        });
-                      },
+                      onPressed: _isLoading ? null : _resetSelection,
                     ),
                   ],
-                );
-              }
-              return const SizedBox();
-            },
-          ),
+                ),
         ),
         const SizedBox(height: 32),
 
-        // Picture Password Selection
         Text(
-          'Select Your Picture Password:',
+          l10n.selectPicturePassword,
           style: TextStyle(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
 
-        // Selected pictures display
+        Text(
+          '${_selectedPictures.length}/$_passwordLength',
+          style: TextStyle(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 12),
+
         Container(
           height: 80,
           padding: const EdgeInsets.all(12),
@@ -403,8 +417,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(3, (index) {
-              final pictureId = _selectedPictures.length > index ? _selectedPictures[index] : null;
+            children: List.generate(_passwordLength, (index) {
+              final pictureId =
+                  _selectedPictures.length > index ? _selectedPictures[index] : null;
               final picture = pictureId != null
                   ? _pictureOptions.firstWhere(
                       (p) => p['id'] == pictureId,
@@ -417,7 +432,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 height: 56,
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
-                  color: picture != null ? AppColors.primary.withOpacity(0.1) : AppColors.lightGrey,
+                  color: picture != null
+                      ? AppColors.primary.withOpacity(0.1)
+                      : AppColors.lightGrey,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: picture != null ? AppColors.primary : AppColors.grey,
@@ -438,7 +455,6 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         ),
         const SizedBox(height: 24),
 
-        // Picture options grid
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -454,15 +470,17 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
             final isSelected = _selectedPictures.contains(picture['id']);
 
             return InkWell(
-              onTap: () {
-                setState(() {
-                  if (_selectedPictures.length < 3 && !isSelected) {
-                    _selectedPictures.add(picture['id'] as String);
-                  } else if (isSelected) {
-                    _selectedPictures.remove(picture['id']);
-                  }
-                });
-              },
+              onTap: _isLoading
+                  ? null
+                  : () {
+                      setState(() {
+                        if (_selectedPictures.length < _passwordLength && !isSelected) {
+                          _selectedPictures.add(picture['id'] as String);
+                        } else if (isSelected) {
+                          _selectedPictures.remove(picture['id']);
+                        }
+                      });
+                    },
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 decoration: BoxDecoration(
@@ -498,27 +516,28 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         ),
         const SizedBox(height: 32),
 
-        // Clear button
         if (_selectedPictures.isNotEmpty)
           Center(
             child: TextButton(
-              onPressed: () {
-                setState(() {
-                  _selectedPictures.clear();
-                });
-              },
-              child: const Text('Clear Selection'),
+              onPressed: _isLoading
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedPictures.clear();
+                      });
+                    },
+              child: Text(l10n.clearSelection),
             ),
           ),
 
         const SizedBox(height: 24),
 
-        // Login button
         SizedBox(
           width: double.infinity,
           height: 64,
           child: ElevatedButton(
-            onPressed: (_selectedPictures.length == 3 && !_isLoading) ? _login : null,
+            onPressed:
+                (_selectedPictures.length == _passwordLength && !_isLoading) ? _login : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.behavioral,
               foregroundColor: AppColors.white,
@@ -529,7 +548,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
             child: _isLoading
                 ? const CircularProgressIndicator(color: AppColors.white)
                 : Text(
-                    'Login',
+                    l10n.login,
                     style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.w600,
@@ -541,24 +560,26 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     );
   }
 
-  Widget _buildChildCard(ChildProfile child) {
+  Widget _buildChildCard(ChildProfile child, AppLocalizations l10n) {
     final isSelected = _selectedChildId == child.id;
 
     return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedChildId = child.id;
-          _selectedPictures.clear();
-        });
-      },
+      onTap: _isLoading
+          ? null
+          : () {
+              setState(() {
+                _selectedChildId = child.id;
+                _selectedChildProfile = child; // ✅ cache selected child
+                _selectedPictures.clear();
+                _error = null;
+              });
+            },
       borderRadius: BorderRadius.circular(16),
       child: Container(
         width: 140,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withOpacity(0.1)
-              : AppColors.white,
+          color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.lightGrey,
@@ -567,7 +588,6 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         ),
         child: Column(
           children: [
-            // Avatar
             Container(
               width: 64,
               height: 64,
@@ -577,7 +597,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               ),
               child: Center(
                 child: Text(
-                  child.name[0],
+                  child.name.isNotEmpty ? child.name[0] : '?',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -596,14 +616,13 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               ),
             ),
             Text(
-              '${child.age} years old',
+              l10n.yearsOld(child.age),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
-            // Level indicator
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -611,7 +630,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'Level ${child.level}',
+                '${l10n.level} ${child.level}',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

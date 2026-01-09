@@ -633,4 +633,37 @@ class AppLocalizationsEn extends AppLocalizations {
   
   @override
   String get switchAccess => 'Switch Access';
-}
+  
+  @override
+  String get chooseProfileToContinue => 'Choose your profile to continue.';
+
+  @override
+  String get chooseYourProfile => 'Choose Your Profile:';
+
+  @override
+  String get clearSelection => 'Clear Selection';
+
+  @override
+  String get goBack => 'Go Back';
+
+  @override
+  String get noChildProfilesFound => 'No child profiles found.';
+
+  @override
+  String get childProfileNotFound => 'Child profile not found.';
+
+  @override
+  String get failedToStartSession => 'Failed to start session. Please try again.';
+
+  @override
+  String get incorrectPicturePassword => 'Incorrect picture password. Please try again.';
+
+  // parameterized strings (NEW)
+  @override
+  String yearsOld(int age) => '$age years old';
+
+  @override
+  String levelXp(int level, int xp) => 'Level $level • $xp XP';
+
+  
+  }

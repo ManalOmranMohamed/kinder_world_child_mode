@@ -7,7 +7,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = 
+  static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
   // Common
@@ -28,7 +28,7 @@ abstract class AppLocalizations {
   String get retry;
   String get noInternet;
   String get offlineMode;
-  
+
   // Authentication
   String get login;
   String get register;
@@ -44,13 +44,27 @@ abstract class AppLocalizations {
   String get picturePasswordError;
   String get loginError;
   String get registerError;
-  
+
+  // ✅ Child Login Screen (NEW)
+  String get chooseProfileToContinue;
+  String get chooseYourProfile;
+  String get clearSelection;
+  String get goBack;
+  String get noChildProfilesFound;
+  String get childProfileNotFound;
+  String get failedToStartSession;
+  String get incorrectPicturePassword;
+
+  // ✅ parameterized strings (NEW)
+  String yearsOld(int age);
+  String levelXp(int level, int xp);
+
   // User Types
   String get selectUserType;
   String get childMode;
   String get parentMode;
   String get teacherMode;
-  
+
   // Child Mode
   String get home;
   String get learn;
@@ -69,7 +83,7 @@ abstract class AppLocalizations {
   String get tired;
   String get angry;
   String get calm;
-  
+
   // Learning
   String get educationalContent;
   String get behavioralSkills;
@@ -95,7 +109,7 @@ abstract class AppLocalizations {
   String get video;
   String get complete;
   String get start;
-  
+
   // Entertainment
   String get entertainment;
   String get educationalGames;
@@ -107,7 +121,7 @@ abstract class AppLocalizations {
   String get cartoonMovies;
   String get songs;
   String get funnyClips;
-  
+
   // AI Buddy
   String get askMeAnything;
   String get quickActions;
@@ -121,7 +135,7 @@ abstract class AppLocalizations {
   String get textChat;
   String get aiThinking;
   String get aiError;
-  
+
   // Progress & Rewards
   String get progress;
   String get xp;
@@ -132,7 +146,7 @@ abstract class AppLocalizations {
   String get dailyStreak;
   String get weeklyProgress;
   String get monthlyProgress;
-  
+
   // Parent Dashboard
   String get parentDashboard;
   String get overview;
@@ -144,7 +158,7 @@ abstract class AppLocalizations {
   String get childInterests;
   String get avatar;
   String get saveChanges;
-  
+
   // Reports
   String get reports;
   String get activityReports;
@@ -159,7 +173,7 @@ abstract class AppLocalizations {
   String get averageScore;
   String get strengths;
   String get areasForImprovement;
-  
+
   // Parental Controls
   String get parentalControls;
   String get contentRestrictions;
@@ -176,7 +190,7 @@ abstract class AppLocalizations {
   String get breakReminders;
   String get smartControl;
   String get aiRecommendations;
-  
+
   // Settings
   String get settings;
   String get notifications;
@@ -197,7 +211,7 @@ abstract class AppLocalizations {
   String get sound;
   String get soundEffects;
   String get voiceGuidance;
-  
+
   // Subscription
   String get subscription;
   String get freeTrial;
@@ -210,7 +224,7 @@ abstract class AppLocalizations {
   String get trialEnds;
   String get subscriptionActive;
   String get subscriptionExpired;
-  
+
   // Safety & Privacy
   String get safety;
   String get privacy;
@@ -221,7 +235,7 @@ abstract class AppLocalizations {
   String get parentalConsentRequired;
   String get minimalDataCollection;
   String get encryptedStorage;
-  
+
   // Help & Support
   String get help;
   String get support;
@@ -230,7 +244,7 @@ abstract class AppLocalizations {
   String get tutorial;
   String get walkthrough;
   String get feedback;
-  
+
   // System Messages
   String get maintenanceMode;
   String get updateRequired;
@@ -240,7 +254,7 @@ abstract class AppLocalizations {
   String get logoutConfirm;
   String get exitConfirm;
   String get deleteConfirm;
-  
+
   // Validation
   String get fieldRequired;
   String get invalidEmail;
@@ -248,7 +262,7 @@ abstract class AppLocalizations {
   String get passwordsDontMatch;
   String get invalidAge;
   String get selectAvatar;
-  
+
   // Accessibility
   String get increaseFontSize;
   String get decreaseFontSize;
