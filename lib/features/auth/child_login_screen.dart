@@ -204,7 +204,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.black.withValues(alpha: 0.2),
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -212,8 +212,8 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 ),
                 child: Text(
                   message,
-                  style: const TextStyle(
-                    color: AppColors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -758,10 +758,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                       children: [
                         Text(
                           l10n.createChildProfile,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: AppConstants.fontSize,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -770,7 +770,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                           decoration: InputDecoration(
                             labelText: l10n.childName,
                             errorText: nameError,
-                            prefixIcon: const Icon(Icons.person),
+                            prefixIcon: Icon(Icons.person),
                           ),
                           textCapitalization: TextCapitalization.words,
                           onChanged: (_) => setDialogState(() {
@@ -783,7 +783,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                           decoration: InputDecoration(
                             labelText: l10n.parentEmail,
                             errorText: emailError,
-                            prefixIcon: const Icon(Icons.email),
+                            prefixIcon: Icon(Icons.email),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           textCapitalization: TextCapitalization.none,
@@ -798,7 +798,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                             const SizedBox(width: 12),
                             DropdownButton<int>(
                               value: age,
-                              hint: const Text('-'),
+                              hint: Text('-'),
                               items: List.generate(12, (i) => i + 3)
                                   .map(
                                     (value) => DropdownMenuItem(
@@ -837,12 +837,12 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                                     color: isSelected
                                         ? AppColors.primary
                                             .withValues(alpha: 0.2)
-                                        : AppColors.white,
+                                        : Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: isSelected
                                           ? AppColors.primary
-                                          : AppColors.lightGrey,
+                                          : Theme.of(context).colorScheme.surfaceVariant,
                                       width: 2,
                                     ),
                                   ),
@@ -883,7 +883,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                           const SizedBox(height: 6),
                           Text(
                             l10n.picturePasswordError,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: AppColors.error,
                               fontSize: 12,
                             ),
@@ -909,12 +909,12 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? option.color.withValues(alpha: 0.2)
-                                        : AppColors.white,
+                                        : Theme.of(context).colorScheme.surface,
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
                                       color: isSelected
                                           ? option.color
-                                          : AppColors.lightGrey,
+                                          : Theme.of(context).colorScheme.surfaceVariant,
                                       width: 2,
                                     ),
                                   ),
@@ -1102,11 +1102,11 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                                       }
                                     : null,
                                 child: isSaving
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         height: 16,
                                         width: 16,
                                         child: CircularProgressIndicator(
-                                          color: AppColors.white,
+                                          color: Theme.of(context).colorScheme.surface,
                                           strokeWidth: 2,
                                         ),
                                       )
@@ -1140,7 +1140,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: _isLoading ? null : () => context.go('/select-user-type'),
         ),
       ),
@@ -1153,18 +1153,18 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               const SizedBox(height: 20),
               Text(
                 l10n.childLogin,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: AppConstants.largeFontSize * 1.2,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 l10n.chooseProfileToContinue,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: AppConstants.fontSize,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 40),
@@ -1235,17 +1235,17 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.child_care_outlined,
             size: 80,
-            color: AppColors.grey,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
           const SizedBox(height: 16),
           Text(
             _error ?? l10n.noChildProfilesFound,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: AppConstants.fontSize,
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -1258,7 +1258,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                   _isLoading ? null : () => context.go('/select-user-type'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -1322,10 +1322,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               ),
             ),
             child: _isLoading
-                ? const CircularProgressIndicator(color: AppColors.white)
+                ? CircularProgressIndicator(color: Theme.of(context).colorScheme.surface)
                 : Text(
                     l10n.login,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1338,7 +1338,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
           height: 48,
           child: OutlinedButton.icon(
             onPressed: _isLoading ? null : () => _showCreateProfileDialog(l10n),
-            icon: const Icon(Icons.add),
+            icon: Icon(Icons.add),
             label: Text(l10n.createChildProfile),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
@@ -1360,10 +1360,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       children: [
         Text(
           l10n.chooseYourProfile,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 16),
@@ -1412,18 +1412,18 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                   children: [
                     Text(
                       child.name.isNotEmpty ? child.name : child.id,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: AppConstants.fontSize,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     if (child.age > 0)
                       Text(
                         l10n.yearsOld(child.age),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                   ],
@@ -1431,7 +1431,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               ),
               if (canChangeChild)
                 IconButton(
-                  icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   onPressed: _isLoading ? null : _resetSelection,
                 ),
             ],
@@ -1452,16 +1452,16 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.behavioral,
-              foregroundColor: AppColors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
             child: _isLoading
-                ? const CircularProgressIndicator(color: AppColors.white)
+                ? CircularProgressIndicator(color: Theme.of(context).colorScheme.surface)
                 : Text(
                     l10n.login,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1478,10 +1478,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       children: [
         Text(
           l10n.selectPicturePassword,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 8),
@@ -1510,10 +1510,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? option.color.withValues(alpha: 0.2)
-                      : AppColors.white,
+                      : Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? option.color : AppColors.lightGrey,
+                    color: isSelected ? option.color : Theme.of(context).colorScheme.surfaceVariant,
                     width: 2,
                   ),
                 ),
@@ -1571,10 +1571,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.white,
+              : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.lightGrey,
+            color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.surfaceVariant,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -1589,10 +1589,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
             const SizedBox(height: 12),
             Text(
               child.name.isNotEmpty ? child.name : child.id,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: AppConstants.fontSize,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -1600,18 +1600,18 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               const SizedBox(height: 4),
               Text(
                 l10n.yearsOld(child.age),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ] else ...[
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 '—',
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -1624,7 +1624,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               ),
               child: Text(
                 '${l10n.level} ${child.level}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.xpColor,
@@ -1645,9 +1645,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         width: 140,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.lightGrey),
+          border: Border.all(color: Theme.of(context).colorScheme.surfaceVariant),
         ),
         child: Column(
           children: [
@@ -1659,7 +1659,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 borderRadius: BorderRadius.circular(32),
                 border: Border.all(color: AppColors.primary),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.add,
                 color: AppColors.primary,
                 size: 30,
@@ -1668,10 +1668,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
             const SizedBox(height: 12),
             Text(
               l10n.createChildProfile,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
             ),
@@ -1681,3 +1681,4 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     );
   }
 }
+

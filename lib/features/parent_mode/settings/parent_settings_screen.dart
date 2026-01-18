@@ -6,7 +6,6 @@ import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/providers/auth_controller.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
-import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/router.dart';
 
 class ParentSettingsScreen extends ConsumerWidget {
@@ -24,8 +23,6 @@ class ParentSettingsScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(l10n.settings),
-        backgroundColor: colors.surface,
-        foregroundColor: colors.onSurface,
       ),
       body: SafeArea(
         child: ListView(
@@ -34,8 +31,9 @@ class ParentSettingsScreen extends ConsumerWidget {
             const SizedBox(height: 8),
 
             // Account Section
-            _buildSectionHeader(l10n.accountSection),
+            _buildSectionHeader(context, l10n.accountSection),
             _buildSettingItem(
+              context,
               l10n.profileLabel,
               Icons.person,
               onTap: () {
@@ -45,6 +43,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.changePassword,
               Icons.lock,
               onTap: () {
@@ -54,6 +53,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.notifications,
               Icons.notifications,
               onTap: () {
@@ -66,8 +66,9 @@ class ParentSettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Family Section
-            _buildSectionHeader(l10n.familySection),
+            _buildSectionHeader(context, l10n.familySection),
             _buildSettingItem(
+              context,
               l10n.childProfiles,
               Icons.child_care,
               onTap: () {
@@ -77,6 +78,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.subscription,
               Icons.payment,
               onTap: () {
@@ -86,6 +88,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.parentalControls,
               Icons.security,
               onTap: () {
@@ -98,8 +101,9 @@ class ParentSettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Preferences Section
-            _buildSectionHeader(l10n.preferencesSection),
+            _buildSectionHeader(context, l10n.preferencesSection),
             _buildSettingItem(
+              context,
               l10n.language,
               Icons.language,
               onTap: () {
@@ -109,6 +113,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.theme,
               Icons.palette,
               onTap: () {
@@ -118,6 +123,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.privacySettings,
               Icons.privacy_tip,
               onTap: () {
@@ -130,8 +136,9 @@ class ParentSettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Support Section
-            _buildSectionHeader(l10n.supportSection),
+            _buildSectionHeader(context, l10n.supportSection),
             _buildSettingItem(
+              context,
               l10n.helpFaq,
               Icons.help,
               onTap: () {
@@ -141,6 +148,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.contactUs,
               Icons.contact_mail,
               onTap: () {
@@ -150,6 +158,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.about,
               Icons.info,
               onTap: () {
@@ -162,8 +171,9 @@ class ParentSettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Legal Section
-            _buildSectionHeader(l10n.legalSection),
+            _buildSectionHeader(context, l10n.legalSection),
             _buildSettingItem(
+              context,
               l10n.termsOfService,
               Icons.description,
               onTap: () {
@@ -173,6 +183,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.privacyPolicy,
               Icons.security,
               onTap: () {
@@ -182,6 +193,7 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
             _buildSettingItem(
+              context,
               l10n.coppaCompliance,
               Icons.child_care,
               onTap: () {
@@ -206,8 +218,8 @@ class ParentSettingsScreen extends ConsumerWidget {
               icon: const Icon(Icons.logout),
               label: Text(l10n.logout),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                foregroundColor: AppColors.white,
+                backgroundColor: colors.error,
+                foregroundColor: colors.onError,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -220,40 +232,43 @@ class ParentSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: AppConstants.fontSize,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
-        ),
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontSize: AppConstants.fontSize,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
 
-  Widget _buildSettingItem(String title, IconData icon, {VoidCallback? onTap}) {
+  Widget _buildSettingItem(BuildContext context, String title, IconData icon, {VoidCallback? onTap}) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return ListTile(
       leading: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
+          color: colors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: AppColors.primary, size: 20),
+        child: Icon(icon, color: colors.primary, size: 20),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: textTheme.bodyMedium?.copyWith(
           fontSize: AppConstants.fontSize,
-          color: AppColors.textPrimary,
         ),
       ),
-      trailing:
-          const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.grey),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: colors.onSurfaceVariant,
+      ),
       onTap: onTap,
     );
   }

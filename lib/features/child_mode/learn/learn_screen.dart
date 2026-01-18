@@ -77,12 +77,12 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Learn',
                           style: TextStyle(
                             fontSize: AppConstants.largeFontSize * 1.5,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         IconButton(
@@ -91,18 +91,18 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                             Icons.filter_list,
                             color: filters.hasActiveFilters
                                 ? AppColors.primary
-                                : AppColors.textSecondary,
+                                : Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           tooltip: 'Filters',
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Choose what you want to learn today!',
                       style: TextStyle(
                         fontSize: AppConstants.fontSize,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -135,10 +135,10 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: isSelected ? color : AppColors.white,
+                          color: isSelected ? color : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: isSelected ? color : AppColors.lightGrey,
+                            color: isSelected ? color : Theme.of(context).colorScheme.surfaceVariant,
                           ),
                         ),
                         child: Row(
@@ -146,7 +146,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                             Icon(
                               _getAspectIcon(aspect),
                               size: 20,
-                              color: isSelected ? AppColors.white : color,
+                              color: isSelected ? Theme.of(context).colorScheme.surface : color,
                             ),
                             const SizedBox(width: 8),
                             Text(
@@ -156,8 +156,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                 fontWeight:
                                     isSelected ? FontWeight.w600 : FontWeight.normal,
                                 color: isSelected
-                                    ? AppColors.white
-                                    : AppColors.textPrimary,
+                                    ? Theme.of(context).colorScheme.surface
+                                    : Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                           ],
@@ -183,7 +183,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.error_outline,
                                   size: 64,
                                   color: AppColors.error,
@@ -191,9 +191,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                 const SizedBox(height: 16),
                                 Text(
                                   contentState.error!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: AppConstants.fontSize,
-                                    color: AppColors.textSecondary,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -204,27 +204,27 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                         .read(contentControllerProvider.notifier)
                                         .loadAllActivities();
                                   },
-                                  child: const Text('Retry'),
+                                  child: Text('Retry'),
                                 ),
                               ],
                             ),
                           )
                         : filteredActivities.isEmpty
-                            ? const Center(
+                            ? Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
                                       Icons.school_outlined,
                                       size: 64,
-                                      color: AppColors.grey,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                     SizedBox(height: 16),
                                     Text(
                                       'No activities available',
                                       style: TextStyle(
                                         fontSize: AppConstants.fontSize,
-                                        color: AppColors.textSecondary,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                     SizedBox(height: 8),
@@ -232,7 +232,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                       'Try adjusting your filters.',
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: AppColors.textSecondary,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -288,12 +288,12 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Filters',
                             style: TextStyle(
                               fontSize: AppConstants.largeFontSize,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           TextButton(
@@ -302,17 +302,17 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                   .read(activityFilterControllerProvider.notifier)
                                   .clearFilters();
                             },
-                            child: const Text('Reset'),
+                            child: Text('Reset'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Category',
                         style: TextStyle(
                           fontSize: AppConstants.fontSize,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -321,7 +321,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                         runSpacing: 8,
                         children: [
                           ChoiceChip(
-                            label: const Text('All'),
+                            label: Text('All'),
                             selected: filters.selectedCategory == null,
                             onSelected: (_) {
                               ref
@@ -345,12 +345,12 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                         ],
                       ),
                       const SizedBox(height: 24),
-                      const Text(
+                      Text(
                         'Difficulty',
                         style: TextStyle(
                           fontSize: AppConstants.fontSize,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -359,7 +359,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                         runSpacing: 8,
                         children: [
                           ChoiceChip(
-                            label: const Text('All'),
+                            label: Text('All'),
                             selected: filters.selectedDifficulty == null,
                             onSelected: (_) {
                               ref
@@ -389,13 +389,13 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                           onPressed: () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            foregroundColor: AppColors.white,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text('Apply Filters'),
+                          child: Text('Apply Filters'),
                         ),
                       ),
                     ],
@@ -415,11 +415,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
       borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.04),
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -462,10 +462,10 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
               activity.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: AppConstants.fontSize,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 6),
@@ -476,27 +476,27 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.access_time,
-                        size: 14, color: AppColors.textSecondary),
+                    Icon(Icons.access_time,
+                        size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text(
                       activity.estimatedTime,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.star, size: 14, color: AppColors.xpColor),
+                    Icon(Icons.star, size: 14, color: AppColors.xpColor),
                     const SizedBox(width: 4),
                     Text(
                       '${activity.xpReward} XP',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -539,3 +539,4 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
     }
   }
 }
+

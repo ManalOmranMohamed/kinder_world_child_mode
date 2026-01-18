@@ -59,6 +59,7 @@ class _ChildHomeScreenState extends ConsumerState<ChildHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -72,11 +73,11 @@ class _ChildHomeScreenState extends ConsumerState<ChildHomeScreen>
         body: widget.navigationShell,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: colors.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(
-                color: AppColors.black.withValues(alpha: 0.1),
+                color: colors.shadow.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -104,14 +105,16 @@ class _ChildHomeScreenState extends ConsumerState<ChildHomeScreen>
 
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = widget.navigationShell.currentIndex == index;
-    final color = isSelected ? AppColors.primary : AppColors.grey;
+    final colors = Theme.of(context).colorScheme;
+    final color = isSelected ? colors.primary : colors.onSurfaceVariant;
     
     return GestureDetector(
       onTap: () => _onTap(index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color:
+              isSelected ? colors.primary.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -184,7 +187,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.error_outline,
                   size: 80,
                   color: AppColors.error,
@@ -192,9 +195,9 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 const SizedBox(height: 24),
                 Text(
                   sessionState.error ?? 'No active child session',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: AppConstants.fontSize,
-                    color: AppColors.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -205,10 +208,10 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   ),
-                  child: const Text('Go to Login'),
+                  child: Text('Go to Login'),
                 ),
               ],
             ),
@@ -237,8 +240,8 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 child: Center(
                   child: Text(
                     childProfile.name[0],
-                    style: const TextStyle(
-                      color: AppColors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.surface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -252,17 +255,17 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 children: [
                   Text(
                     'Hello, ${childProfile.name}!',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Ready to learn today?',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -274,21 +277,21 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
                   Text(
                     MoodTypes.getEmoji(childProfile.currentMood ?? MoodTypes.happy),
-                    style: const TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 20),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     _getMoodLabel(childProfile.currentMood ?? MoodTypes.happy),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -355,11 +358,11 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -368,12 +371,12 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Your Progress',
             style: TextStyle(
               fontSize: AppConstants.fontSize,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 20),
@@ -425,17 +428,17 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -446,12 +449,12 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Continue Learning',
           style: TextStyle(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 16),
@@ -472,7 +475,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   color: AppColors.educational.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.school,
                   size: 30,
                   color: AppColors.educational,
@@ -480,7 +483,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
               ),
               const SizedBox(width: 16),
               
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -489,14 +492,14 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                       style: TextStyle(
                         fontSize: AppConstants.fontSize,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       'Explore new topics and activities',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -509,12 +512,12 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.educational,
-                  foregroundColor: AppColors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text('Start'),
+                child: Text('Start'),
               ),
             ],
           ),
@@ -535,12 +538,12 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Daily Goal',
               style: TextStyle(
                 fontSize: AppConstants.fontSize,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -557,17 +560,17 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Complete $targetActivities activities',
                         style: TextStyle(
                           fontSize: AppConstants.fontSize,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         '$todayActivities/$targetActivities',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: AppConstants.fontSize,
                           fontWeight: FontWeight.bold,
                           color: AppColors.success,
@@ -581,7 +584,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
                       value: clampedProgress,
-                      backgroundColor: AppColors.lightGrey,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
                       minHeight: 8,
                     ),
@@ -599,12 +602,12 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Recommended for You',
           style: TextStyle(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 16),
@@ -633,9 +636,9 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   width: 120,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.lightGrey),
+                    border: Border.all(color: Theme.of(context).colorScheme.surfaceVariant),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -656,10 +659,10 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                       const SizedBox(height: 8),
                       Text(
                         activity['title'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -693,19 +696,19 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   color: AppColors.secondary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.star,
                   color: AppColors.secondary,
                   size: 20,
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Activity of the Day',
                 style: TextStyle(
                   fontSize: AppConstants.fontSize,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
@@ -721,7 +724,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   color: AppColors.secondary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.lightbulb,
                   size: 40,
                   color: AppColors.secondary,
@@ -729,7 +732,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
               ),
               const SizedBox(width: 16),
               
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -738,14 +741,14 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                       style: TextStyle(
                         fontSize: AppConstants.fontSize,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     Text(
                       'Discover something amazing!',
                       style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     SizedBox(height: 8),
@@ -767,12 +770,12 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.secondary,
-                  foregroundColor: AppColors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text('Start'),
+                child: Text('Start'),
               ),
             ],
           ),

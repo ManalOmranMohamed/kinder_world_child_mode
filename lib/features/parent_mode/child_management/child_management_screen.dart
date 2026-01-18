@@ -344,7 +344,7 @@ class _ChildManagementScreenState
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.black.withValues(alpha: 0.2),
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -352,8 +352,8 @@ class _ChildManagementScreenState
                 ),
                 child: Text(
                   message,
-                  style: const TextStyle(
-                    color: AppColors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -474,14 +474,14 @@ class _ChildManagementScreenState
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.error,
-                    foregroundColor: AppColors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                   child: isDeleting
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(
-                            color: AppColors.white,
+                            color: Theme.of(context).colorScheme.surface,
                             strokeWidth: 2,
                           ),
                         )
@@ -578,28 +578,28 @@ class _ChildManagementScreenState
                             const SizedBox(height: 20),
                             Text(
                               l10n.manageChildProfiles,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: AppConstants.largeFontSize,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               l10n.addEditManageChildren,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: AppConstants.fontSize,
-                                color: AppColors.textSecondary,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
                             ),
                             const SizedBox(height: 24),
                             const PlanStatusBanner(),
                             Text(
                               l10n.yourChildren,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: AppConstants.fontSize,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -615,18 +615,18 @@ class _ChildManagementScreenState
                                     const SizedBox(height: 16),
                                     Text(
                                       l10n.noChildProfilesYet,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: AppConstants.fontSize,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.textPrimary,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       l10n.tapToAddChild,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
-                                        color: AppColors.textSecondary,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                   ],
@@ -640,10 +640,10 @@ class _ChildManagementScreenState
                             const SizedBox(height: 24),
                             Text(
                               l10n.childProfiles,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: AppConstants.fontSize,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -738,7 +738,7 @@ class _ChildManagementScreenState
                               const SizedBox(width: 12),
                               DropdownButton<int>(
                                 value: age,
-                                hint: const Text('-'),
+                                hint: Text('-'),
                                 items: List.generate(12, (i) => i + 3)
                                     .map((v) => DropdownMenuItem(
                                           value: v,
@@ -777,12 +777,12 @@ class _ChildManagementScreenState
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? AppColors.primary.withValues(alpha: 0.2)
-                                          : AppColors.white,
+                                          : Theme.of(context).colorScheme.surface,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: isSelected
                                             ? AppColors.primary
-                                            : AppColors.lightGrey,
+                                            : Theme.of(context).colorScheme.surfaceVariant,
                                         width: 2,
                                       ),
                                     ),
@@ -809,7 +809,7 @@ class _ChildManagementScreenState
                             const SizedBox(height: 6),
                             Text(
                               l10n.picturePasswordError,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.error,
                                 fontSize: 12,
                               ),
@@ -833,12 +833,12 @@ class _ChildManagementScreenState
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? option.color.withValues(alpha: 0.2)
-                                          : AppColors.white,
+                                          : Theme.of(context).colorScheme.surface,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: isSelected
                                             ? option.color
-                                            : AppColors.lightGrey,
+                                            : Theme.of(context).colorScheme.surfaceVariant,
                                         width: 2,
                                       ),
                                     ),
@@ -975,11 +975,11 @@ class _ChildManagementScreenState
                               }
                             : null,
                         child: isSaving
-                            ? const SizedBox(
+                            ? SizedBox(
                                 height: 16,
                                 width: 16,
                                 child: CircularProgressIndicator(
-                                  color: AppColors.white,
+                                  color: Theme.of(context).colorScheme.surface,
                                   strokeWidth: 2,
                                 ),
                               )
@@ -993,7 +993,7 @@ class _ChildManagementScreenState
           );
         },
         backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add),
       ),
     );
   }
@@ -1016,11 +1016,11 @@ class _ChildManagementScreenState
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -1051,10 +1051,10 @@ class _ChildManagementScreenState
                 children: [
                   Text(
                     child.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -1063,9 +1063,9 @@ class _ChildManagementScreenState
                       Expanded(
                         child: Text(
                           '${l10n.childId}: ${child.id}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -1081,8 +1081,8 @@ class _ChildManagementScreenState
                             ),
                           );
                         },
-                        icon: const Icon(Icons.copy, size: 16),
-                        color: AppColors.textSecondary,
+                        icon: Icon(Icons.copy, size: 16),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints.tightFor(
                           width: 28,
@@ -1095,9 +1095,9 @@ class _ChildManagementScreenState
                   if (details.isNotEmpty)
                     Text(
                       details.join(' - '),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   const SizedBox(height: 8),
@@ -1128,12 +1128,12 @@ class _ChildManagementScreenState
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.lightGrey,
+                    color: Theme.of(context).colorScheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     MoodTypes.getEmoji(child.currentMood ?? MoodTypes.happy),
-                    style: const TextStyle(fontSize: 22),
+                    style: TextStyle(fontSize: 22),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1142,7 +1142,7 @@ class _ChildManagementScreenState
                   child: IconButton(
                     onPressed: () =>
                         context.push('/parent/reports', extra: child.id),
-                    icon: const Icon(Icons.pie_chart),
+                    icon: Icon(Icons.pie_chart),
                     color: AppColors.primary,
                     iconSize: 20,
                     padding: EdgeInsets.zero,
@@ -1158,7 +1158,7 @@ class _ChildManagementScreenState
                   message: l10n.delete,
                   child: IconButton(
                     onPressed: () => _confirmDeleteChild(child),
-                    icon: const Icon(Icons.delete_outline),
+                    icon: Icon(Icons.delete_outline),
                     color: AppColors.error,
                     iconSize: 20,
                     padding: EdgeInsets.zero,
@@ -1204,9 +1204,9 @@ class _ChildManagementScreenState
           const SizedBox(width: 12),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],

@@ -247,17 +247,17 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                               ),
                             ],
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.psychology,
                             size: 30,
-                            color: AppColors.white,
+                            color: Theme.of(context).colorScheme.surface,
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
                       
                       // Title
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -265,14 +265,14 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                             style: TextStyle(
                               fontSize: AppConstants.largeFontSize,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Text(
                             'Your learning companion',
                             style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -282,12 +282,12 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                   const SizedBox(height: 24),
                   
                   // Quick Actions
-                  const Text(
+                  Text(
                     'Quick Actions',
                     style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -326,11 +326,11 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.black.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -344,7 +344,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: AppColors.lightGrey,
+                          color: Theme.of(context).colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: TextField(
@@ -369,7 +369,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.send, color: AppColors.white),
+                        icon: Icon(Icons.send, color: Theme.of(context).colorScheme.surface),
                         onPressed: _sendMessage,
                       ),
                     ),
@@ -391,9 +391,9 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
         width: 100,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.lightGrey),
+          border: Border.all(color: Theme.of(context).colorScheme.surfaceVariant),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -414,10 +414,10 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
             const SizedBox(height: 8),
             Text(
               action.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
@@ -443,14 +443,14 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: message.isUser ? AppColors.primary : AppColors.white,
+          color: message.isUser ? AppColors.primary : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20).copyWith(
             bottomLeft: message.isUser ? const Radius.circular(20) : Radius.zero,
             bottomRight: !message.isUser ? const Radius.circular(20) : Radius.zero,
           ),
           boxShadow: message.isUser ? [] : [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -459,7 +459,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
         child: Text(
           message.text,
           style: TextStyle(
-            color: message.isUser ? AppColors.white : AppColors.textPrimary,
+            color: message.isUser ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.onSurface,
             fontSize: AppConstants.fontSize,
           ),
         ),
@@ -474,11 +474,11 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -491,7 +491,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                color: AppColors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -500,7 +500,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                color: AppColors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -509,7 +509,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
               width: 8,
               height: 8,
               decoration: BoxDecoration(
-                color: AppColors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -545,3 +545,4 @@ class QuickAction {
     required this.onTap,
   });
 }
+
