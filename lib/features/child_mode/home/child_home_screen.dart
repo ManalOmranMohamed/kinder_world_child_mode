@@ -187,7 +187,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline,
                   size: 80,
                   color: AppColors.error,
@@ -211,7 +211,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   ),
-                  child: Text('Go to Login'),
+                  child: const Text('Go to Login'),
                 ),
               ],
             ),
@@ -284,7 +284,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 children: [
                   Text(
                     MoodTypes.getEmoji(childProfile.currentMood ?? MoodTypes.happy),
-                    style: TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -475,7 +475,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   color: AppColors.educational.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.school,
                   size: 30,
                   color: AppColors.educational,
@@ -517,7 +517,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text('Start'),
+                child: const Text('Start'),
               ),
             ],
           ),
@@ -584,7 +584,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
                       value: clampedProgress,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
                       minHeight: 8,
                     ),
@@ -638,7 +638,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Theme.of(context).colorScheme.surfaceVariant),
+                    border: Border.all(color: Theme.of(context).colorScheme.surfaceContainerHighest),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -696,7 +696,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   color: AppColors.secondary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.star,
                   color: AppColors.secondary,
                   size: 20,
@@ -724,7 +724,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                   color: AppColors.secondary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.lightbulb,
                   size: 40,
                   color: AppColors.secondary,
@@ -751,7 +751,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       '+50 XP Bonus',
                       style: TextStyle(
@@ -775,7 +775,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text('Start'),
+                child: const Text('Start'),
               ),
             ],
           ),
