@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/providers/change_password_controller.dart';
+import 'package:kinder_world/router.dart';
 
 class ParentChangePasswordScreen extends ConsumerStatefulWidget {
   const ParentChangePasswordScreen({super.key});
@@ -166,7 +167,7 @@ class _ParentChangePasswordScreenState
                           duration: Duration(seconds: 2),
                         ),
                       );
-                      context.pop();
+                      context.go(Routes.parentSettings);
                     }
                   },
                 ),

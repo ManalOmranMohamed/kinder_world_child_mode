@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,11 +12,15 @@ import 'package:kinder_world/router.dart';
 class ParentSettingsScreen extends ConsumerWidget {
   const ParentSettingsScreen({super.key});
 
+  void _safeNavigate(VoidCallback action) {
+    Future.microtask(action);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(l10n.settings),
         backgroundColor: AppColors.primary,
@@ -33,21 +38,27 @@ class ParentSettingsScreen extends ConsumerWidget {
               l10n.profileLabel,
               Icons.person,
               onTap: () {
-                context.push(Routes.parentProfile);
+                _safeNavigate(
+                  () => context.push(Routes.parentProfile),
+                );
               },
             ),
             _buildSettingItem(
               l10n.changePassword,
               Icons.lock,
               onTap: () {
-                context.push(Routes.parentChangePassword);
+                _safeNavigate(
+                  () => context.push(Routes.parentChangePassword),
+                );
               },
             ),
             _buildSettingItem(
               l10n.notifications,
               Icons.notifications,
               onTap: () {
-                context.go(Routes.parentNotifications);
+                _safeNavigate(
+                  () => context.go(Routes.parentNotifications),
+                );
               },
             ),
 
@@ -59,21 +70,27 @@ class ParentSettingsScreen extends ConsumerWidget {
               l10n.childProfiles,
               Icons.child_care,
               onTap: () {
-                context.go(Routes.parentChildManagement);
+                _safeNavigate(
+                  () => context.go(Routes.parentChildManagement),
+                );
               },
             ),
             _buildSettingItem(
               l10n.subscription,
               Icons.payment,
               onTap: () {
-                context.go(Routes.parentSubscription);
+                _safeNavigate(
+                  () => context.go(Routes.parentSubscription),
+                );
               },
             ),
             _buildSettingItem(
               l10n.parentalControls,
               Icons.security,
               onTap: () {
-                context.go(Routes.parentControls);
+                _safeNavigate(
+                  () => context.go(Routes.parentControls),
+                );
               },
             ),
 
@@ -85,21 +102,27 @@ class ParentSettingsScreen extends ConsumerWidget {
               l10n.language,
               Icons.language,
               onTap: () {
-                context.go(Routes.language);
+                _safeNavigate(
+                  () => context.go(Routes.language),
+                );
               },
             ),
             _buildSettingItem(
               l10n.theme,
               Icons.palette,
               onTap: () {
-                context.push(Routes.parentTheme);
+                _safeNavigate(
+                  () => context.push(Routes.parentTheme),
+                );
               },
             ),
             _buildSettingItem(
               l10n.privacySettings,
               Icons.privacy_tip,
               onTap: () {
-                context.push(Routes.parentPrivacySettings);
+                _safeNavigate(
+                  () => context.push(Routes.parentPrivacySettings),
+                );
               },
             ),
 
@@ -111,21 +134,27 @@ class ParentSettingsScreen extends ConsumerWidget {
               l10n.helpFaq,
               Icons.help,
               onTap: () {
-                context.push(Routes.parentHelp);
+                _safeNavigate(
+                  () => context.push(Routes.parentHelp),
+                );
               },
             ),
             _buildSettingItem(
               l10n.contactUs,
               Icons.contact_mail,
               onTap: () {
-                context.push(Routes.parentContactUs);
+                _safeNavigate(
+                  () => context.push(Routes.parentContactUs),
+                );
               },
             ),
             _buildSettingItem(
               l10n.about,
               Icons.info,
               onTap: () {
-                context.push(Routes.parentAbout);
+                _safeNavigate(
+                  () => context.push(Routes.parentAbout),
+                );
               },
             ),
 
@@ -137,21 +166,27 @@ class ParentSettingsScreen extends ConsumerWidget {
               l10n.termsOfService,
               Icons.description,
               onTap: () {
-                context.push('${Routes.legal}?type=terms');
+                _safeNavigate(
+                  () => context.push('${Routes.legal}?type=terms'),
+                );
               },
             ),
             _buildSettingItem(
               l10n.privacyPolicy,
               Icons.security,
               onTap: () {
-                context.push('${Routes.legal}?type=privacy');
+                _safeNavigate(
+                  () => context.push('${Routes.legal}?type=privacy'),
+                );
               },
             ),
             _buildSettingItem(
               l10n.coppaCompliance,
               Icons.child_care,
               onTap: () {
-                context.push('${Routes.legal}?type=coppa');
+                _safeNavigate(
+                  () => context.push('${Routes.legal}?type=coppa'),
+                );
               },
             ),
 
@@ -163,9 +198,9 @@ class ParentSettingsScreen extends ConsumerWidget {
                 await ref
                     .read(childSessionControllerProvider.notifier)
                     .endChildSession();
+                // Calling logout will clear authToken, triggering GoRouter.redirect
+                // Do NOT call context.go() here to avoid double navigation
                 await ref.read(authControllerProvider.notifier).logout();
-                if (!context.mounted) return;
-                context.go(Routes.welcome);
               },
               icon: const Icon(Icons.logout),
               label: Text(l10n.logout),
