@@ -281,6 +281,19 @@ class AppLocalizationsAr extends AppLocalizationsEn {
   String get theme => 'المظهر';
 
   @override
+  String get mode => 'الوضع';
+
+  @override
+  String get systemMode => 'وضع النظام';
+
+  @override
+  String get themePalette => 'لوحة الألوان';
+
+  @override
+  String get themePaletteHint =>
+      'اختر لوحة ألوان ومظهرًا يناسب عائلتك.';
+
+  @override
   String get subscription => 'الاشتراك';
 
   @override

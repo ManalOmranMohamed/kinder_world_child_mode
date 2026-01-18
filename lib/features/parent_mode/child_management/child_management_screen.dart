@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:kinder_world/core/models/child_profile.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
 import 'package:kinder_world/core/providers/plan_provider.dart';
 import 'package:kinder_world/core/widgets/picture_password_row.dart';
+import 'package:kinder_world/core/widgets/avatar_view.dart';
 import 'package:kinder_world/core/widgets/plan_status_banner.dart';
 
 class _AvatarOption {
@@ -147,6 +149,50 @@ class _ChildManagementScreenState
     return null;
   }
 
+  DateTime? _parseBirthDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+    if (value is double) {
+      return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    }
+    return null;
+  }
+
+  int _ageFromBirthDate(DateTime? birthDate) {
+    if (birthDate == null) return 0;
+    final now = DateTime.now();
+    var age = now.year - birthDate.year;
+    final hasHadBirthday = (now.month > birthDate.month) ||
+        (now.month == birthDate.month && now.day >= birthDate.day);
+    if (!hasHadBirthday) age -= 1;
+    return age.clamp(0, 120);
+  }
+
+  int _resolveAgeFromApi(Map<String, dynamic> data, ChildProfile? existing) {
+    final apiAge = _parseInt(data['age'], 0);
+    final birthDate = _parseBirthDate(
+      data['birthdate'] ??
+          data['birth_date'] ??
+          data['date_of_birth'] ??
+          data['dob'],
+    );
+    final computedAge = _ageFromBirthDate(birthDate);
+
+    if (kDebugMode) {
+      debugPrint(
+        'Child age resolve: apiAge=$apiAge, birthDate=$birthDate, computedAge=$computedAge, existing=${existing?.age}',
+      );
+    }
+
+    if (apiAge > 0) return apiAge;
+    if (computedAge > 0) return computedAge;
+    return existing?.age ?? 0;
+  }
+
   ChildProfile? _mergeChildProfileFromApi(
     Map<String, dynamic> data, {
     required String parentId,
@@ -160,8 +206,7 @@ class _ChildManagementScreenState
     final apiName = data['name']?.toString().trim();
     final resolvedName =
         (apiName != null && apiName.isNotEmpty) ? apiName : (existing?.name ?? childId);
-    final existingAge = existing?.age ?? 0;
-    final age = existingAge > 0 ? existingAge : _parseInt(data['age'], 0);
+    final age = _resolveAgeFromApi(data, existing);
     final existingLevel = existing?.level ?? 0;
     final level = existingLevel > 0 ? existingLevel : _parseInt(data['level'], 1);
     final avatar = existing?.avatar ?? data['avatar']?.toString() ?? _avatarOptions.first.id;
@@ -468,85 +513,29 @@ class _ChildManagementScreenState
   }
 
   Widget _buildAvatarCircle({
-    required String? avatar,
-    required String fallback,
+    required String? avatarId,
+    required String? avatarPath,
     required double size,
   }) {
-    final option = _avatarForValue(avatar);
-    if (option != null) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: option.backgroundColor,
-          borderRadius: BorderRadius.circular(size / 2),
-        ),
-        child: ClipOval(
-          child: option.assetPath.isNotEmpty
-              ? Image.asset(
-                  option.assetPath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Center(
-                    child: Icon(
-                      option.icon,
-                      color: option.iconColor,
-                      size: size * 0.5,
-                    ),
-                  ),
-                )
-              : Center(
-                  child: Icon(
-                    option.icon,
-                    color: option.iconColor,
-                    size: size * 0.5,
-                  ),
-                ),
-        ),
-      );
-    }
-
-    if (avatar != null && avatar.startsWith('assets/')) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(size / 2),
-        ),
-        child: ClipOval(
-          child: Image.asset(
-            avatar,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Center(
-              child: Text(
-                fallback,
-                style: TextStyle(
-                  fontSize: size * 0.45,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+    final option = _avatarForValue(avatarId ?? avatarPath);
+    final resolvedBackground =
+        option?.backgroundColor ?? AppColors.primary.withOpacity(0.1);
+    final resolvedPath =
+        option?.assetPath.isNotEmpty == true ? option!.assetPath : avatarPath;
 
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.2),
+        color: resolvedBackground,
         borderRadius: BorderRadius.circular(size / 2),
       ),
-      child: Center(
-        child: Text(
-          fallback,
-          style: TextStyle(
-            fontSize: size * 0.45,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
+      child: ClipOval(
+        child: AvatarView(
+          avatarId: avatarId,
+          avatarPath: resolvedPath,
+          radius: size / 2,
+          backgroundColor: Colors.transparent,
         ),
       ),
     );
@@ -556,11 +545,11 @@ class _ChildManagementScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(l10n.childManagement),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -1043,8 +1032,8 @@ class _ChildManagementScreenState
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildAvatarCircle(
-                  avatar: child.avatar,
-                  fallback: child.name.isNotEmpty ? child.name[0] : '?',
+                  avatarId: child.avatar,
+                  avatarPath: child.avatarPath,
                   size: 60,
                 ),
                 const SizedBox(height: 6),

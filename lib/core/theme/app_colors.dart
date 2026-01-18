@@ -45,9 +45,9 @@ class AppColors {
   static const Color entertaining = Color(0xFF00BCD4);
 
   // Special modes (not used)
-  static const Color nightModeBackground = Color(0xFFFFFFFF);
-  static const Color nightModeSurface = Color(0xFFFFFFFF);
-  static const Color nightModeText = Color(0xFF000000);
+  static const Color nightModeBackground = Color(0xFF0F1115);
+  static const Color nightModeSurface = Color(0xFF1B1F26);
+  static const Color nightModeText = Color(0xFFE8EAF0);
 
   // Eye-friendly colors (not used)
   static const Color eyeFriendlyBackground = Color(0xFFFFFFFF);

@@ -4,6 +4,7 @@ import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/models/child_profile.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
+import 'package:kinder_world/core/widgets/avatar_view.dart';
 import 'package:kinder_world/core/widgets/picture_password_row.dart';
 
 class ParentChildProfileScreen extends StatelessWidget {
@@ -27,11 +28,11 @@ class ParentChildProfileScreen extends StatelessWidget {
     final fallback = child.name.isNotEmpty ? child.name[0] : '?';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(child.name),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -40,8 +41,8 @@ class ParentChildProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildAvatarCircle(
-                avatar: child.avatar,
-                fallback: fallback,
+                avatarId: child.avatar,
+                avatarPath: child.avatarPath,
                 size: 96,
               ),
               const SizedBox(height: 10),
@@ -61,7 +62,9 @@ class ParentChildProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '${l10n.yearsOld(child.age)} - ${l10n.level} ${child.level}',
+                child.age > 0
+                    ? '${l10n.yearsOld(child.age)} - ${l10n.level} ${child.level}'
+                    : '— - ${l10n.level} ${child.level}',
                 style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
@@ -151,27 +154,17 @@ class ParentChildProfileScreen extends StatelessWidget {
   }
 
   Widget _buildAvatarCircle({
-    required String? avatar,
-    required String fallback,
+    required String? avatarId,
+    required String? avatarPath,
     required double size,
   }) {
-    final resolvedAvatar = _avatarAssets[avatar] ?? avatar;
-    final fallbackWidget = Center(
-      child: Text(
-        fallback,
-        style: TextStyle(
-          fontSize: size * 0.45,
-          fontWeight: FontWeight.bold,
-          color: AppColors.primary,
-        ),
-      ),
-    );
+    final resolvedAvatar = _avatarAssets[avatarId] ?? avatarPath;
 
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.15),
+        color: AppColors.primary.withOpacity(0.15),
         borderRadius: BorderRadius.circular(size / 2),
         border: Border.all(
           color: AppColors.primary,
@@ -179,15 +172,12 @@ class ParentChildProfileScreen extends StatelessWidget {
         ),
       ),
       child: ClipOval(
-        child: resolvedAvatar != null &&
-                resolvedAvatar.isNotEmpty &&
-                resolvedAvatar.startsWith('assets/')
-            ? Image.asset(
-                resolvedAvatar,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => fallbackWidget,
-              )
-            : fallbackWidget,
+        child: AvatarView(
+          avatarId: avatarId,
+          avatarPath: resolvedAvatar,
+          radius: size / 2,
+          backgroundColor: Colors.transparent,
+        ),
       ),
     );
   }

@@ -68,7 +68,7 @@ class _ChildHomeScreenState extends ConsumerState<ChildHomeScreen>
         );
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: widget.navigationShell,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
@@ -166,9 +166,9 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
 
     // Show loading state
     if (sessionState.isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(
           child: CircularProgressIndicator(color: AppColors.primary),
         ),
       );
@@ -177,7 +177,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
     // Show error state
     if (sessionState.error != null || childProfile == null) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -221,7 +221,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
       slivers: [
         // App Bar
         SliverAppBar(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           floating: true,
           title: Row(

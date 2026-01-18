@@ -72,7 +72,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
       },
     ];
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _controller,

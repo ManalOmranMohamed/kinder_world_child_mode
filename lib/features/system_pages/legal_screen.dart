@@ -16,9 +16,9 @@ class LegalScreen extends ConsumerWidget {
     final title = _getTitle(type);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         title: Text(
           title,
@@ -42,7 +42,7 @@ class LegalScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.description,
                   size: 72,
                   color: AppColors.primary,

@@ -420,11 +420,11 @@ class AuthRepository {
 
   // ==================== LOGOUT ====================
 
-  /// Logout current user
+  /// Logout current user (clears auth tokens only, preserves local profiles/preferences)
   Future<bool> logout() async {
     try {
       _logger.d('Logging out user');
-      await _secureStorage.clearAll();
+      await _secureStorage.clearAuthOnly();
       _logger.d('Logout successful');
       return true;
     } catch (e) {

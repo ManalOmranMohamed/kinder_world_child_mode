@@ -45,6 +45,7 @@ class ChildProfile with _$ChildProfile {
   // Helper methods
   int get nextLevelXP => level * 1000;
   double get xpProgress => (xp % 1000) / 1000.0;
+  String get displayAge => age <= 0 ? '—' : age.toString();
   
   bool get hasStreak => streak > 0;
   

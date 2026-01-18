@@ -55,7 +55,7 @@ class _UserTypeSelectionScreenState extends ConsumerState<UserTypeSelectionScree
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _controller,

@@ -20,6 +20,9 @@ final changePasswordControllerProvider = StateNotifierProvider.autoDispose<
 class ChangePasswordController extends StateNotifier<AsyncValue<void>> {
   final AuthService _authService;
   final Logger _logger;
+  static final RegExp _strongPassword = RegExp(
+    r'''^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]).{8,}$''',
+  );
 
   ChangePasswordController({
     required AuthService authService,
@@ -48,7 +51,15 @@ class ChangePasswordController extends StateNotifier<AsyncValue<void>> {
 
     if (newPassword.length < 6) {
       state = AsyncValue.error(
-        'Password must be at least 6 characters',
+        'Password must be at least 8 characters',
+        StackTrace.current,
+      );
+      return false;
+    }
+
+    if (!_strongPassword.hasMatch(newPassword)) {
+      state = AsyncValue.error(
+        'Password must include uppercase, number, and special character',
         StackTrace.current,
       );
       return false;
@@ -65,6 +76,7 @@ class ChangePasswordController extends StateNotifier<AsyncValue<void>> {
       final success = await _authService.changePassword(
         currentPassword: currentPassword,
         newPassword: newPassword,
+        confirmPassword: confirmPassword,
       );
 
       if (success) {

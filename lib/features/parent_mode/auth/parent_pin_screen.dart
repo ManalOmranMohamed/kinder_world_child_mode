@@ -95,9 +95,9 @@ class _ParentPinScreenState extends ConsumerState<ParentPinScreen>
     final pinState = ref.watch(parentPinProvider);
     
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
@@ -149,15 +149,16 @@ class _ParentPinScreenState extends ConsumerState<ParentPinScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(4, (index) {
+                    final colors = Theme.of(context).colorScheme;
                     return Container(
                       width: 20,
                       height: 20,
                       margin: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _enteredPin.length > index 
-                            ? AppColors.primary 
-                            : AppColors.lightGrey,
+                        color: _enteredPin.length > index
+                            ? colors.primary
+                            : colors.surfaceVariant,
                       ),
                     );
                   }),

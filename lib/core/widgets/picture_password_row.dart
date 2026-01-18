@@ -85,19 +85,21 @@ class PicturePasswordRow extends StatelessWidget {
     super.key,
     required this.picturePassword,
     this.size = 18,
-    this.color = AppColors.primary,
+    this.color,
     this.showPlaceholders = true,
     this.useOptionColor = true,
   });
 
   final List<String> picturePassword;
   final double size;
-  final Color color;
+  final Color? color;
   final bool showPlaceholders;
   final bool useOptionColor;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final fallbackColor = color ?? colors.primary;
     final slots = showPlaceholders
         ? List<String?>.generate(
             3,
@@ -111,19 +113,22 @@ class PicturePasswordRow extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: slots.map(_buildSlot).toList(),
+      children: slots.map((slot) => _buildSlot(slot, fallbackColor, colors)).toList(),
     );
   }
 
-  Widget _buildSlot(String? id) {
+  Widget _buildSlot(String? id, Color fallbackColor, ColorScheme colors) {
     final option = id == null ? null : picturePasswordOptionsById[id];
-    final fallbackColor = color;
     final resolvedColor =
         useOptionColor ? option?.color ?? fallbackColor : fallbackColor;
-    final borderColor = resolvedColor.withValues(alpha: 0.4);
+    
+    // Ensure better visibility in both light and dark themes
+    final borderColor = resolvedColor.withValues(alpha: 0.6);
     final fillColor = id == null
-        ? AppColors.lightGrey.withValues(alpha: 0.4)
-        : resolvedColor.withValues(alpha: 0.12);
+        ? colors.surfaceVariant.withOpacity(0.5)
+        : resolvedColor.withValues(alpha: 0.15);
+    final iconColor = resolvedColor; // Use full opacity for icons
+    
     final icon = option?.icon;
     final fallback = id == null || id.isEmpty ? '?' : id[0].toUpperCase();
 
@@ -134,19 +139,19 @@ class PicturePasswordRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: fillColor,
         shape: BoxShape.circle,
-        border: Border.all(color: borderColor),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
       child: id == null
           ? const SizedBox.shrink()
           : Center(
               child: icon != null
-                  ? Icon(icon, size: size * 0.6, color: resolvedColor)
+                  ? Icon(icon, size: size * 0.6, color: iconColor)
                   : Text(
                       fallback,
                       style: TextStyle(
                         fontSize: size * 0.55,
                         fontWeight: FontWeight.w600,
-                        color: resolvedColor,
+                        color: iconColor,
                       ),
                     ),
             ),

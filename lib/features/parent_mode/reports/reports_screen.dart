@@ -10,8 +10,10 @@ import 'package:kinder_world/core/models/child_profile.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/subscription/plan_info.dart';
-import 'package:kinder_world/core/widgets/plan_guard.dart';
+import 'package:kinder_world/core/providers/plan_provider.dart';
 import 'package:kinder_world/core/widgets/plan_status_banner.dart';
+import 'package:kinder_world/core/widgets/avatar_view.dart';
+import 'package:kinder_world/core/widgets/premium_section_upsell.dart';
 
 enum ReportPeriod { week, month, year }
 
@@ -96,27 +98,45 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     return '$percent%';
   }
 
-  TextStyle _sliceLabelStyle(Color color) {
+  TextStyle _sliceLabelStyle(
+    Color color,
+    TextTheme textTheme,
+    ColorScheme colors,
+  ) {
     final isDark = color.computeLuminance() < 0.45;
-    return TextStyle(
-      fontSize: AppConstants.fontSize - 2,
-      fontWeight: FontWeight.w600,
-      color: isDark ? AppColors.white : AppColors.textPrimary,
-      shadows: isDark
-          ? [
-              Shadow(
-                color: AppColors.black.withValues(alpha: 0.35),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ]
-          : null,
-    );
+    return textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: isDark ? colors.onPrimary : colors.onSurface,
+          shadows: isDark
+              ? [
+                  Shadow(
+                    color: colors.shadow.withValues(alpha: 0.35),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
+        ) ??
+        TextStyle(
+          fontSize: AppConstants.fontSize - 2,
+          fontWeight: FontWeight.w600,
+          color: isDark ? colors.onPrimary : colors.onSurface,
+          shadows: isDark
+              ? [
+                  Shadow(
+                    color: colors.shadow.withValues(alpha: 0.35),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
+        );
   }
 
   Widget _buildActivityLegend(
     List<_ActivitySegment> segments,
     TextDirection textDirection,
+    TextTheme textTheme,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,10 +160,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               Expanded(
                 child: Text(
                   segment.label,
-                  style: const TextStyle(
-                    fontSize: AppConstants.fontSize,
+                  style: textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -157,7 +175,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   void _showChildSelection(List<ChildProfile> children) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -170,17 +188,23 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             itemBuilder: (context, index) {
               final child = children[index];
               return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                  child: Text(
-                    child.name.isNotEmpty ? child.name[0] : '?',
-                    style: const TextStyle(color: AppColors.primary),
-                  ),
+                leading: AvatarView(
+                  avatarId: child.avatar,
+                  avatarPath: child.avatarPath,
+                  radius: 20,
+                  backgroundColor: AppColors.primary.withOpacity(0.2),
                 ),
                 title: Text(child.name),
-                subtitle: Text('Age ${child.age} - Level ${child.level}'),
+                subtitle: Text(
+                  child.age > 0
+                      ? 'Age ${child.age} - Level ${child.level}'
+                      : 'Age — - Level ${child.level}',
+                ),
                 trailing: _selectedChild?.id == child.id
-                    ? const Icon(Icons.check, color: AppColors.primary)
+                    ? Icon(
+                        Icons.check,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
                     : null,
                 onTap: () {
                   setState(() {
@@ -199,12 +223,17 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final plan =
+        ref.watch(planInfoProvider).asData?.value ?? PlanInfo.fromTier(PlanTier.free);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(l10n.reportsAndAnalytics),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
       ),
       body: SafeArea(
         child: FutureBuilder<String?>(
@@ -246,44 +275,38 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                 final segments = _activitySegments(l10n);
                 final textDirection = Directionality.of(context);
 
-                return PlanGuard(
-                  requiredTier: PlanTier.premium,
-                  featureLabel: l10n.reportsAndAnalytics,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        Text(
-                          l10n.learningProgressReports,
-                          style: const TextStyle(
-                            fontSize: AppConstants.largeFontSize,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      Text(
+                        l10n.learningProgressReports,
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.trackChildDevelopment,
-                          style: const TextStyle(
-                            fontSize: AppConstants.fontSize,
-                            color: AppColors.textSecondary,
-                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.trackChildDevelopment,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
                         ),
-                        const SizedBox(height: 16),
-                        const PlanStatusBanner(),
-                        const SizedBox(height: 24),
+                      ),
+                      const SizedBox(height: 16),
+                      const PlanStatusBanner(),
+                      const SizedBox(height: 24),
 
                       // Child Selection
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: colors.surface,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.black.withValues(alpha: 0.05),
+                              color: colors.shadow.withValues(alpha: 0.08),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -295,7 +318,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.2),
+                                color: colors.primary.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(25),
                               ),
                               child: Center(
@@ -303,10 +326,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                   selectedChild?.name.isNotEmpty == true
                                       ? selectedChild!.name[0]
                                       : '?',
-                                  style: const TextStyle(
-                                    fontSize: 20,
+                                  style: textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
+                                    color: colors.primary,
                                   ),
                                 ),
                               ),
@@ -318,19 +340,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                                 children: [
                                   Text(
                                     selectedChild?.name ?? l10n.noChildSelected,
-                                    style: const TextStyle(
-                                      fontSize: AppConstants.fontSize,
+                                    style: textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                   Text(
                                     selectedChild != null
                                         ? '${l10n.childAge} ${selectedChild.age} - ${l10n.level} ${selectedChild.level}'
                                         : l10n.addChildToViewReports,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.textSecondary,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colors.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
@@ -368,145 +387,37 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Activity Breakdown Chart
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
+                      if (plan.hasAdvancedReports)
+                        _buildAdvancedReportSection(
+                          l10n: l10n,
+                          colors: colors,
+                          textTheme: textTheme,
+                          segments: segments,
+                          textDirection: textDirection,
+                        )
+                      else
+                        _buildPremiumLockedCard(
+                          context,
+                          title: l10n.activityBreakdown,
+                          message: l10n.planAdvancedReports,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.activityBreakdown,
-                              style: const TextStyle(
-                                fontSize: AppConstants.fontSize + 2,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                const chartHeight = 180.0;
-                                final chartSize =
-                                    math.min(constraints.maxWidth, chartHeight);
-                                final chartRadius = math.max(
-                                  0.0,
-                                  (chartSize / 2) - 14.0,
-                                );
-                                final centerSpaceRadius = chartRadius * 0.6;
-                                final ringCenter = centerSpaceRadius +
-                                    ((chartRadius - centerSpaceRadius) / 2);
-                                final titleOffset =
-                                    chartRadius > 0 ? ringCenter / chartRadius : 0.5;
-                                final total = segments.fold<double>(
-                                  0,
-                                  (sum, segment) => sum + segment.value,
-                                );
-
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SizedBox(
-                                      height: chartHeight,
-                                      child: PieChart(
-                                        PieChartData(
-                                          startDegreeOffset: -90,
-                                          centerSpaceRadius: centerSpaceRadius,
-                                          sectionsSpace: 2,
-                                          sections: segments.map((segment) {
-                                            final title = _formatPercentLabel(
-                                              segment.value,
-                                              total,
-                                            );
-                                            return PieChartSectionData(
-                                              value: segment.value,
-                                              color: segment.color,
-                                              radius: chartRadius,
-                                              showTitle: title.isNotEmpty,
-                                              title: title,
-                                              titleStyle:
-                                                  _sliceLabelStyle(segment.color),
-                                              titlePositionPercentageOffset:
-                                                  titleOffset,
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    _buildActivityLegend(segments, textDirection),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
                       const SizedBox(height: 24),
-
-                      // Recent Achievements
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
+                      if (plan.hasAdvancedReports)
+                        _buildAchievementsSection(
+                          l10n: l10n,
+                          colors: colors,
+                          textTheme: textTheme,
+                        )
+                      else
+                        _buildPremiumLockedCard(
+                          context,
+                          title: l10n.recentAchievements,
+                          message: l10n.planAdvancedReports,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.recentAchievements,
-                              style: const TextStyle(
-                                fontSize: AppConstants.fontSize,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            _buildAchievementItem(
-                              '*',
-                              'Math Master',
-                              'Completed 10 math activities',
-                              '2 ${l10n.daysAgo}',
-                            ),
-                            const SizedBox(height: 12),
-                            _buildAchievementItem(
-                              '!',
-                              'Perfect Score',
-                              'Got 100% in Science Quiz',
-                              '3 ${l10n.daysAgo}',
-                            ),
-                            const SizedBox(height: 12),
-                            _buildAchievementItem(
-                              '+',
-                              '5-Day Streak',
-                              'Used app for 5 consecutive days',
-                              l10n.justNow,
-                            ),
-                          ],
-                        ),
-                      ),
                       const SizedBox(height: 40),
                     ],
                   ),
-                ));
+                );
               },
             );
           },
@@ -516,6 +427,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   Widget _buildPeriodButton(String text, ReportPeriod period) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final isSelected = _period == period;
     return InkWell(
       onTap: () {
@@ -527,21 +440,178 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
+          color: isSelected ? colors.primary : colors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.lightGrey,
+            color: isSelected ? colors.primary : colors.outlineVariant,
           ),
         ),
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: 14,
+          style: textTheme.labelLarge?.copyWith(
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? AppColors.white : AppColors.textPrimary,
+            color: isSelected ? colors.onPrimary : colors.onSurface,
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAdvancedReportSection({
+    required AppLocalizations l10n,
+    required ColorScheme colors,
+    required TextTheme textTheme,
+    required List<_ActivitySegment> segments,
+    required TextDirection textDirection,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.activityBreakdown,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const chartHeight = 180.0;
+              final chartSize = math.min(constraints.maxWidth, chartHeight);
+              final chartRadius = math.max(
+                0.0,
+                (chartSize / 2) - 14.0,
+              );
+              final centerSpaceRadius = chartRadius * 0.6;
+              final ringCenter =
+                  centerSpaceRadius + ((chartRadius - centerSpaceRadius) / 2);
+              final titleOffset =
+                  chartRadius > 0 ? ringCenter / chartRadius : 0.5;
+              final total = segments.fold<double>(
+                0,
+                (sum, segment) => sum + segment.value,
+              );
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: chartHeight,
+                    child: PieChart(
+                      PieChartData(
+                        startDegreeOffset: -90,
+                        centerSpaceRadius: centerSpaceRadius,
+                        sectionsSpace: 2,
+                        sections: segments.map((segment) {
+                          final title = _formatPercentLabel(
+                            segment.value,
+                            total,
+                          );
+                          return PieChartSectionData(
+                            value: segment.value,
+                            color: segment.color,
+                            radius: chartRadius,
+                            showTitle: title.isNotEmpty,
+                            title: title,
+                            titleStyle: _sliceLabelStyle(
+                              segment.color,
+                              textTheme,
+                              colors,
+                            ),
+                            titlePositionPercentageOffset: titleOffset,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildActivityLegend(segments, textDirection, textTheme),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAchievementsSection({
+    required AppLocalizations l10n,
+    required ColorScheme colors,
+    required TextTheme textTheme,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.recentAchievements,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          _buildAchievementItem(
+            '*',
+            'Math Master',
+            'Completed 10 math activities',
+            '2 ${l10n.daysAgo}',
+            textTheme,
+            colors,
+          ),
+          const SizedBox(height: 12),
+          _buildAchievementItem(
+            '!',
+            'Perfect Score',
+            'Got 100% in Science Quiz',
+            '3 ${l10n.daysAgo}',
+            textTheme,
+            colors,
+          ),
+          const SizedBox(height: 12),
+          _buildAchievementItem(
+            '+',
+            '5-Day Streak',
+            'Used app for 5 consecutive days',
+            l10n.justNow,
+            textTheme,
+            colors,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumLockedCard(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) {
+    return PremiumSectionUpsell(
+      title: title,
+      description: message,
+      showBadge: true,
     );
   }
 
@@ -551,14 +621,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     String score,
     String time,
   ) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: colors.shadow.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -569,11 +641,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: AppConstants.fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-            ),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           Row(
@@ -610,6 +678,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     Color color,
     IconData icon,
   ) {
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
     return Column(
       children: [
         Container(
@@ -628,18 +698,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: AppConstants.fontSize,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
+          style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
         ),
       ],
     );
@@ -650,6 +713,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     String title,
     String description,
     String time,
+    TextTheme textTheme,
+    ColorScheme colors,
   ) {
     return Row(
       children: [
@@ -661,17 +726,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
                 ),
               ),
               Text(
                 description,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
                 ),
               ),
             ],
@@ -679,10 +741,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         ),
         Text(
           time,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
+          style:
+              textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:kinder_world/core/models/progress_record.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
 import 'package:kinder_world/core/providers/progress_controller.dart';
 import 'package:kinder_world/core/providers/theme_provider.dart';
+import 'package:kinder_world/core/widgets/avatar_view.dart';
 import 'package:kinder_world/app.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -29,7 +31,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
   late Animation<double> _fadeAnimation;
   Future<List<ChildProfile>>? _childrenFuture;
   String? _cachedParentId;
-  // Removed local switch state; use themeModeProvider instead
+  // Theme mode handled via ThemeController
 
   @override
   void initState() {
@@ -118,6 +120,50 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     return null;
   }
 
+  DateTime? _parseBirthDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+    if (value is double) {
+      return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    }
+    return null;
+  }
+
+  int _ageFromBirthDate(DateTime? birthDate) {
+    if (birthDate == null) return 0;
+    final now = DateTime.now();
+    var age = now.year - birthDate.year;
+    final hasHadBirthday = (now.month > birthDate.month) ||
+        (now.month == birthDate.month && now.day >= birthDate.day);
+    if (!hasHadBirthday) age -= 1;
+    return age.clamp(0, 120);
+  }
+
+  int _resolveAgeFromApi(Map<String, dynamic> data, ChildProfile? existing) {
+    final apiAge = _parseInt(data['age'], 0);
+    final birthDate = _parseBirthDate(
+      data['birthdate'] ??
+          data['birth_date'] ??
+          data['date_of_birth'] ??
+          data['dob'],
+    );
+    final computedAge = _ageFromBirthDate(birthDate);
+
+    if (kDebugMode) {
+      debugPrint(
+        'Child age resolve: apiAge=$apiAge, birthDate=$birthDate, computedAge=$computedAge, existing=${existing?.age}',
+      );
+    }
+
+    if (apiAge > 0) return apiAge;
+    if (computedAge > 0) return computedAge;
+    return existing?.age ?? 0;
+  }
+
   List<String> _parseStringList(dynamic value) {
     if (value is List) {
       return value.map((item) => item.toString()).toList();
@@ -146,8 +192,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     final resolvedName = (apiName != null && apiName.isNotEmpty)
         ? apiName
         : (existing?.name ?? childId);
-    final existingAge = existing?.age ?? 0;
-    final age = existingAge > 0 ? existingAge : _parseInt(data['age'], 0);
+    final age = _resolveAgeFromApi(data, existing);
     final existingLevel = existing?.level ?? 0;
     final level = existingLevel > 0 ? existingLevel : _parseInt(data['level'], 1);
     final avatar =
@@ -245,6 +290,9 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final textTheme = theme.textTheme;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -254,14 +302,14 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
         );
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
           child: FutureBuilder<String?>(
             future: ref.read(secureStorageProvider).getParentId(),
             builder: (context, parentIdSnapshot) {
               if (!parentIdSnapshot.hasData || parentIdSnapshot.data == null) {
-                return const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                return Center(
+                  child: CircularProgressIndicator(color: colors.primary),
                 );
               }
 
@@ -275,8 +323,8 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
                 future: _childrenFuture,
                 builder: (context, childrenSnapshot) {
                   if (childrenSnapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                    return Center(
+                      child: CircularProgressIndicator(color: colors.primary),
                     );
                   }
 
@@ -286,25 +334,25 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
                     slivers: [
                       // App Bar
                       SliverAppBar(
-                        backgroundColor: AppColors.background,
+                        backgroundColor:
+                            Theme.of(context).scaffoldBackgroundColor,
                         elevation: 0,
                         floating: true,
-                        title: const Column(
+                        title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Parent Dashboard',
-                              style: TextStyle(
+                              style: textTheme.titleLarge?.copyWith(
                                 fontSize: AppConstants.largeFontSize,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
                               'Welcome back! Here\'s what\'s happening',
-                              style: TextStyle(
+                              style: textTheme.bodySmall?.copyWith(
                                 fontSize: 14,
-                                color: AppColors.textSecondary,
+                                color: colors.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -312,29 +360,34 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
                         actions: [
                           IconButton(
                             icon: const Icon(Icons.settings),
-                            color: AppColors.textPrimary,
+                            color: colors.onSurface,
                             onPressed: () {
                               context.go('/parent/settings');
                             },
                           ),
                           IconButton(
                             icon: const Icon(Icons.notifications),
-                            color: AppColors.textPrimary,
+                            color: colors.onSurface,
                             onPressed: () {
                               context.go('/parent/notifications');
                             },
                           ),
                           Consumer(
                             builder: (context, ref, _) {
-                              final themeMode = ref.watch(themeModeProvider);
+                              final themeMode =
+                                  ref.watch(themeControllerProvider).mode;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: DashboardThemeSwitch(
                                   value: themeMode == ThemeMode.dark,
                                   onChanged: (isDark) {
-                                    ref.read(themeModeProvider.notifier).setTheme(
-                                      isDark ? ThemeMode.dark : ThemeMode.light,
-                                    );
+                                    ref
+                                        .read(themeControllerProvider.notifier)
+                                        .setMode(
+                                          isDark
+                                              ? ThemeMode.dark
+                                              : ThemeMode.light,
+                                        );
                                   },
                                 ),
                               );
@@ -391,7 +444,7 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
           onPressed: () {
             context.go('/parent/child-management');
           },
-          backgroundColor: AppColors.primary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           icon: const Icon(Icons.add),
           label: const Text('Add Child'),
         ),
@@ -400,31 +453,32 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
   }
 
   Widget _buildChildrenOverview(List<ChildProfile> children) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     if (children.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           children: [
-            const Icon(Icons.child_care, size: 64, color: AppColors.grey),
+            Icon(Icons.child_care, size: 64, color: colors.onSurfaceVariant),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'No children added yet',
-              style: TextStyle(
+              style: textTheme.titleMedium?.copyWith(
                 fontSize: AppConstants.fontSize,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Add your first child to get started',
-              style: TextStyle(
+              style: textTheme.bodySmall?.copyWith(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: colors.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 16),
@@ -442,33 +496,33 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Your Children',
-          style: TextStyle(
+          style: textTheme.titleMedium?.copyWith(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
-        
-        ...children.map((child) => _buildChildCard(child)),
+        ...children.map((child) => _buildChildCard(context, child)),
       ],
     );
   }
 
-  Widget _buildChildCard(ChildProfile child) {
-    final initials = child.name.isNotEmpty ? child.name[0] : '?';
-
+  Widget _buildChildCard(BuildContext context, ChildProfile child) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final ageLabel = child.age > 0 ? l10n.yearsOld(child.age) : '—';
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: colors.shadow.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -476,23 +530,11 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
       ),
       child: Row(
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Center(
-              child: Text(
-                initials,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
+          AvatarView(
+            avatarId: child.avatar,
+            avatarPath: child.avatarPath,
+            radius: 30,
+            backgroundColor: colors.primary.withOpacity(0.2),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -501,18 +543,17 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
               children: [
                 Text(
                   child.name,
-                  style: const TextStyle(
+                  style: textTheme.titleSmall?.copyWith(
                     fontSize: AppConstants.fontSize,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${child.age} years old • Level ${child.level}',
-                  style: const TextStyle(
+                  '$ageLabel • Level ${child.level}',
+                  style: textTheme.bodySmall?.copyWith(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -537,6 +578,8 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     if (children.isEmpty) {
       return const SizedBox();
     }
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     final totalTime = children.fold<int>(0, (sum, child) => sum + child.totalTimeSpent);
     final totalActivities =
@@ -548,12 +591,11 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Today\'s Overview',
-          style: TextStyle(
+          style: textTheme.titleMedium?.copyWith(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -592,14 +634,16 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: colors.shadow.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -623,17 +667,16 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
+            style: textTheme.titleMedium?.copyWith(
               fontSize: AppConstants.fontSize,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
             ),
           ),
           Text(
             title,
-            style: const TextStyle(
+            style: textTheme.bodySmall?.copyWith(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: colors.onSurfaceVariant,
             ),
           ),
         ],
@@ -664,13 +707,15 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     if (children.isEmpty) {
       return const SizedBox();
     }
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: colors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: colors.primary.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -681,22 +726,17 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.2),
+                  color: colors.primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
-                  Icons.psychology,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
+                child: Icon(Icons.psychology, color: colors.primary, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'AI Insights',
-                style: TextStyle(
+                style: textTheme.titleMedium?.copyWith(
                   fontSize: AppConstants.fontSize,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -705,9 +745,9 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
           
           Text(
             _generateInsightMessage(children),
-            style: const TextStyle(
+            style: textTheme.bodySmall?.copyWith(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: colors.onSurfaceVariant,
               height: 1.5,
             ),
           ),
@@ -717,13 +757,6 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
             onPressed: () {
               context.go('/parent/reports');
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
             child: const Text('View Detailed Report'),
           ),
         ],
@@ -759,13 +792,12 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Recent Activities',
-                  style: TextStyle(
-                    fontSize: AppConstants.fontSize,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontSize: AppConstants.fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -781,15 +813,15 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
+                child: Text(
                   'No recent activities',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
               )
             else
@@ -842,13 +874,15 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
   }
 
   Widget _buildActivityItem(String text, String time, Color color) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.lightGrey),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Row(
         children: [
@@ -864,17 +898,16 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
+              style: textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
-                color: AppColors.textPrimary,
               ),
             ),
           ),
           Text(
             time,
-            style: const TextStyle(
+            style: textTheme.bodySmall?.copyWith(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: colors.onSurfaceVariant,
             ),
           ),
         ],
@@ -886,6 +919,8 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     if (children.isEmpty) {
       return const SizedBox();
     }
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     // Placeholder data - in real app, would calculate from progress records
     final weekData = [3, 5, 2, 4, 6, 3, 2];
@@ -893,11 +928,11 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.05),
+            color: colors.shadow.withOpacity(0.08),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -906,12 +941,11 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Weekly Progress',
-            style: TextStyle(
+            style: textTheme.titleMedium?.copyWith(
               fontSize: AppConstants.fontSize,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 20),
@@ -928,7 +962,12 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
                       getTitlesWidget: (value, meta) {
                         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                         if (value.toInt() >= 0 && value.toInt() < days.length) {
-                          return Text(days[value.toInt()]);
+                          return Text(
+                            days[value.toInt()],
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colors.onSurfaceVariant,
+                            ),
+                          );
                         }
                         return const Text('');
                       },

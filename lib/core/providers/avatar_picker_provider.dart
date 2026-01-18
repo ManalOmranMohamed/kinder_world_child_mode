@@ -9,11 +9,11 @@ class AvatarPickerNotifier extends StateNotifier<String> {
       : super(initial ?? AppConstants.defaultChildAvatar);
 
   static const List<String> availableAvatars = [
-    'assets/avatars/kids/boy_01.png',
-    'assets/avatars/kids/boy_02.png',
-    'assets/avatars/kids/girl_01.png',
-    'assets/avatars/kids/girl_02.png',
-    'assets/avatars/kids/neutral_01.png',
+    'assets/images/avatars/boy1.png',
+    'assets/images/avatars/boy2.png',
+    'assets/images/avatars/girl1.png',
+    'assets/images/avatars/girl2.png',
+    'assets/images/avatars/girl1.png',
   ];
 
   void selectAvatar(String avatarPath) {

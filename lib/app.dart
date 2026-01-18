@@ -36,14 +36,15 @@ class KinderWorldApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
-    final themeMode = ref.watch(themeModeProvider);
+    final themeSettings = ref.watch(themeControllerProvider);
+    final palette = ref.watch(themePaletteProvider);
 
     return MaterialApp.router(
       title: 'Kinder World',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme(),
-      darkTheme: AppTheme.darkTheme(),
-      themeMode: themeMode,
+      theme: AppTheme.lightTheme(palette: palette),
+      darkTheme: AppTheme.darkTheme(palette: palette),
+      themeMode: themeSettings.mode,
       localizationsDelegates: const [
         custom_localizations.AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

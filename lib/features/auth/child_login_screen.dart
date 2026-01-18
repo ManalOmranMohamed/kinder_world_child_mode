@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ import 'package:kinder_world/core/models/child_profile.dart';
 import 'package:kinder_world/core/providers/auth_controller.dart';
 import 'package:kinder_world/core/providers/child_session_controller.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
+import 'package:kinder_world/core/widgets/avatar_view.dart';
 import 'package:kinder_world/core/widgets/picture_password_row.dart';
 import 'package:kinder_world/features/child_mode/paywall/child_paywall_screen.dart';
 
@@ -79,33 +81,38 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
 
   final List<PicturePasswordOption> _pictureOptions = picturePasswordOptions;
 
-  OutlineInputBorder get _loginBorder => OutlineInputBorder(
+  OutlineInputBorder _loginBorder(ColorScheme colors) => OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.grey),
+        borderSide: BorderSide(color: colors.outlineVariant),
       );
 
-  InputDecoration _buildLoginDecoration({
+  InputDecoration _buildLoginDecoration(
+    BuildContext context, {
     required String label,
     required IconData icon,
     Widget? suffix,
   }) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon, color: AppColors.textSecondary),
+      prefixIcon: Icon(icon, color: colors.onSurfaceVariant),
       suffixIcon: suffix,
       filled: true,
-      fillColor: AppColors.surface,
-      labelStyle: const TextStyle(
-        color: AppColors.textPrimary,
+      fillColor: colors.surfaceVariant,
+      labelStyle: textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
         fontWeight: FontWeight.w600,
       ),
-      hintStyle: const TextStyle(color: AppColors.textSecondary),
-      enabledBorder: _loginBorder,
-      focusedBorder: _loginBorder.copyWith(
-        borderSide: const BorderSide(color: AppColors.primary),
+      hintStyle: textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
       ),
-      errorBorder: _loginBorder.copyWith(
-        borderSide: const BorderSide(color: AppColors.error),
+      enabledBorder: _loginBorder(colors),
+      focusedBorder: _loginBorder(colors).copyWith(
+        borderSide: BorderSide(color: colors.primary, width: 1.6),
+      ),
+      errorBorder: _loginBorder(colors).copyWith(
+        borderSide: BorderSide(color: colors.error, width: 1.6),
       ),
     );
   }
@@ -419,6 +426,50 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     return null;
   }
 
+  DateTime? _parseBirthDate(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+    if (value is double) {
+      return DateTime.fromMillisecondsSinceEpoch(value.toInt());
+    }
+    return null;
+  }
+
+  int _ageFromBirthDate(DateTime? birthDate) {
+    if (birthDate == null) return 0;
+    final now = DateTime.now();
+    var age = now.year - birthDate.year;
+    final hasHadBirthday = (now.month > birthDate.month) ||
+        (now.month == birthDate.month && now.day >= birthDate.day);
+    if (!hasHadBirthday) age -= 1;
+    return age.clamp(0, 120);
+  }
+
+  int _resolveAgeFromApi(Map<String, dynamic> data, ChildProfile? existing) {
+    final apiAge = _parseInt(data['age'], 0);
+    final birthDate = _parseBirthDate(
+      data['birthdate'] ??
+          data['birth_date'] ??
+          data['date_of_birth'] ??
+          data['dob'],
+    );
+    final computedAge = _ageFromBirthDate(birthDate);
+
+    if (kDebugMode) {
+      debugPrint(
+        'Child age resolve: apiAge=$apiAge, birthDate=$birthDate, computedAge=$computedAge, existing=${existing?.age}',
+      );
+    }
+
+    if (apiAge > 0) return apiAge;
+    if (computedAge > 0) return computedAge;
+    return existing?.age ?? 0;
+  }
+
   ChildProfile? _mergeChildProfileFromApi(
     Map<String, dynamic> data, {
     ChildProfile? existing,
@@ -433,8 +484,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     final resolvedName = (apiName != null && apiName.isNotEmpty)
         ? apiName
         : (existing?.name ?? childId);
-    final existingAge = existing?.age ?? 0;
-    final age = existingAge > 0 ? existingAge : _parseInt(data['age'], 0);
+    final age = _resolveAgeFromApi(data, existing);
     final existingLevel = existing?.level ?? 0;
     final level =
         existingLevel > 0 ? existingLevel : _parseInt(data['level'], 1);
@@ -1085,9 +1135,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
@@ -1149,7 +1199,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
 
   Widget _buildLoginFlow(AppLocalizations l10n, List<ChildProfile> children) {
     if (children.isEmpty) {
-      return _buildManualLogin(l10n);
+      return _buildManualLogin(context, l10n);
     }
 
     final selectedChild = _resolveSelectedChild(children);
@@ -1221,7 +1271,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     );
   }
 
-  Widget _buildManualLogin(AppLocalizations l10n) {
+  Widget _buildManualLogin(BuildContext context, AppLocalizations l10n) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final canLogin = !_isLoading &&
         _childIdController.text.trim().isNotEmpty &&
         _selectedPictures.length == 3;
@@ -1230,10 +1282,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       children: [
         Text(
           l10n.childId,
-          style: const TextStyle(
+          style: textTheme.titleMedium?.copyWith(
             fontSize: AppConstants.fontSize,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: colors.onSurface,
           ),
         ),
         const SizedBox(height: 12),
@@ -1241,8 +1293,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
           controller: _childIdController,
           keyboardType: TextInputType.text,
           textCapitalization: TextCapitalization.none,
-          style: const TextStyle(color: AppColors.textPrimary),
+          style: TextStyle(color: colors.onSurface),
           decoration: _buildLoginDecoration(
+            context,
             label: l10n.childId,
             icon: Icons.badge,
           ),
@@ -1262,8 +1315,8 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                 ? () => _loginWithChildId(childId: _childIdController.text)
                 : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.behavioral,
-              foregroundColor: AppColors.white,
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -1332,7 +1385,6 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     ChildProfile child, {
     required bool canChangeChild,
   }) {
-    final fallback = child.name.isNotEmpty ? child.name[0] : '?';
     final canLogin = !_isLoading && _selectedPictures.length == 3;
 
     return Column(
@@ -1348,11 +1400,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
           child: Row(
             children: [
               _buildAvatarCircle(
-                avatar: child.avatar,
-                fallback: fallback,
+                avatarId: child.avatar,
+                avatarPath: child.avatarPath,
                 size: 50,
                 backgroundColor: AppColors.primary,
-                textColor: AppColors.white,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1480,72 +1531,30 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
   }
 
   Widget _buildAvatarCircle({
-    required String? avatar,
-    required String fallback,
+    required String? avatarId,
+    required String? avatarPath,
     required double size,
     required Color backgroundColor,
-    required Color textColor,
   }) {
-    final fallbackWidget = Center(
-      child: Text(
-        fallback,
-        style: TextStyle(
-          fontSize: size * 0.45,
-          fontWeight: FontWeight.bold,
-          color: textColor,
-        ),
-      ),
-    );
-
-    final option = _avatarForValue(avatar);
-    if (option != null) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: option.backgroundColor,
-          borderRadius: BorderRadius.circular(size / 2),
-        ),
-        child: ClipOval(
-          child: option.assetPath.isNotEmpty
-              ? Image.asset(
-                  option.assetPath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Center(
-                    child: Icon(
-                      option.icon,
-                      color: option.iconColor,
-                      size: size * 0.5,
-                    ),
-                  ),
-                )
-              : Center(
-                  child: Icon(
-                    option.icon,
-                    color: option.iconColor,
-                    size: size * 0.5,
-                  ),
-                ),
-        ),
-      );
-    }
+    final option = _avatarForValue(avatarId ?? avatarPath);
+    final resolvedBackground = option?.backgroundColor ?? backgroundColor;
+    final resolvedPath =
+        option?.assetPath.isNotEmpty == true ? option!.assetPath : avatarPath;
 
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: resolvedBackground,
         borderRadius: BorderRadius.circular(size / 2),
       ),
       child: ClipOval(
-        child:
-            avatar != null && avatar.isNotEmpty && avatar.startsWith('assets/')
-                ? Image.asset(
-                    avatar,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => fallbackWidget,
-                  )
-                : fallbackWidget,
+        child: AvatarView(
+          avatarId: avatarId,
+          avatarPath: resolvedPath,
+          radius: size / 2,
+          backgroundColor: Colors.transparent,
+        ),
       ),
     );
   }
@@ -1572,11 +1581,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
         child: Column(
           children: [
             _buildAvatarCircle(
-              avatar: child.avatar,
-              fallback: child.name.isNotEmpty ? child.name[0] : '?',
+              avatarId: child.avatar,
+              avatarPath: child.avatarPath,
               size: 64,
               backgroundColor: AppColors.behavioral.withValues(alpha: 0.2),
-              textColor: AppColors.behavioral,
             ),
             const SizedBox(height: 12),
             Text(
@@ -1593,6 +1601,15 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
               Text(
                 l10n.yearsOld(child.age),
                 style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ] else ...[
+              const SizedBox(height: 4),
+              const Text(
+                '—',
+                style: TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                 ),

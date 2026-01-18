@@ -299,6 +299,26 @@ class SecureStorage {
     }
   }
 
+  /// Clear only authentication/session data while preserving child profiles and preferences
+  /// Use this for logout to keep local child data intact
+  Future<bool> clearAuthOnly() async {
+    try {
+      // Clear auth tokens and session
+      await _storage.delete(key: _keyAuthToken);
+      await _storage.delete(key: _keyUserRole);
+      await _storage.delete(key: _keyUserId);
+      await _storage.delete(key: _keyUserEmail);
+      await _storage.delete(key: _keyChildSession);
+      await _storage.delete(key: _keyParentPin);
+      
+      // Preserve: child profiles, plan type, theme settings, privacy settings
+      // These are accessible without authentication
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   // ==================== HELPERS ====================
 
   Future<bool> isAuthenticated() async {

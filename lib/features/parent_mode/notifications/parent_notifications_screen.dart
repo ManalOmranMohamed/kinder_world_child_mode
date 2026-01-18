@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/subscription/plan_info.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
-import 'package:kinder_world/core/widgets/plan_guard.dart';
+import 'package:kinder_world/core/providers/plan_provider.dart';
 import 'package:kinder_world/core/widgets/plan_status_banner.dart';
+import 'package:kinder_world/core/widgets/premium_badge.dart';
+import 'package:kinder_world/core/widgets/premium_section_upsell.dart';
 
 class ParentNotificationsScreen extends ConsumerWidget {
   const ParentNotificationsScreen({super.key});
@@ -14,19 +15,21 @@ class ParentNotificationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final notifications = _getMockNotifications(l10n);
-    
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final plan =
+        ref.watch(planInfoProvider).asData?.value ?? PlanInfo.fromTier(PlanTier.free);
+    final isSmartLocked = !plan.hasAiInsights;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.surface,
         elevation: 0,
         title: Text(
           l10n.notifications,
-          style: const TextStyle(
-            fontSize: AppConstants.fontSize,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         actions: [
           TextButton(
@@ -35,44 +38,86 @@ class ParentNotificationsScreen extends ConsumerWidget {
             },
             child: Text(
               l10n.markAllRead,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.primary,
-              ),
+              style: textTheme.bodyMedium?.copyWith(color: colors.primary),
             ),
           ),
         ],
       ),
       body: SafeArea(
-        child: PlanGuard(
-          requiredTier: PlanTier.premium,
-          featureLabel: l10n.notifications,
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: PlanStatusBanner(margin: EdgeInsets.zero),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                  itemCount: notifications.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final notification = notifications[index];
-                    return _NotificationCard(
-                      notification: notification,
-                      onTap: () {
-                        // Handle notification tap
-                      },
-                    );
-                  },
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: PlanStatusBanner(margin: EdgeInsets.zero),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colors.outlineVariant),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.shadow.withValues(alpha: 0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.recommendedForYou,
+                            style: textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        if (isSmartLocked) const PremiumBadge(),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.planAiInsightsPro,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                    if (isSmartLocked)
+                      PremiumSectionUpsell(
+                        title: l10n.planFeatureInPremium,
+                        description: l10n.planAiInsightsPro,
+                        buttonLabel: l10n.upgradeNow,
+                        showBadge: false,
+                        padding: const EdgeInsets.all(12),
+                      ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                itemCount: notifications.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 16),
+                itemBuilder: (context, index) {
+                  final notification = notifications[index];
+                  return _NotificationCard(
+                    notification: notification,
+                    onTap: () {
+                      // Handle notification tap
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -149,20 +194,26 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: notification['isRead'] ? AppColors.white : AppColors.primary.withValues(alpha: 0.05),
+          color: notification['isRead']
+              ? colors.surface
+              : colors.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: notification['isRead'] ? AppColors.lightGrey : AppColors.primary.withValues(alpha: 0.2),
+            color: notification['isRead']
+                ? colors.outlineVariant
+                : colors.primary.withValues(alpha: 0.3),
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.05),
+              color: colors.shadow.withValues(alpha: 0.08),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -176,7 +227,8 @@ class _NotificationCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: _getTypeColor(notification['type']).withValues(alpha: 0.1),
+                color:
+                    _getTypeColor(notification['type']).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Icon(
@@ -197,10 +249,10 @@ class _NotificationCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           notification['title'],
-                          style: TextStyle(
-                            fontSize: AppConstants.fontSize,
-                            fontWeight: notification['isRead'] ? FontWeight.normal : FontWeight.bold,
-                            color: AppColors.textPrimary,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: notification['isRead']
+                                ? FontWeight.normal
+                                : FontWeight.bold,
                           ),
                         ),
                       ),
@@ -219,9 +271,8 @@ class _NotificationCard extends StatelessWidget {
                   
                   Text(
                     notification['message'],
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -230,26 +281,21 @@ class _NotificationCard extends StatelessWidget {
                     children: [
                       Text(
                         notification['childName'],
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.primary,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(width: 8),
                       const Text(
                         '-',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 12),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         notification['time'],
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                     ],

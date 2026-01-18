@@ -237,6 +237,10 @@ abstract class AppLocalizations {
   String get english;
   String get arabic;
   String get theme;
+  String get mode;
+  String get systemMode;
+  String get themePalette;
+  String get themePaletteHint;
   String get lightMode;
   String get darkMode;
   String get eyeFriendlyMode;

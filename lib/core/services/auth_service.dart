@@ -47,18 +47,15 @@ class AuthService {
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,
+    required String confirmPassword,
   }) async {
     try {
-      if (newPassword.length < 6) {
-        _logger.w('Password too short');
-        return false;
-      }
-
       final response = await _networkService.post<Map<String, dynamic>>(
         '/auth/change-password',
         data: {
-          'current_password': currentPassword,
-          'new_password': newPassword,
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
         },
       );
 

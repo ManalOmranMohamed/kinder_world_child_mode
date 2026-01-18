@@ -5,6 +5,7 @@ import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/providers/auth_controller.dart';
 import 'package:kinder_world/core/providers/profile_controller.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
+import 'package:kinder_world/core/widgets/avatar_view.dart';
 
 class ParentProfileScreen extends ConsumerStatefulWidget {
   const ParentProfileScreen({super.key});
@@ -121,15 +122,10 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
                   Center(
                     child: Column(
                       children: [
-                        CircleAvatar(
+                        AvatarView(
                           radius: 48,
                           backgroundColor:
-                              AppColors.primary.withValues(alpha: 0.2),
-                          child: const Icon(
-                            Icons.person,
-                            size: 48,
-                            color: AppColors.primary,
-                          ),
+                              AppColors.primary.withOpacity(0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
