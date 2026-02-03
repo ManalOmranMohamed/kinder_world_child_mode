@@ -3,17 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
-import 'package:kinder_world/app.dart';
+import 'package:kinder_world/app.dart'; // تأكد من أن هذا المسار صحيح لاستدعاء localeProvider
 
 class LanguageSelectionScreen extends ConsumerStatefulWidget {
   const LanguageSelectionScreen({super.key});
 
   @override
-  ConsumerState<LanguageSelectionScreen> createState() => 
+  ConsumerState<LanguageSelectionScreen> createState() =>
       _LanguageSelectionScreenState();
 }
 
-class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScreen> 
+class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _slideAnimation;
@@ -25,7 +25,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    
+
     _slideAnimation = Tween<double>(
       begin: 1.0,
       end: 0.0,
@@ -33,7 +33,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
       parent: _controller,
       curve: const Interval(0.0, 1.0, curve: Curves.easeOutCubic),
     ));
-    
+
     _controller.forward();
   }
 
@@ -44,13 +44,12 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
   }
 
   void _selectLanguage(String languageCode) {
-    // Update app locale
+    // تحديث حالة اللغة في البروفايدر
     ref.read(localeProvider.notifier).state = Locale(languageCode);
   }
 
   void _continueToNextScreen() {
-    // Navigate to onboarding
-    final currentLocale = ref.read(localeProvider);
+    // الانتقال للشاشة التالية
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
         context.go('/onboarding');
@@ -63,6 +62,10 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    
+    // مراقبة اللغة الحالية لتحديث الواجهة فوراً
+    final currentLocale = ref.watch(localeProvider);
+
     final languages = [
       {
         'code': 'en',
@@ -75,6 +78,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
         'flag': 'AR',
       },
     ];
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -120,7 +124,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                       ),
                     ),
                     const SizedBox(height: 32),
-                    
+
                     // Title
                     Text(
                       l10n.chooseLanguageTitle,
@@ -130,7 +134,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                       ),
                     ),
                     const SizedBox(height: 12),
-                    
+
                     // Subtitle
                     Text(
                       l10n.chooseLanguageSubtitle,
@@ -140,12 +144,12 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                       ),
                     ),
                     const SizedBox(height: 48),
-                    
+
                     // Language Options
                     ...languages.map((language) => _buildLanguageCard(language)),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Continue Button
                     ElevatedButton(
                       onPressed: () {
@@ -167,7 +171,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -180,9 +184,11 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
   }
 
   Widget _buildLanguageCard(Map<String, dynamic> language) {
-    final isSelected = ref.watch(localeProvider).languageCode == language['code'];
+    // نستخدم ref.watch لمعرفة أي لغة محددة حالياً
+    final currentLocale = ref.watch(localeProvider);
+    final isSelected = currentLocale.languageCode == language['code'];
     final colors = Theme.of(context).colorScheme;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: InkWell(
@@ -217,7 +223,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                     style: const TextStyle(fontSize: 32),
                   ),
                   const SizedBox(width: 16),
-                  
+
                   // Language Name
                   Text(
                     language['name'],
@@ -229,7 +235,7 @@ class _LanguageSelectionScreenState extends ConsumerState<LanguageSelectionScree
                   ),
                 ],
               ),
-              
+
               // Selection Indicator
               Container(
                 width: 24,

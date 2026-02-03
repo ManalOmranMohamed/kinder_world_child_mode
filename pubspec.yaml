@@ -102,6 +102,8 @@ flutter:
     - assets/sounds/
     - assets/videos/
     
+    - assets/images/child/learn/
+
   # fonts:
   #   - family: Poppins
   #     fonts:
@@ -121,3 +123,4 @@ flutter_native_splash:
   # image: assets/images/splash_logo.png
   android: true
   ios: true
+
