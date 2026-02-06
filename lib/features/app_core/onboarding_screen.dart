@@ -75,6 +75,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/welcome');
+            }
+          },
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [

@@ -104,6 +104,12 @@ class AuthController extends StateNotifier<AuthState> {
         );
         return false;
       }
+    } on ParentAuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.message,
+      );
+      return false;
     } catch (e) {
       _logger.e('Parent login error: $e');
       state = state.copyWith(
@@ -148,6 +154,12 @@ class AuthController extends StateNotifier<AuthState> {
         );
         return false;
       }
+    } on ParentAuthException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.message,
+      );
+      return false;
     } catch (e) {
       _logger.e('Parent registration error: $e');
       state = state.copyWith(
@@ -163,6 +175,7 @@ class AuthController extends StateNotifier<AuthState> {
   /// Login child with picture password
   Future<bool> loginChild({
     required String childId,
+    required String childName,
     required List<String> picturePassword,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -170,6 +183,7 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       final user = await _authRepository.loginChild(
         childId: childId,
+        childName: childName,
         picturePassword: picturePassword,
       );
       
@@ -210,6 +224,8 @@ class AuthController extends StateNotifier<AuthState> {
     required String name,
     required List<String> picturePassword,
     required String parentEmail,
+    required int age,
+    String? avatar,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -218,6 +234,8 @@ class AuthController extends StateNotifier<AuthState> {
         name: name,
         picturePassword: picturePassword,
         parentEmail: parentEmail,
+        age: age,
+        avatar: avatar,
       );
 
       if (response != null) {
@@ -235,7 +253,8 @@ class AuthController extends StateNotifier<AuthState> {
     } on ChildRegisterException catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: _childRegisterErrorForStatus(e.statusCode, e.detailCode),
+        error: e.message ??
+            _childRegisterErrorForStatus(e.statusCode, e.detailCode),
       );
       return null;
     } catch (e) {

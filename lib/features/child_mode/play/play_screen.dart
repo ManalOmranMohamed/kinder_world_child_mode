@@ -147,6 +147,16 @@ class _PlayScreenState extends ConsumerState<PlayScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else {
+                        context.go('/child/home');
+                      }
+                    },
+                  ),
                   const ChildHeader(compact: true),
                   const Spacer(),
                   _iconBubble(Icons.cast, onTap: () {

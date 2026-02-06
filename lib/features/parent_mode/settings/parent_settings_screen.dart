@@ -174,41 +174,6 @@ class ParentSettingsScreen extends ConsumerWidget {
               },
             ),
 
-            const SizedBox(height: 24),
-
-            // Legal Section
-            _buildSectionHeader(context, l10n.legalSection),
-            _buildSettingItem(
-              context,
-              l10n.termsOfService,
-              Icons.description,
-              onTap: () {
-                _safeNavigate(
-                  () => context.push('${Routes.legal}?type=terms'),
-                );
-              },
-            ),
-            _buildSettingItem(
-              context,
-              l10n.privacyPolicy,
-              Icons.security,
-              onTap: () {
-                _safeNavigate(
-                  () => context.push('${Routes.legal}?type=privacy'),
-                );
-              },
-            ),
-            _buildSettingItem(
-              context,
-              l10n.coppaCompliance,
-              Icons.child_care,
-              onTap: () {
-                _safeNavigate(
-                  () => context.push('${Routes.legal}?type=coppa'),
-                );
-              },
-            ),
-
             const SizedBox(height: 40),
 
             // Logout Button

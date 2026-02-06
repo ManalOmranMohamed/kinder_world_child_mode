@@ -14,6 +14,7 @@ import 'package:kinder_world/features/auth/parent_register_screen.dart';
 import 'package:kinder_world/features/auth/child_login_screen.dart';
 
 import 'package:kinder_world/features/child_mode/home/child_home_screen.dart';
+import 'package:kinder_world/features/child_mode/home/activity_of_the_day_screen.dart';
 import 'package:kinder_world/features/child_mode/learn/learn_screen.dart';
 import 'package:kinder_world/features/child_mode/learn/subject_screen.dart';
 import 'package:kinder_world/features/child_mode/learn/lesson_flow_screen.dart';
@@ -36,6 +37,7 @@ import 'package:kinder_world/features/parent_mode/settings/screens/privacy_setti
 import 'package:kinder_world/features/parent_mode/settings/screens/help_screen.dart';
 import 'package:kinder_world/features/parent_mode/settings/screens/contact_us_screen.dart';
 import 'package:kinder_world/features/parent_mode/settings/screens/about_screen.dart';
+import 'package:kinder_world/features/parent_mode/settings/screens/legal_pages.dart';
 import 'package:kinder_world/features/parent_mode/subscription/subscription_screen.dart';
 import 'package:kinder_world/features/parent_mode/subscription/billing_management_screen.dart';
 import 'package:kinder_world/features/parent_mode/notifications/parent_notifications_screen.dart';
@@ -68,6 +70,7 @@ class Routes {
   static const childPlay = '/child/play';
   static const childAiBuddy = '/child/ai-buddy';
   static const childProfile = '/child/profile';
+  static const childActivityOfDay = '/child/home/activity-of-day';
 
   // Parent
   static const parentDashboard = '/parent/dashboard';
@@ -90,6 +93,9 @@ class Routes {
   static const parentHelp = '/parent/help';
   static const parentContactUs = '/parent/contact-us';
   static const parentAbout = '/parent/about';
+  static const parentTerms = '/parent/legal/terms';
+  static const parentPrivacyPolicy = '/parent/legal/privacy';
+  static const parentCoppa = '/parent/legal/coppa';
 
   // System
   static const noInternet = '/no-internet';
@@ -245,6 +251,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.childHome,
                 builder: (context, state) => const ChildHomeContent(),
+                routes: [
+                  GoRoute(
+                    path: 'activity-of-day',
+                    builder: (context, state) => const ActivityOfTheDayScreen(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -385,6 +397,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.parentAbout,
         builder: (context, state) => const ParentAboutScreen(),
+      ),
+      GoRoute(
+        path: Routes.parentTerms,
+        builder: (context, state) => const ParentTermsScreen(),
+      ),
+      GoRoute(
+        path: Routes.parentPrivacyPolicy,
+        builder: (context, state) => const ParentPrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: Routes.parentCoppa,
+        builder: (context, state) => const ParentCoppaScreen(),
       ),
       GoRoute(
         path: Routes.parentSubscription,

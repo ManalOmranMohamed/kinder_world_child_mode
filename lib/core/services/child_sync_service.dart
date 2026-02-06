@@ -189,6 +189,9 @@ class ChildSyncService {
     final avatar = existing?.avatar ??
         data['avatar']?.toString() ??
         AppConstants.defaultChildAvatar;
+    final resolvedAvatarPath = existing?.avatarPath.isNotEmpty == true
+        ? existing!.avatarPath
+        : (avatar.isNotEmpty ? avatar : AppConstants.defaultChildAvatar);
     final picturePassword = (existing?.picturePassword.isNotEmpty ?? false)
         ? existing!.picturePassword
         : _parseStringList(data['picture_password']);
@@ -202,6 +205,7 @@ class ChildSyncService {
       name: resolvedName,
       age: age,
       avatar: avatar,
+      avatarPath: resolvedAvatarPath,
       interests: existing?.interests ?? _parseStringList(data['interests']),
       level: level,
       xp: existing?.xp ?? _parseInt(data['xp'], 0),

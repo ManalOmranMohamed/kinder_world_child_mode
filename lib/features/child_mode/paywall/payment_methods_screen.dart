@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
+import 'package:kinder_world/app.dart';
 
 class PaymentMethodsScreen extends ConsumerStatefulWidget {
   const PaymentMethodsScreen({super.key});
@@ -13,7 +14,32 @@ class PaymentMethodsScreen extends ConsumerStatefulWidget {
 }
 
 class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
-  final List<String> _methods = [];
+  late Future<List<Map<String, dynamic>>> _methodsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _methodsFuture = _loadMethods();
+  }
+
+  Future<List<Map<String, dynamic>>> _loadMethods() async {
+    try {
+      final response =
+          await ref.read(networkServiceProvider).get<Map<String, dynamic>>(
+                '/billing/methods',
+              );
+      final data = response.data;
+      if (data == null) return [];
+      final methods = data['methods'];
+      if (methods is List) {
+        return methods
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+      }
+    } catch (_) {}
+    return [];
+  }
 
   Future<void> _addPaymentMethod(AppLocalizations l10n) async {
     final controller = TextEditingController();
@@ -44,16 +70,24 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
     );
     controller.dispose();
     if (method == null || method.isEmpty) return;
+    await ref.read(networkServiceProvider).post<Map<String, dynamic>>(
+      '/billing/methods',
+      data: {
+        'label': method,
+      },
+    );
+    if (!mounted) return;
     setState(() {
-      _methods.add(method);
+      _methodsFuture = _loadMethods();
     });
   }
 
   void _openPaymentPortal(AppLocalizations l10n) {
+    ref.read(networkServiceProvider).post<Map<String, dynamic>>(
+      '/billing/portal',
+    );
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.openPaymentPortal),
-      ),
+      SnackBar(content: Text(l10n.openPaymentPortal)),
     );
   }
 
@@ -74,8 +108,15 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           child: Column(
             children: [
               Expanded(
-                child: _methods.isEmpty
-                    ? Center(
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _methodsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final methods = snapshot.data ?? [];
+                    if (methods.isEmpty) {
+                      return Center(
                         child: Text(
                           l10n.paymentMethodsEmpty,
                           style: textTheme.bodyMedium?.copyWith(
@@ -84,55 +125,67 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                      )
-                    : ListView.separated(
-                        itemCount: _methods.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final method = _methods[index];
-                          return Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: colors.surface,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: colors.shadow.withValues(alpha: 0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.credit_card,
-                                    color: AppColors.primary),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    method,
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      fontSize: AppConstants.fontSize,
-                                    ),
+                      );
+                    }
+                    return ListView.separated(
+                      itemCount: methods.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final method = methods[index];
+                        final label = method['label']?.toString() ?? '';
+                        final id = method['id']?.toString() ?? '';
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: colors.surface,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: colors.shadow.withValues(alpha: 0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.credit_card,
+                                  color: AppColors.primary),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  label,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontSize: AppConstants.fontSize,
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _methods.removeAt(index);
-                                    });
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: AppColors.error,
-                                  ),
-                                  tooltip: l10n.removePaymentMethod,
+                              ),
+                              IconButton(
+                                onPressed: () async {
+                                  if (id.isEmpty) return;
+                                  await ref
+                                      .read(networkServiceProvider)
+                                      .delete<Map<String, dynamic>>(
+                                        '/billing/methods/$id',
+                                      );
+                                  if (!mounted) return;
+                                  setState(() {
+                                    _methodsFuture = _loadMethods();
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: AppColors.error,
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                                tooltip: l10n.removePaymentMethod,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 12),
               SizedBox(

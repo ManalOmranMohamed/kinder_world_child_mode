@@ -7,7 +7,7 @@ class AppConstants {
   
   // API
   static const String baseUrl = 'http://127.0.0.1:8000';
-  static const Duration apiTimeout = Duration(seconds: 30);
+  static const Duration apiTimeout = Duration(seconds: 60);
   
   // Storage
   static const String hiveBoxName = 'kinder_world_box';

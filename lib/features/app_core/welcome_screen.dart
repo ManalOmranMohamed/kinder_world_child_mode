@@ -62,6 +62,21 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/select-user-type');
+            }
+          },
+        ),
+      ),
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _controller,
@@ -130,8 +145,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 const SizedBox(height: 48),
                 
                 // Features Grid
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  alignment: WrapAlignment.center,
                   children: [
                     _buildFeatureItem(
                       Icons.school,
@@ -200,30 +217,36 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
   Widget _buildFeatureItem(IconData icon, String label, Color color) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
+    return SizedBox(
+      width: 96,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              icon,
+              size: 30,
+              color: color,
+            ),
           ),
-          child: Icon(
-            icon,
-            size: 30,
-            color: color,
+          const SizedBox(height: 8),
+          Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: textTheme.bodySmall?.copyWith(
+              fontSize: 14,
+              color: colors.onSurfaceVariant,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: textTheme.bodySmall?.copyWith(
-            fontSize: 14,
-            color: colors.onSurfaceVariant,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

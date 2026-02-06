@@ -24,6 +24,7 @@ abstract class AppLocalizations {
   String get edit;
   String get loading;
   String get error;
+  String get connectionError;
   String get success;
   String get retry;
   String get noInternet;
@@ -69,6 +70,7 @@ abstract class AppLocalizations {
   String get paywallManagePaymentMethods;
   String get paymentMethodsTitle;
   String get paymentMethodsEmpty;
+  String get noNotifications;
   String get addPaymentMethod;
   String get removePaymentMethod;
   String get openPaymentPortal;

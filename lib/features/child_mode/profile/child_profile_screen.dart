@@ -69,6 +69,20 @@ class ChildProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/child/home');
+            }
+          },
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -249,20 +263,6 @@ class ChildProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await ref.read(childSessionControllerProvider.notifier).endChildSession();
-                  await ref.read(authControllerProvider.notifier).logout();
-                  if (!context.mounted) return;
-                  context.go('/welcome');
-                },
-                icon: const Icon(Icons.logout),
-                label: Text(l10n.logout),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-              ),
               const SizedBox(height: 40),
             ],
           ),
@@ -406,6 +406,25 @@ class _ChildSettingsScreenState extends ConsumerState<ChildSettingsScreen> {
           ),
           const SizedBox(height: 20),
           ..._buildFilteredSettings(context, locale),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () async {
+              await ref.read(childSessionControllerProvider.notifier).endChildSession();
+              await ref.read(authControllerProvider.notifier).logout();
+              if (!context.mounted) return;
+              context.go('/welcome');
+            },
+            icon: const Icon(Icons.logout),
+            label: Text(l10n.logout),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.error,
+              foregroundColor: colors.onError,
+              minimumSize: const Size(double.infinity, 52),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -476,20 +495,6 @@ class _ChildSettingsScreenState extends ConsumerState<ChildSettingsScreen> {
       sections.add(const SizedBox(height: 30));
     }
 
-    if (match('danger') || match('reset')) {
-      sections.add(_buildSectionHeader(context, "Danger Zone"));
-      sections.add(const SizedBox(height: 10));
-      sections.add(_buildSettingsCard(
-        context,
-        color: Colors.red.withValues(alpha: 0.05),
-        children: [
-          _buildListTile(context, title: "Reset Progress", icon: Icons.refresh, iconColor: Colors.red, titleColor: Colors.red, onTap: () {
-            _showResetDialog(context);
-          }),
-        ],
-      ));
-    }
-
     if (sections.isEmpty) {
       return [
         Center(
@@ -540,10 +545,6 @@ class _ChildSettingsScreenState extends ConsumerState<ChildSettingsScreen> {
     if (query == 'privacy' || query == 'privacy policy' || query == 'الخصوصية' || query == 'سياسة الخصوصية') {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const SettingsPrivacyPolicyScreen()));
-      return;
-    }
-    if (query == 'reset' || query == 'reset progress' || query == 'إعادة الضبط' || query == 'اعادة الضبط') {
-      _showResetDialog(context);
       return;
     }
   }
@@ -615,27 +616,6 @@ class _ChildSettingsScreenState extends ConsumerState<ChildSettingsScreen> {
   Widget _buildDivider() {
     return Divider(height: 1, thickness: 1, indent: 70, endIndent: 20, color: Theme.of(context).colorScheme.outlineVariant);
   }
-
-  void _showResetDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("Reset Progress?"),
-        content: const Text("This will delete all your XP, levels, and achievements. This action cannot be undone."),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Progress Reset")));
-            },
-            child: const Text("Reset", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ==========================================
@@ -652,7 +632,7 @@ class SettingsLanguageScreen extends ConsumerWidget {
 
     final languages = const [
       {'code': 'en', 'name': 'English (US)'},
-      {'code': 'ar', 'name': '???????'},
+      {'code': 'ar', 'name': 'العربية'},
     ];
 
     return Scaffold(
@@ -882,12 +862,38 @@ class _SettingsEditProfileScreenState
       return;
     }
 
+    final newPassword = List<String>.from(_selectedPictures);
+    final hasPasswordChange =
+        child.picturePassword.length == 3 && child.picturePassword != newPassword;
+
+    if (hasPasswordChange) {
+      try {
+        await ref.read(networkServiceProvider).post(
+          '/auth/child/change-password',
+          data: {
+            'child_id': int.tryParse(child.id) ?? child.id,
+            'name': child.name,
+            'current_picture_password': child.picturePassword,
+            'new_picture_password': newPassword,
+          },
+        );
+      } catch (_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update picture password')),
+        );
+        return;
+      }
+    }
+
     final updated = child.copyWith(
       name: _nameController.text.trim(),
-      picturePassword: List<String>.from(_selectedPictures),
+      picturePassword: newPassword,
     );
 
-    await ref.read(childSessionControllerProvider.notifier).updateChildProfile(updated);
+    await ref
+        .read(childSessionControllerProvider.notifier)
+        .updateChildProfile(updated);
 
     if (!mounted) return;
     Navigator.pop(context);

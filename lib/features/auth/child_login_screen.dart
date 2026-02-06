@@ -39,6 +39,7 @@ class ChildLoginScreen extends ConsumerStatefulWidget {
 }
 
 class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
+  final TextEditingController _childNameController = TextEditingController();
   final TextEditingController _childIdController = TextEditingController();
   late Future<List<ChildProfile>> _childrenFuture;
 
@@ -142,6 +143,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
   void dispose() {
     _topMessageEntry?.remove();
     _topMessageEntry = null;
+    _childNameController.dispose();
     _childIdController.dispose();
     super.dispose();
   }
@@ -516,6 +518,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     final avatar = existing?.avatar ??
         data['avatar']?.toString() ??
         _avatarOptions.first.id;
+    final resolvedAvatarPath = existing?.avatarPath.isNotEmpty == true
+        ? existing!.avatarPath
+        : (avatar.isNotEmpty ? avatar : AppConstants.defaultChildAvatar);
     final picturePassword = (existing?.picturePassword.isNotEmpty ?? false)
         ? existing!.picturePassword
         : _parseStringList(data['picture_password']);
@@ -530,6 +535,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       name: resolvedName,
       age: age,
       avatar: avatar,
+      avatarPath: resolvedAvatarPath,
       interests: existing?.interests ?? _parseStringList(data['interests']),
       level: level,
       xp: existing?.xp ?? _parseInt(data['xp'], 0),
@@ -672,12 +678,16 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
 
   Future<void> _loginWithChildId({
     required String childId,
+    required String childName,
     ChildProfile? childProfile,
   }) async {
     final l10n = AppLocalizations.of(context)!;
     final trimmedId = childId.trim();
+    final trimmedName = childName.trim();
 
-    if (trimmedId.isEmpty || _selectedPictures.length != 3) {
+    if (trimmedId.isEmpty ||
+        trimmedName.isEmpty ||
+        _selectedPictures.length != 3) {
       _showError(l10n.childLoginMissingData);
       return;
     }
@@ -691,6 +701,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       final authController = ref.read(authControllerProvider.notifier);
       final authSuccess = await authController.loginChild(
         childId: trimmedId,
+        childName: trimmedName,
         picturePassword: List<String>.from(_selectedPictures),
       );
 
@@ -704,7 +715,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
       final storedProfile = await _ensureLocalChildProfile(
         trimmedId,
         childProfile,
-        fallbackName: loggedInName,
+        fallbackName: loggedInName ?? trimmedName,
       );
       if (storedProfile == null) {
         _showError(l10n.childProfileNotFound);
@@ -750,9 +761,13 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     bool isSaving = false;
 
     bool isValidEmail(String value) {
-      final trimmed = value.trim();
-      if (trimmed.isEmpty) return false;
-      return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(trimmed);
+      final trimmed = value.trim().toLowerCase();
+      if (trimmed.isEmpty || !trimmed.contains('@')) return false;
+      final domain = trimmed.split('@').last;
+      return domain == 'gmail.com' ||
+          domain == 'outlook.com' ||
+          domain == 'hotmail.com' ||
+          domain == 'live.com';
     }
 
     void togglePicture(
@@ -859,7 +874,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                             DropdownButton<int>(
                               value: age,
                               hint: Text('-'),
-                              items: List.generate(12, (i) => i + 3)
+                              items: List.generate(8, (i) => i + 5)
                                   .map(
                                     (value) => DropdownMenuItem(
                                       value: value,
@@ -1020,6 +1035,9 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                                             trimmedName.toLowerCase() == 'child' ||
                                             trimmedName.length < 2 ||
                                             !isValidEmail(trimmedEmail) ||
+                                            age == null ||
+                                            age! < 5 ||
+                                            age! > 12 ||
                                             selectedPassword.length != 3) {
                                           setDialogState(() {
                                             isSaving = false;
@@ -1038,6 +1056,8 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                                           picturePassword: List<String>.from(
                                               selectedPassword),
                                           parentEmail: trimmedEmail,
+                                          age: age ?? 0,
+                                          avatar: selectedAvatar,
                                         );
 
                                         if (response == null &&
@@ -1067,6 +1087,8 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                                               selectedPassword,
                                             ),
                                             parentEmail: trimmedEmail,
+                                            age: age ?? 0,
+                                            avatar: selectedAvatar,
                                           );
                                         }
 
@@ -1342,11 +1364,34 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final canLogin = !_isLoading &&
+        _childNameController.text.trim().isNotEmpty &&
         _childIdController.text.trim().isNotEmpty &&
         _selectedPictures.length == 3;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          l10n.childName,
+          style: textTheme.titleMedium?.copyWith(
+            fontSize: AppConstants.fontSize,
+            fontWeight: FontWeight.w600,
+            color: colors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _childNameController,
+          keyboardType: TextInputType.name,
+          textCapitalization: TextCapitalization.words,
+          style: TextStyle(color: colors.onSurface),
+          decoration: _buildLoginDecoration(
+            context,
+            label: l10n.childName,
+            icon: Icons.person,
+          ),
+          onChanged: (_) => setState(() {}),
+        ),
+        const SizedBox(height: 20),
         Text(
           l10n.childId,
           style: textTheme.titleMedium?.copyWith(
@@ -1379,7 +1424,10 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
           height: 56,
           child: ElevatedButton(
             onPressed: canLogin
-                ? () => _loginWithChildId(childId: _childIdController.text)
+                ? () => _loginWithChildId(
+                      childId: _childIdController.text,
+                      childName: _childNameController.text,
+                    )
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: colors.primary,
@@ -1514,6 +1562,7 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
             onPressed: canLogin
                 ? () => _loginWithChildId(
                       childId: child.id,
+                      childName: child.name,
                       childProfile: child,
                     )
                 : null,

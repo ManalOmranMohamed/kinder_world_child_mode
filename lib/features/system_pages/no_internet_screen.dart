@@ -48,6 +48,11 @@ class _NoInternetScreenState extends ConsumerState<NoInternetScreen>
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _controller,

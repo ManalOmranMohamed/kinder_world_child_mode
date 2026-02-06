@@ -63,6 +63,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: colors.primary,
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: colors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/welcome');
+            }
+          },
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: AnimatedBuilder(

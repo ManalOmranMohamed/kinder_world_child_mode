@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:kinder_world/app.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
@@ -44,6 +45,34 @@ class ReportsScreen extends ConsumerStatefulWidget {
 class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   ReportPeriod _period = ReportPeriod.week;
   ChildProfile? _selectedChild;
+  List<Map<String, dynamic>> _basicReports = [];
+  bool _isLoadingReports = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReports();
+  }
+
+  Future<void> _loadReports() async {
+    try {
+      final response = await ref
+          .read(networkServiceProvider)
+          .get<Map<String, dynamic>>('/reports/basic');
+      final list = response.data?['reports'];
+      if (list is List) {
+        _basicReports = list
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+      }
+    } catch (_) {}
+    if (mounted) {
+      setState(() {
+        _isLoadingReports = false;
+      });
+    }
+  }
 
   String _periodLabel(AppLocalizations l10n) {
     switch (_period) {
@@ -57,6 +86,18 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   Map<String, String> _periodMetrics() {
+    if (_basicReports.isNotEmpty) {
+      final totalMinutes = _basicReports.fold<int>(
+        0,
+        (sum, item) => sum + (item['screen_time_minutes'] ?? 0) as int,
+      );
+      final hours = (totalMinutes / 60).toStringAsFixed(1);
+      return {
+        'activities': '${_basicReports.length}',
+        'score': '85%',
+        'time': '${hours}h',
+      };
+    }
     switch (_period) {
       case ReportPeriod.week:
         return {'activities': '25', 'score': '85%', 'time': '5.2h'};
@@ -240,6 +281,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         title: Text(l10n.reportsAndAnalytics),
         backgroundColor: colors.surface,
         foregroundColor: colors.onSurface,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/parent/dashboard');
+            }
+          },
+        ),
       ),
       body: SafeArea(
         child: FutureBuilder<String?>(
@@ -300,6 +351,37 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                           color: colors.onSurfaceVariant,
                         ),
                       ),
+                      if (_isLoadingReports) ...[
+                        const SizedBox(height: 12),
+                        const LinearProgressIndicator(),
+                      ],
+                      if (_basicReports.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.recentActivities,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ..._basicReports.map((report) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(report['date']?.toString() ?? ''),
+                                Text(
+                                  '${report['screen_time_minutes']} min',
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ],
                       const SizedBox(height: 16),
                       const PlanStatusBanner(),
                       const SizedBox(height: 24),

@@ -226,6 +226,9 @@ class _ChildManagementScreenState
     final existingLevel = existing?.level ?? 0;
     final level = existingLevel > 0 ? existingLevel : _parseInt(data['level'], 1);
     final avatar = existing?.avatar ?? data['avatar']?.toString() ?? _avatarOptions.first.id;
+    final resolvedAvatarPath = existing?.avatarPath.isNotEmpty == true
+        ? existing!.avatarPath
+        : (avatar.isNotEmpty ? avatar : AppConstants.defaultChildAvatar);
     final picturePassword = (existing?.picturePassword.isNotEmpty ?? false)
         ? existing!.picturePassword
         : _parseStringList(data['picture_password']);
@@ -239,6 +242,7 @@ class _ChildManagementScreenState
       name: resolvedName,
       age: age,
       avatar: avatar,
+      avatarPath: resolvedAvatarPath,
       interests: existing?.interests ?? _parseStringList(data['interests']),
       level: level,
       xp: existing?.xp ?? _parseInt(data['xp'], 0),
@@ -777,7 +781,7 @@ class _ChildManagementScreenState
                               DropdownButton<int>(
                                 value: age,
                                 hint: Text('-'),
-                                items: List.generate(12, (i) => i + 3)
+                                items: List.generate(8, (i) => i + 5)
                                     .map((v) => DropdownMenuItem(
                                           value: v,
                                           child: Text('$v'),
@@ -910,6 +914,9 @@ class _ChildManagementScreenState
                                 if (trimmedName.isEmpty ||
                                     trimmedName.toLowerCase() == 'child' ||
                                     trimmedName.length < 2 ||
+                                    age == null ||
+                                    age! < 5 ||
+                                    age! > 12 ||
                                     picturePassword.length != 3) {
                                   setDialogState(() {
                                     isSaving = false;
@@ -928,6 +935,8 @@ class _ChildManagementScreenState
                                       'name': trimmedName,
                                       'picture_password':
                                           List<String>.from(picturePassword),
+                                      'age': age,
+                                      'avatar': selectedAvatar,
                                     },
                                   );
                                   responseData = response.data;

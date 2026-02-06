@@ -344,6 +344,16 @@ class _ParentDashboardScreenState extends ConsumerState<ParentDashboardScreen>
                             Theme.of(context).scaffoldBackgroundColor,
                         elevation: 0,
                         floating: true,
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            } else {
+                              context.go('/parent/dashboard');
+                            }
+                          },
+                        ),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

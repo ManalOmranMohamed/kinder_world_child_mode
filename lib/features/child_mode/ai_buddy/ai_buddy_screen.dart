@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kinder_world/core/theme/app_colors.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 import 'package:kinder_world/core/widgets/child_header.dart';
 
@@ -223,7 +223,22 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const ChildHeader(compact: true),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else {
+                            context.go('/child/home');
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 4),
+                      const ChildHeader(compact: true),
+                    ],
+                  ),
                   Row(
                     children: [
                       // AI Buddy Avatar
@@ -239,11 +254,11 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                           width: 60,
                           height: 60,
                           decoration: BoxDecoration(
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.3),
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
                               ),
@@ -367,7 +382,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: IconButton(
@@ -404,13 +419,13 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 action.icon,
                 size: 20,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 8),
@@ -445,7 +460,7 @@ class _AiBuddyScreenState extends ConsumerState<AiBuddyScreen>
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: message.isUser ? AppColors.primary : Theme.of(context).colorScheme.surface,
+          color: message.isUser ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20).copyWith(
             bottomLeft: message.isUser ? const Radius.circular(20) : Radius.zero,
             bottomRight: !message.isUser ? const Radius.circular(20) : Radius.zero,

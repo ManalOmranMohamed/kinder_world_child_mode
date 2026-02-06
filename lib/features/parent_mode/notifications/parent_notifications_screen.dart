@@ -1,20 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kinder_world/app.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
 import 'package:kinder_world/core/subscription/plan_info.dart';
 import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/providers/plan_provider.dart';
 import 'package:kinder_world/core/widgets/plan_status_banner.dart';
-import 'package:kinder_world/core/widgets/premium_badge.dart';
 import 'package:kinder_world/core/widgets/premium_section_upsell.dart';
 
-class ParentNotificationsScreen extends ConsumerWidget {
+class ParentNotificationsScreen extends ConsumerStatefulWidget {
   const ParentNotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ParentNotificationsScreen> createState() =>
+      _ParentNotificationsScreenState();
+}
+
+class _ParentNotificationsScreenState
+    extends ConsumerState<ParentNotificationsScreen> {
+  late Future<List<Map<String, dynamic>>> _notificationsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationsFuture = _fetchNotifications();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchNotifications() async {
+    try {
+      final response =
+          await ref.read(networkServiceProvider).get<Map<String, dynamic>>(
+                '/notifications',
+              );
+      final data = response.data;
+      if (data == null) return [];
+      final list = data['notifications'];
+      if (list is List) {
+        return list
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> _markAllRead() async {
+    await ref.read(networkServiceProvider).post<Map<String, dynamic>>(
+          '/notifications/mark-all-read',
+        );
+    if (!mounted) return;
+    setState(() {
+      _notificationsFuture = _fetchNotifications();
+    });
+  }
+
+  Future<void> _markRead(String id) async {
+    await ref
+        .read(networkServiceProvider)
+        .post<Map<String, dynamic>>('/notifications/$id/read');
+    if (!mounted) return;
+    setState(() {
+      _notificationsFuture = _fetchNotifications();
+    });
+  }
+
+  String _formatTime(String? iso) {
+    if (iso == null) return '';
+    final parsed = DateTime.tryParse(iso);
+    if (parsed == null) return '';
+    final diff = DateTime.now().difference(parsed);
+    if (diff.inMinutes < 60) return '${diff.inMinutes} min';
+    if (diff.inHours < 24) return '${diff.inHours} h';
+    return '${diff.inDays} d';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final notifications = _getMockNotifications(l10n);
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -27,15 +91,23 @@ class ParentNotificationsScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: colors.surface,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/parent/dashboard');
+            }
+          },
+        ),
         title: Text(
           l10n.notifications,
           style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              // Mark all as read
-            },
+            onPressed: _markAllRead,
             child: Text(
               l10n.markAllRead,
               style: textTheme.bodyMedium?.copyWith(color: colors.primary),
@@ -48,47 +120,60 @@ class ParentNotificationsScreen extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: colors.outlineVariant),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colors.shadow.withValues(alpha: 0.08),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (isSmartLocked)
-                      PremiumSectionUpsell(
+              child: Column(
+                children: [
+                  const PlanStatusBanner(),
+                  if (isSmartLocked)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: PremiumSectionUpsell(
                         title: l10n.recommendedForYou,
                         description: l10n.planAiInsightsPro,
                         buttonLabel: l10n.upgradeNow,
                         showBadge: true,
                         padding: const EdgeInsets.all(12),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ),
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                itemCount: notifications.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-                  return _NotificationCard(
-                    notification: notification,
-                    onTap: () {
-                      // Handle notification tap
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _notificationsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  final notifications = snapshot.data ?? [];
+                  if (notifications.isEmpty) {
+                    return Center(
+                      child: Text(
+                        l10n.noNotifications,
+                        style: textTheme.bodyMedium
+                            ?.copyWith(color: colors.onSurfaceVariant),
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                    itemCount: notifications.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final notification = notifications[index];
+                      final isRead = notification['is_read'] == true;
+                      return _NotificationCard(
+                        notification: notification,
+                        isRead: isRead,
+                        timeLabel: _formatTime(
+                          notification['created_at']?.toString(),
+                        ),
+                        onTap: () => _markRead(
+                          notification['id'].toString(),
+                        ),
+                      );
                     },
                   );
                 },
@@ -99,73 +184,18 @@ class ParentNotificationsScreen extends ConsumerWidget {
       ),
     );
   }
-
-  List<Map<String, dynamic>> _getMockNotifications(AppLocalizations l10n) {
-    return [
-      {
-        'id': '1',
-        'title': l10n.dailyGoal,
-        'message': l10n.notificationDailyGoal('Lina', 3),
-        'time': '2 ${l10n.hoursAgo}',
-        'type': 'achievement',
-        'isRead': false,
-        'childName': 'Lina',
-      },
-      {
-        'id': '2',
-        'title': l10n.screenTime,
-        'message': l10n.notificationScreenTime('Omar', 2),
-        'time': '4 ${l10n.hoursAgo}',
-        'type': 'warning',
-        'isRead': false,
-        'childName': 'Omar',
-      },
-      {
-        'id': '3',
-        'title': l10n.achievements,
-        'message': l10n.notificationAchievement('Lina', 'Math Master'),
-        'time': '1 ${l10n.daysAgo}',
-        'type': 'achievement',
-        'isRead': true,
-        'childName': 'Lina',
-      },
-      {
-        'id': '4',
-        'title': l10n.weeklyProgress,
-        'message': l10n.notificationWeeklyReport,
-        'time': '2 ${l10n.daysAgo}',
-        'type': 'report',
-        'isRead': true,
-        'childName': l10n.childProfiles,
-      },
-      {
-        'id': '5',
-        'title': l10n.learningProgress,
-        'message': l10n.notificationMilestone('Omar', 50),
-        'time': '3 ${l10n.daysAgo}',
-        'type': 'milestone',
-        'isRead': true,
-        'childName': 'Omar',
-      },
-      {
-        'id': '6',
-        'title': l10n.recommendedForYou,
-        'message': l10n.notificationRecommendation('Lina'),
-        'time': '1 ${l10n.week}',
-        'type': 'recommendation',
-        'isRead': true,
-        'childName': 'Lina',
-      },
-    ];
-  }
 }
 
 class _NotificationCard extends StatelessWidget {
   final Map<String, dynamic> notification;
+  final bool isRead;
+  final String timeLabel;
   final VoidCallback onTap;
-  
+
   const _NotificationCard({
     required this.notification,
+    required this.isRead,
+    required this.timeLabel,
     required this.onTap,
   });
 
@@ -173,18 +203,18 @@ class _NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final type = notification['type']?.toString() ?? 'info';
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: notification['isRead']
-              ? colors.surface
-              : colors.primary.withValues(alpha: 0.08),
+          color: isRead ? colors.surface : colors.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: notification['isRead']
+            color: isRead
                 ? colors.outlineVariant
                 : colors.primary.withValues(alpha: 0.3),
           ),
@@ -199,24 +229,20 @@ class _NotificationCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon based on type
             Container(
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color:
-                    _getTypeColor(notification['type']).withValues(alpha: 0.1),
+                color: _getTypeColor(type).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Icon(
-                _getTypeIcon(notification['type']),
+                _getTypeIcon(type),
                 size: 24,
-                color: _getTypeColor(notification['type']),
+                color: _getTypeColor(type),
               ),
             ),
             const SizedBox(width: 16),
-            
-            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,15 +251,13 @@ class _NotificationCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          notification['title'],
+                          notification['title']?.toString() ?? 'Notification',
                           style: textTheme.titleMedium?.copyWith(
-                            fontWeight: notification['isRead']
-                                ? FontWeight.normal
-                                : FontWeight.bold,
+                            fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
                           ),
                         ),
                       ),
-                      if (!notification['isRead'])
+                      if (!isRead)
                         Container(
                           width: 8,
                           height: 8,
@@ -244,39 +268,22 @@ class _NotificationCard extends StatelessWidget {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  
+                  const SizedBox(height: 6),
                   Text(
-                    notification['message'],
+                    notification['body']?.toString() ?? '',
                     style: textTheme.bodyMedium?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  
-                  Row(
-                    children: [
-                      Text(
-                        notification['childName'],
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  if (timeLabel.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      timeLabel,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
                       ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        '-',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        notification['time'],
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -286,37 +293,33 @@ class _NotificationCard extends StatelessWidget {
     );
   }
 
-  Color _getTypeColor(String type) {
-    switch (type) {
-      case 'achievement':
-        return AppColors.success;
+  IconData _getTypeIcon(String type) {
+    switch (type.toLowerCase()) {
       case 'warning':
-        return AppColors.error;
+        return Icons.warning_amber_rounded;
+      case 'achievement':
+        return Icons.emoji_events;
       case 'report':
-        return AppColors.info;
+        return Icons.bar_chart;
       case 'milestone':
-        return AppColors.xpColor;
-      case 'recommendation':
-        return AppColors.secondary;
+        return Icons.flag;
       default:
-        return AppColors.primary;
+        return Icons.notifications;
     }
   }
 
-  IconData _getTypeIcon(String type) {
-    switch (type) {
-      case 'achievement':
-        return Icons.emoji_events;
+  Color _getTypeColor(String type) {
+    switch (type.toLowerCase()) {
       case 'warning':
-        return Icons.warning;
+        return AppColors.error;
+      case 'achievement':
+        return AppColors.success;
       case 'report':
-        return Icons.analytics;
+        return AppColors.info;
       case 'milestone':
-        return Icons.flag;
-      case 'recommendation':
-        return Icons.thumb_up;
+        return AppColors.streakColor;
       default:
-        return Icons.notifications;
+        return AppColors.primary;
     }
   }
 }

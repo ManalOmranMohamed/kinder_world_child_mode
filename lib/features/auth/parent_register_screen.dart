@@ -25,6 +25,16 @@ class _ParentRegisterScreenState extends ConsumerState<ParentRegisterScreen> {
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
 
+  bool _isAllowedEmail(String value) {
+    final email = value.trim().toLowerCase();
+    if (!email.contains('@')) return false;
+    final domain = email.split('@').last;
+    return domain == 'gmail.com' ||
+        domain == 'outlook.com' ||
+        domain == 'hotmail.com' ||
+        domain == 'live.com';
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -160,8 +170,8 @@ class _ParentRegisterScreenState extends ConsumerState<ParentRegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                    if (!_isAllowedEmail(value)) {
+                      return 'Use Gmail or Microsoft email';
                     }
                     return null;
                   },

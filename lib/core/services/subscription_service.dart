@@ -27,6 +27,44 @@ class SubscriptionService {
     }
   }
 
+  Future<Map<String, dynamic>?> getSubscription() async {
+    try {
+      final response = await _networkService.get<Map<String, dynamic>>(
+        '/subscription/me',
+      );
+      return response.data;
+    } catch (e) {
+      _logger.e('Error fetching subscription: $e');
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> listPlans() async {
+    try {
+      final response = await _networkService.get<List<dynamic>>('/plans');
+      final data = response.data;
+      if (data is List) {
+        return data
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+      }
+    } catch (e) {
+      _logger.e('Error fetching plans: $e');
+    }
+    return [];
+  }
+
+  Future<bool> openBillingPortal() async {
+    try {
+      await _networkService.post<Map<String, dynamic>>('/billing/portal');
+      return true;
+    } catch (e) {
+      _logger.e('Error opening billing portal: $e');
+      return false;
+    }
+  }
+
   String _planTypeForTier(PlanTier tier) {
     switch (tier) {
       case PlanTier.familyPlus:

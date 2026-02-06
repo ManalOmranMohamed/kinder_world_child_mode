@@ -39,6 +39,9 @@ class AppLocalizationsEn extends AppLocalizations {
   
   @override
   String get error => 'Error';
+
+  @override
+  String get connectionError => 'Connection error. Please try again.';
   
   @override
   String get success => 'Success';
@@ -729,6 +732,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paymentMethodsEmpty => 'No payment methods added yet.';
+
+  @override
+  String get noNotifications => 'No notifications yet.';
 
   @override
   String get addPaymentMethod => 'Add payment method';

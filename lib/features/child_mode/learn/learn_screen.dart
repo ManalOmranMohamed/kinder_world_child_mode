@@ -2051,70 +2051,8 @@ class LessonDetailScreen extends StatefulWidget {
 }
 
 class _LessonDetailScreenState extends State<LessonDetailScreen> {
-  int _currentQuestionIndex = 0;
-  int? _selectedAnswerIndex;
-  bool _showResult = false;
-
-  final List<Map<String, dynamic>> _quizData = const [
-    {
-      'question': 'What color is the sky?',
-      'options': ['Blue', 'Green', 'Red', 'Yellow'],
-      'correct': 0,
-    },
-    {
-      'question': 'How many legs does a dog have?',
-      'options': ['Two', 'Four', 'Six', 'Eight'],
-      'correct': 1,
-    },
-    {
-      'question': 'Which one is a fruit?',
-      'options': ['Carrot', 'Apple', 'Potato', 'Onion'],
-      'correct': 1,
-    },
-  ];
-
-  void _checkAnswer(int selectedIndex) {
-    setState(() {
-      _selectedAnswerIndex = selectedIndex;
-      _showResult = true;
-    });
-  }
-
-  void _nextQuestion() {
-    if (_currentQuestionIndex < _quizData.length - 1) {
-      setState(() {
-        _currentQuestionIndex++;
-        _selectedAnswerIndex = null;
-        _showResult = false;
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Row(
-            children: [
-              Icon(Icons.celebration, color: Colors.orange, size: 30),
-              SizedBox(width: 10),
-              Text('Great Job!'),
-            ],
-          ),
-          content: const Text('You completed the lesson!'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Awesome!', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currentQ = _quizData[_currentQuestionIndex];
-
     return Scaffold(
       backgroundColor: Color(0xFFE1F5FE),
       body: SafeArea(
@@ -2209,134 +2147,64 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
                           ],
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(8),
+                                  width: 44,
+                                  height: 44,
                                   decoration: BoxDecoration(
-                                    color: Colors.orange[100],
+                                    color: AppColors.educational.withOpacity(0.15),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: Icon(Icons.lightbulb, color: Colors.orange[700]),
+                                  child: const Icon(Icons.quiz, color: AppColors.educational),
                                 ),
                                 const SizedBox(width: 10),
                                 const Text(
-                                  "Let's Check!",
+                                  "Ready for a fun quiz?",
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: LinearProgressIndicator(
-                                      value: (_currentQuestionIndex + 1) / _quizData.length,
-                                      backgroundColor: Colors.grey[200],
-                                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.educational),
-                                      minHeight: 8,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  "${_currentQuestionIndex + 1}/${_quizData.length}",
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 14),
                             Text(
-                              currentQ['question'],
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
+                              "Play a quick quiz to earn stars and show what you learned!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.grey[600],
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 15,
-                              childAspectRatio: 1.5,
-                              children: List.generate(currentQ['options'].length, (index) {
-                                final option = currentQ['options'][index];
-                                final isCorrect = index == currentQ['correct'];
-                                final isSelected = _selectedAnswerIndex == index;
-
-                                Color bgColor = Colors.white;
-                                Color borderColor = Colors.grey[300]!;
-                                Color textColor = Colors.black87;
-
-                                if (_showResult) {
-                                  if (isCorrect) {
-                                    bgColor = Colors.green[100]!;
-                                    borderColor = Colors.green;
-                                    textColor = Colors.green[900]!;
-                                  } else if (isSelected && !isCorrect) {
-                                    bgColor = Colors.red[100]!;
-                                    borderColor = Colors.red;
-                                    textColor = Colors.red[900]!;
-                                  }
-                                } else {
-                                  if (isSelected) {
-                                    bgColor = AppColors.educational.withOpacity(0.1);
-                                    borderColor = AppColors.educational;
-                                  }
-                                }
-
-                                return InkWell(
-                                  onTap: _showResult ? null : () => _checkAnswer(index),
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: bgColor,
-                                      border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        option,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: textColor,
-                                        ),
+                            const SizedBox(height: 18),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => LessonQuizScreen(
+                                        lessonTitle: widget.lessonTitle,
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            ),
-                            const SizedBox(height: 20),
-                            if (_showResult)
-                              SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: _nextQuestion,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                    ),
-                                    child: Text(
-                                      _currentQuestionIndex < _quizData.length - 1 ? "Next Question" : "Finish",
-                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
+                                  );
+                                },
+                                icon: const Icon(Icons.play_circle_fill),
+                                label: const Text(
+                                  "Start Quiz",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.educational,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                ),
                               ),
+                            ),
                           ],
                         ),
                       ),
@@ -2347,6 +2215,264 @@ class _LessonDetailScreenState extends State<LessonDetailScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class LessonQuizScreen extends StatefulWidget {
+  final String lessonTitle;
+
+  const LessonQuizScreen({super.key, required this.lessonTitle});
+
+  @override
+  State<LessonQuizScreen> createState() => _LessonQuizScreenState();
+}
+
+class _LessonQuizScreenState extends State<LessonQuizScreen> {
+  int _currentQuestionIndex = 0;
+  int? _selectedAnswerIndex;
+  bool _showResult = false;
+
+  final List<Map<String, dynamic>> _quizData = const [
+    {
+      'question': 'What color is the sky?',
+      'options': ['Blue', 'Green', 'Red', 'Yellow'],
+      'correct': 0,
+    },
+    {
+      'question': 'How many legs does a dog have?',
+      'options': ['Two', 'Four', 'Six', 'Eight'],
+      'correct': 1,
+    },
+    {
+      'question': 'Which one is a fruit?',
+      'options': ['Carrot', 'Apple', 'Potato', 'Onion'],
+      'correct': 1,
+    },
+  ];
+
+  void _checkAnswer(int selectedIndex) {
+    setState(() {
+      _selectedAnswerIndex = selectedIndex;
+      _showResult = true;
+    });
+  }
+
+  void _nextQuestion() {
+    if (_currentQuestionIndex < _quizData.length - 1) {
+      setState(() {
+        _currentQuestionIndex++;
+        _selectedAnswerIndex = null;
+        _showResult = false;
+      });
+    } else {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              Icon(Icons.celebration, color: Colors.orange, size: 28),
+              SizedBox(width: 10),
+              Text('Great Job!'),
+            ],
+          ),
+          content: const Text('You completed the quiz!'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text(
+                'Awesome!',
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentQ = _quizData[_currentQuestionIndex];
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFF3E0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          '${widget.lessonTitle} Quiz',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.educational,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.educational),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppColors.educational.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.star, color: AppColors.educational),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Quiz Time!',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Question ${_currentQuestionIndex + 1} of ${_quizData.length}',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: (_currentQuestionIndex + 1) / _quizData.length,
+                  backgroundColor: Colors.orange[100],
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.educational),
+                  minHeight: 8,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Text(
+                  currentQ['question'],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 14,
+                  mainAxisSpacing: 14,
+                  childAspectRatio: 1.25,
+                  children: List.generate(currentQ['options'].length, (index) {
+                    final option = currentQ['options'][index];
+                    final isCorrect = index == currentQ['correct'];
+                    final isSelected = _selectedAnswerIndex == index;
+
+                    Color bgColor = Colors.white;
+                    Color borderColor = Colors.orange[200]!;
+                    Color textColor = Colors.black87;
+
+                    if (_showResult) {
+                      if (isCorrect) {
+                        bgColor = Colors.green[100]!;
+                        borderColor = Colors.green;
+                        textColor = Colors.green[900]!;
+                      } else if (isSelected && !isCorrect) {
+                        bgColor = Colors.red[100]!;
+                        borderColor = Colors.red;
+                        textColor = Colors.red[900]!;
+                      }
+                    } else if (isSelected) {
+                      bgColor = AppColors.educational.withOpacity(0.1);
+                      borderColor = AppColors.educational;
+                    }
+
+                    return InkWell(
+                      onTap: _showResult ? null : () => _checkAnswer(index),
+                      borderRadius: BorderRadius.circular(18),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: bgColor,
+                          border: Border.all(color: borderColor, width: 2),
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Center(
+                          child: Text(
+                            option,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _showResult ? _nextQuestion : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.educational,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                  child: Text(
+                    _currentQuestionIndex < _quizData.length - 1 ? 'Next Question' : 'Finish',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

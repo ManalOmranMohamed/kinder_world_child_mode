@@ -234,6 +234,8 @@ class _CreateChildProfileScreenState extends ConsumerState<CreateChildProfileScr
       name: trimmedName,
       picturePassword: List<String>.from(_picturePassword),
       parentEmail: trimmedEmail,
+      age: _selectedAge,
+      avatar: _selectedAvatar,
     );
 
     if (response == null &&
@@ -245,6 +247,8 @@ class _CreateChildProfileScreenState extends ConsumerState<CreateChildProfileScr
         name: trimmedName,
         picturePassword: List<String>.from(_picturePassword),
         parentEmail: trimmedEmail,
+        age: _selectedAge,
+        avatar: _selectedAvatar,
       );
     }
 
@@ -297,6 +301,7 @@ class _CreateChildProfileScreenState extends ConsumerState<CreateChildProfileScr
 
     final authSuccess = await authController.loginChild(
       childId: response.childId,
+      childName: newProfile.name,
       picturePassword: List<String>.from(_picturePassword),
     );
 

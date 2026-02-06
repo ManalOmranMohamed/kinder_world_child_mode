@@ -55,6 +55,9 @@ class AppLocalizationsAr extends AppLocalizationsEn {
   String get error => 'خطأ';
 
   @override
+  String get connectionError => 'خطأ في الاتصال. حاول مرة أخرى.';
+
+  @override
   String get success => 'نجاح';
 
   @override
@@ -420,6 +423,9 @@ class AppLocalizationsAr extends AppLocalizationsEn {
 
   @override
   String get paymentMethodsEmpty => 'لا توجد طرق دفع محفوظة.';
+
+  @override
+  String get noNotifications => 'No notifications yet.';
 
   @override
   String get addPaymentMethod => 'إضافة طريقة دفع';

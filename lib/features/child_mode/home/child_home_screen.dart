@@ -176,8 +176,10 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
     if (sessionState.isLoading) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
       );
     }
@@ -212,7 +214,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     context.go('/child/login');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   ),
@@ -232,6 +234,16 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           floating: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                context.go('/child/home');
+              }
+            },
+          ),
           title: const ChildHeader(
             compact: true,
             padding: EdgeInsets.zero,
@@ -806,6 +818,7 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
   }
 
   Widget _buildActivityOfTheDay() {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -831,55 +844,49 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                'Activity of the Day',
-                style: TextStyle(
-                  fontSize: AppConstants.fontSize,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
+              Expanded(
+                child: Text(
+                  'Activity of the Day',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: AppConstants.fontSize,
+                    fontWeight: FontWeight.bold,
+                    color: colors.onSurface,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          
-          Row(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.lightbulb,
-                  size: 40,
-                  color: AppColors.secondary,
-                ),
-              ),
-              const SizedBox(width: 16),
-              
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Explore New Activities',
-                      style: TextStyle(
-                        fontSize: AppConstants.fontSize,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 360;
+              final iconSize = isNarrow ? 64.0 : 80.0;
+              final content = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Explore New Activities',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: AppConstants.fontSize,
+                      fontWeight: FontWeight.bold,
+                      color: colors.onSurface,
                     ),
-                    Text(
-                      'Discover something amazing!',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Discover something amazing!',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colors.onSurfaceVariant,
                     ),
-                    const SizedBox(height: 8),
+                  ),
+                  const SizedBox(height: 8),
                   const Text(
                     '+50 XP Bonus',
                     style: TextStyle(
@@ -889,29 +896,93 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                     ),
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                context.go('/child/play');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('Start Activity'),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+              );
+
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: iconSize,
+                          height: iconSize,
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.lightbulb,
+                            size: 36,
+                            color: AppColors.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: content),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          context.go('/child/home/activity-of-day');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colors.secondary,
+                          foregroundColor: colors.onSecondary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Start Activity'),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Container(
+                    width: iconSize,
+                    height: iconSize,
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.lightbulb,
+                      size: 40,
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(child: content),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.go('/child/home/activity-of-day');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.secondary,
+                      foregroundColor: colors.onSecondary,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Start Activity'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AxisHistory {

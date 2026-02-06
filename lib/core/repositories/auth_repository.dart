@@ -13,10 +13,12 @@ class ChildLoginException implements Exception {
 class ChildRegisterException implements Exception {
   final int? statusCode;
   final String? detailCode;
+  final String? message;
 
   const ChildRegisterException({
     this.statusCode,
     this.detailCode,
+    this.message,
   });
 }
 
@@ -28,6 +30,13 @@ class ChildRegisterResponse {
     required this.childId,
     this.name,
   });
+}
+
+class ParentAuthException implements Exception {
+  final String message;
+  final int? statusCode;
+
+  const ParentAuthException({required this.message, this.statusCode});
 }
 
 /// Repository for authentication operations
@@ -178,7 +187,10 @@ class AuthRepository {
       return user;
     } on DioException catch (e) {
       _logger.e('Parent login error: ${e.response?.statusCode} - ${e.response?.data}');
-      return null;
+      throw ParentAuthException(
+        message: _extractErrorMessage(e) ?? 'Invalid credentials',
+        statusCode: e.response?.statusCode,
+      );
     } catch (e) {
       _logger.e('Parent login error: $e');
       return null;
@@ -233,11 +245,28 @@ class AuthRepository {
       return user;
     } on DioException catch (e) {
       _logger.e('Parent registration error: ${e.response?.statusCode} - ${e.response?.data}');
-      return null;
+      throw ParentAuthException(
+        message: _extractErrorMessage(e) ?? 'Registration failed',
+        statusCode: e.response?.statusCode,
+      );
     } catch (e) {
       _logger.e('Parent registration error: $e');
       return null;
     }
+  }
+
+  String? _extractErrorMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is Map) {
+      final detail = data['detail'];
+      if (detail is String && detail.isNotEmpty) return detail;
+      if (detail is Map && detail['message'] != null) {
+        return detail['message'].toString();
+      }
+      if (data['message'] != null) return data['message'].toString();
+    }
+    if (data is String && data.isNotEmpty) return data;
+    return e.message;
   }
 
   // ==================== CHILD AUTHENTICATION ====================
@@ -245,12 +274,15 @@ class AuthRepository {
   /// Login child via picture password
   Future<User?> loginChild({
     required String childId,
+    required String childName,
     required List<String> picturePassword,
   }) async {
     try {
       _logger.d('Attempting child login for: $childId');
 
-      if (childId.trim().isEmpty || picturePassword.length != 3) {
+      if (childId.trim().isEmpty ||
+          childName.trim().isEmpty ||
+          picturePassword.length != 3) {
         _logger.w('Child login failed: Missing or invalid credentials');
         throw const ChildLoginException(statusCode: 422);
       }
@@ -259,6 +291,7 @@ class AuthRepository {
         '/auth/child/login',
         data: {
           'child_id': int.tryParse(childId) ?? childId,
+          'name': childName.trim(),
           'picture_password': picturePassword,
         },
       );
@@ -305,6 +338,8 @@ class AuthRepository {
     required String name,
     required List<String> picturePassword,
     required String parentEmail,
+    required int age,
+    String? avatar,
   }) async {
     try {
       final trimmedName = name.trim();
@@ -312,7 +347,9 @@ class AuthRepository {
 
       if (trimmedName.isEmpty ||
           trimmedEmail.isEmpty ||
-          picturePassword.length != 3) {
+          picturePassword.length != 3 ||
+          age < 5 ||
+          age > 12) {
         _logger.w('Child register failed: Missing or invalid data');
         throw const ChildRegisterException(statusCode: 422);
       }
@@ -323,6 +360,8 @@ class AuthRepository {
           'name': trimmedName,
           'picture_password': picturePassword,
           'parent_email': trimmedEmail,
+          'age': age,
+          if (avatar != null) 'avatar': avatar,
         },
       );
 
@@ -356,6 +395,7 @@ class AuthRepository {
     } on DioException catch (e) {
       final statusCode = e.response?.statusCode;
       String? detailCode;
+      String? message;
       final data = e.response?.data;
       if (data is Map) {
         final detail = data['detail'];
@@ -364,14 +404,23 @@ class AuthRepository {
           if (code != null) {
             detailCode = code.toString();
           }
+          if (detail['message'] != null) {
+            message = detail['message'].toString();
+          }
+        } else if (detail is String) {
+          message = detail;
         } else if (data['code'] != null) {
           detailCode = data['code'].toString();
+        }
+        if (message == null && data['message'] != null) {
+          message = data['message'].toString();
         }
       }
       _logger.e('Child register error: $statusCode - $data');
       throw ChildRegisterException(
         statusCode: statusCode,
         detailCode: detailCode,
+        message: message,
       );
     } catch (e) {
       _logger.e('Child register error: $e');

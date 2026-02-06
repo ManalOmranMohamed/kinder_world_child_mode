@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart';
+import 'package:kinder_world/app.dart';
 import 'package:kinder_world/router.dart';
 
 class ParentAboutScreen extends ConsumerStatefulWidget {
@@ -14,15 +15,44 @@ class ParentAboutScreen extends ConsumerStatefulWidget {
 
 class _ParentAboutScreenState extends ConsumerState<ParentAboutScreen> {
   late final Future<PackageInfo> _packageInfo;
+  late Future<String> _aboutTextFuture;
 
   @override
   void initState() {
     super.initState();
     _packageInfo = PackageInfo.fromPlatform();
+    _aboutTextFuture = _fetchAbout();
+  }
+
+  Future<String> _fetchAbout() async {
+    try {
+      final response =
+          await ref.read(networkServiceProvider).get<Map<String, dynamic>>(
+                '/content/about',
+              );
+      final data = response.data;
+      if (data != null && data['body'] != null) {
+        return data['body'].toString();
+      }
+    } catch (_) {}
+    return 'Kinder World helps parents guide learning in a safe environment.';
   }
 
   void _openLegal(String type) {
-    context.push('${Routes.legal}?type=$type');
+    switch (type) {
+      case 'terms':
+        context.push(Routes.parentTerms);
+        break;
+      case 'privacy':
+        context.push(Routes.parentPrivacyPolicy);
+        break;
+      case 'coppa':
+        context.push(Routes.parentCoppa);
+        break;
+      default:
+        context.push(Routes.parentTerms);
+        break;
+    }
   }
 
   @override
@@ -61,6 +91,20 @@ class _ParentAboutScreenState extends ConsumerState<ParentAboutScreen> {
                   );
                 }
                 return const Text('Loading version...');
+              },
+            ),
+            const SizedBox(height: 20),
+            FutureBuilder<String>(
+              future: _aboutTextFuture,
+              builder: (context, snapshot) {
+                final text = snapshot.data ?? 'Loading...';
+                return Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                );
               },
             ),
             const Spacer(),
