@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kinder_world/app.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -45,9 +46,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     
     // Navigate after animation
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        context.go('/language');
-      }
+      if (!mounted) return;
+      _navigateNext();
     });
   }
 
@@ -57,27 +57,40 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     super.dispose();
   }
 
+  Future<void> _navigateNext() async {
+    final storage = ref.read(secureStorageProvider);
+    final token = await storage.getAuthToken();
+    final role = await storage.getUserRole();
+    final childSession = await storage.getChildSession();
+
+    if (token == null || token.isEmpty) {
+      context.go('/language');
+      return;
+    }
+
+    if (role == 'parent') {
+      context.go('/parent/dashboard');
+      return;
+    }
+
+    if (role == 'child') {
+      if (childSession != null) {
+        context.go('/child/home');
+      } else {
+        context.go('/child/login');
+      }
+      return;
+    }
+
+    context.go('/select-user-type');
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: colors.primary,
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        backgroundColor: colors.primary,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              context.go('/welcome');
-            }
-          },
-        ),
-      ),
       body: SafeArea(
         child: Center(
           child: AnimatedBuilder(

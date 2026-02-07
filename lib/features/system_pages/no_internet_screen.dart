@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kinder_world/core/theme/app_colors.dart';
 import 'package:kinder_world/core/constants/app_constants.dart';
-import 'package:lottie/lottie.dart';
 
 class NoInternetScreen extends ConsumerStatefulWidget {
   const NoInternetScreen({super.key});
@@ -47,12 +45,7 @@ class _NoInternetScreenState extends ConsumerState<NoInternetScreen>
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      backgroundColor: const Color(0xFF4C4552),
       body: SafeArea(
         child: AnimatedBuilder(
           animation: _controller,
@@ -62,165 +55,81 @@ class _NoInternetScreenState extends ConsumerState<NoInternetScreen>
               child: child,
             );
           },
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Animation
-                SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: Lottie.asset(
-                    'assets/animations/no_internet.json',
-                    fit: BoxFit.contain,
-                    repeat: true,
+          child: Center(
+            child: Container(
+              width: 320,
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 18),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.shadow.withValues(alpha: 0.2),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
                   ),
-                ),
-                const SizedBox(height: 40),
-                
-                // Title
-                Text(
-                  'No Internet Connection',
-                  style: textTheme.titleLarge?.copyWith(
-                    fontSize: AppConstants.largeFontSize * 1.2,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                
-                // Description
-                Text(
-                  'Don\'t worry! You can still use offline features. Some content may be limited until you\'re back online.',
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontSize: AppConstants.fontSize,
-                    color: colors.onSurfaceVariant,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                
-                // Offline Features
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: colors.outlineVariant),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Available Offline:',
-                        style: textTheme.titleSmall?.copyWith(
-                          fontSize: AppConstants.fontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      _buildOfflineFeature(Icons.school, 'Downloaded lessons'),
-                      const SizedBox(height: 12),
-                      _buildOfflineFeature(Icons.games, 'Saved games'),
-                      const SizedBox(height: 12),
-                      _buildOfflineFeature(Icons.book, 'Offline stories'),
-                      const SizedBox(height: 12),
-                      _buildOfflineFeature(Icons.person, 'Progress tracking'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                
-                // Retry Button
-                ElevatedButton.icon(
-                  onPressed: () {
-                    final messenger = ScaffoldMessenger.of(context);
-                    // Simulate checking connection
-                    messenger.showSnackBar(
-                      const SnackBar(
-                        content: Text('Checking connection...'),
-                        backgroundColor: AppColors.info,
-                      ),
-                    );
-                    
-                    Future.delayed(const Duration(seconds: 2), () {
-                      if (!mounted) {
-                        return;
-                      }
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Still no connection. Please check your internet.'),
-                          backgroundColor: AppColors.warning,
-                        ),
-                      );
-                    });
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Try Again'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: colors.onPrimary,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFE8EE),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: const Icon(
+                      Icons.portable_wifi_off_rounded,
+                      size: 44,
+                      color: Color(0xFFE95C82),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                
-                // Continue Offline Button
-                OutlinedButton(
-                  onPressed: () {
-                    // Navigate back to the app in offline mode
-                    context.go('/child/home');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No internet connection',
+                    style: textTheme.titleMedium?.copyWith(
+                      fontSize: AppConstants.fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Please try again',
+                    style: textTheme.bodySmall?.copyWith(
+                      fontSize: 14,
+                      color: colors.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: () => context.pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6B2A8B),
+                        foregroundColor: colors.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
-                  child: const Text('Continue Offline'),
-                ),
-                const SizedBox(height: 40),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildOfflineFeature(IconData icon, String text) {
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: AppColors.success,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: textTheme.bodyMedium?.copyWith(
-            fontSize: AppConstants.fontSize,
-            color: colors.onSurfaceVariant,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -329,20 +329,28 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: textTheme.bodyMedium?.copyWith(
-              fontSize: AppConstants.fontSize,
-              color: colors.onSurfaceVariant,
+          Expanded(
+            child: Text(
+              label,
+              style: textTheme.bodyMedium?.copyWith(
+                fontSize: AppConstants.fontSize,
+                color: colors.onSurfaceVariant,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text(
-            value,
-            style: textTheme.bodyMedium?.copyWith(
-              fontSize: AppConstants.fontSize,
-              fontWeight: FontWeight.bold,
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              value,
+              style: textTheme.bodyMedium?.copyWith(
+                fontSize: AppConstants.fontSize,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
             ),
           ),
         ],

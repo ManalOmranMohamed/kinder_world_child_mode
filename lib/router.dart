@@ -11,7 +11,9 @@ import 'package:kinder_world/features/app_core/welcome_screen.dart';
 import 'package:kinder_world/features/auth/user_type_selection_screen.dart';
 import 'package:kinder_world/features/auth/parent_login_screen.dart';
 import 'package:kinder_world/features/auth/parent_register_screen.dart';
+import 'package:kinder_world/features/auth/parent_forgot_password_screen.dart';
 import 'package:kinder_world/features/auth/child_login_screen.dart';
+import 'package:kinder_world/features/auth/child_forgot_password_screen.dart';
 
 import 'package:kinder_world/features/child_mode/home/child_home_screen.dart';
 import 'package:kinder_world/features/child_mode/home/activity_of_the_day_screen.dart';
@@ -62,7 +64,9 @@ class Routes {
   static const selectUserType = '/select-user-type';
   static const parentLogin = '/parent/login';
   static const parentRegister = '/parent/register';
+  static const parentForgotPassword = '/parent/forgot-password';
   static const childLogin = '/child/login';
+  static const childForgotPassword = '/child/forgot-password';
 
   // Child shell tabs
   static const childHome = '/child/home';
@@ -111,6 +115,8 @@ bool _isPublicRoute(String path) {
       path == Routes.onboarding ||
       path == Routes.welcome ||
       path == Routes.selectUserType ||
+      path == Routes.parentForgotPassword ||
+      path == Routes.childForgotPassword ||
       path == Routes.error ||
       path == Routes.noInternet ||
       path == Routes.maintenance;
@@ -152,7 +158,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       // If not authenticated -> go to welcome (unless already on auth pages)
       if (!isAuthenticated) {
         // allow reaching parent login/register + child login, and select-user-type
-        if (_isParentAuthRoute(path) || path == Routes.childLogin || path == Routes.selectUserType) {
+        if (_isParentAuthRoute(path) ||
+            path == Routes.childLogin ||
+            path == Routes.selectUserType ||
+            path == Routes.parentForgotPassword ||
+            path == Routes.childForgotPassword) {
           return null;
         }
         return Routes.welcome;
@@ -235,8 +245,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ParentRegisterScreen(),
       ),
       GoRoute(
+        path: Routes.parentForgotPassword,
+        builder: (context, state) => const ParentForgotPasswordScreen(),
+      ),
+      GoRoute(
         path: Routes.childLogin,
         builder: (context, state) => const ChildLoginScreen(),
+      ),
+      GoRoute(
+        path: Routes.childForgotPassword,
+        builder: (context, state) => const ChildForgotPasswordScreen(),
       ),
 
       // Child Mode Routes with Bottom Navigation (Shell)

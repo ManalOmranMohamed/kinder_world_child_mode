@@ -211,7 +211,7 @@ class _ParentLoginScreenState extends ConsumerState<ParentLoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // TODO: Implement forgot password
+                      context.go('/parent/forgot-password');
                     },
                     child: const Text('Forgot Password?'),
                   ),

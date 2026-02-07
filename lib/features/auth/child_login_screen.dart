@@ -1443,8 +1443,15 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                     style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.w600,
-                    ),
                   ),
+                ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Center(
+          child: TextButton(
+            onPressed: _isLoading ? null : () => context.go('/child/forgot-password'),
+            child: const Text('Forgot Password?'),
           ),
         ),
         const SizedBox(height: 12),
@@ -1580,8 +1587,15 @@ class _ChildLoginScreenState extends ConsumerState<ChildLoginScreen> {
                     style: TextStyle(
                       fontSize: AppConstants.fontSize,
                       fontWeight: FontWeight.w600,
-                    ),
                   ),
+                ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Center(
+          child: TextButton(
+            onPressed: _isLoading ? null : () => context.go('/child/forgot-password'),
+            child: const Text('Forgot Password?'),
           ),
         ),
       ],

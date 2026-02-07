@@ -234,86 +234,91 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
           floating: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              } else {
-                context.go('/child/home');
-              }
-            },
-          ),
           title: const ChildHeader(
             compact: true,
             padding: EdgeInsets.zero,
           ),
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.color_lens_outlined,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ChildThemeScreen(),
-                  ),
-                );
-              },
-            ),
-            Consumer(
-              builder: (context, ref, _) {
-                final themeState = ref.watch(themeControllerProvider);
-                final isDark = themeState.mode == ThemeMode.dark;
-                return IconButton(
-                  icon: Icon(
-                    isDark ? Icons.light_mode : Icons.dark_mode,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  onPressed: () {
-                    ref.read(themeControllerProvider.notifier).setMode(
-                          isDark ? ThemeMode.light : ThemeMode.dark,
-                        );
-                  },
-                );
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.onSurface),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ChildSettingsScreen(),
-                  ),
-                );
-              },
-            ),
-            // Mood indicator
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(12),
-              ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  Text(
-                    MoodTypes.getEmoji(childProfile.currentMood ?? MoodTypes.happy),
-                    style: const TextStyle(fontSize: 20),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    iconSize: 20,
+                    icon: Icon(
+                      Icons.color_lens_outlined,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ChildThemeScreen(),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    _getMoodLabel(childProfile.currentMood ?? MoodTypes.happy),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final themeState = ref.watch(themeControllerProvider);
+                      final isDark = themeState.mode == ThemeMode.dark;
+                      return IconButton(
+                        visualDensity: VisualDensity.compact,
+                        iconSize: 20,
+                        icon: Icon(
+                          isDark ? Icons.light_mode : Icons.dark_mode,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        onPressed: () {
+                          ref.read(themeControllerProvider.notifier).setMode(
+                                isDark ? ThemeMode.light : ThemeMode.dark,
+                              );
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    iconSize: 20,
+                    icon: Icon(
+                      Icons.settings,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ChildSettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          MoodTypes.getEmoji(childProfile.currentMood ?? MoodTypes.happy),
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _getMoodLabel(childProfile.currentMood ?? MoodTypes.happy),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  const SizedBox(width: 8),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
           ],
         ),
         
@@ -405,6 +410,16 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
                 '${child.xpProgress}/1000 XP',
                 AppColors.xpColor,
                 Icons.star,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ChildLevelsScreen(
+                        currentLevel: child.level,
+                        coins: child.xpProgress.round(),
+                      ),
+                    ),
+                  );
+                },
               ),
               _buildProgressItem(
                 '${child.streak}',
@@ -425,39 +440,48 @@ class _ChildHomeContentState extends ConsumerState<ChildHomeContent> {
     );
   }
 
-  Widget _buildProgressItem(String value, String label, Color color, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(30),
+  Widget _buildProgressItem(
+    String value,
+    String label,
+    Color color,
+    IconData icon, {
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Icon(
+              icon,
+              size: 30,
+              color: color,
+            ),
           ),
-          child: Icon(
-            icon,
-            size: 30,
-            color: color,
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: AppConstants.fontSize,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: AppConstants.fontSize,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

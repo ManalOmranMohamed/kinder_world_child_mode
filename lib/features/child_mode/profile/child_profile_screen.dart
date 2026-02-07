@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -249,6 +250,76 @@ class ChildProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.shadow.withValues(alpha: 0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Levels',
+                            style: textTheme.titleMedium?.copyWith(
+                              fontSize: AppConstants.fontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Track your level journey',
+                            style: textTheme.bodySmall?.copyWith(
+                              fontSize: 12,
+                              color: colors.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ChildLevelsScreen(
+                              currentLevel: child.level,
+                              coins: child.xp,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE6D7F7),
+                        foregroundColor: const Color(0xFF5D2E9E),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                        elevation: 3,
+                      ),
+                      child: const Text(
+                        'Levels',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ChildSettingsScreen()));
@@ -351,6 +422,398 @@ class ChildProfileScreen extends ConsumerWidget {
         Text(description, style: textTheme.labelSmall?.copyWith(fontSize: 10, color: colors.onSurfaceVariant), textAlign: TextAlign.center),
       ],
     );
+  }
+}
+
+// ==========================================
+// 1.5 Child Levels Screen
+// ==========================================
+
+class ChildLevelsScreen extends StatelessWidget {
+  const ChildLevelsScreen({
+    super.key,
+    required this.currentLevel,
+    required this.coins,
+  });
+
+  final int currentLevel;
+  final int coins;
+
+  List<_LevelNode> _buildLevels() {
+    final levels = <_LevelNode>[];
+    for (var level = 1; level <= 50; level += 1) {
+      final isCurrent = level == currentLevel;
+      final isUnlocked = level <= currentLevel;
+      final stars = isUnlocked ? 3 : 0;
+      levels.add(
+        _LevelNode(
+          level: level,
+          stars: isCurrent ? 2 : stars,
+          isCurrent: isCurrent,
+          isUnlocked: isUnlocked,
+        ),
+      );
+    }
+    return levels;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final levels = _buildLevels();
+    final displayLevels = levels.reversed.toList();
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      extendBodyBehindAppBar: true,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1A083F),
+              Color(0xFF3B0C7A),
+              Color(0xFF7E2FA8),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  children: [
+                    _buildStatPill(
+                      icon: Icons.emoji_events,
+                      label: 'Level',
+                      value: '$currentLevel',
+                      color: const Color(0xFFFFC34A),
+                    ),
+                    const SizedBox(width: 12),
+                    _buildStatPill(
+                      icon: Icons.star,
+                      label: 'XP',
+                      value: '${coins}/1000',
+                      color: const Color(0xFF7AE3FF),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final contentHeight = (displayLevels.length * 95).toDouble() + 220;
+                    final height = math.max(contentHeight, constraints.maxHeight + 40);
+                    final points = <Offset>[];
+                    for (var i = 0; i < displayLevels.length; i++) {
+                      final x = i.isEven ? width * 0.28 : width * 0.72;
+                      final y = 95.0 * i + 140;
+                      points.add(Offset(x, y));
+                    }
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 90),
+                      child: SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            CustomPaint(
+                              size: Size(width, height),
+                              painter: _PathPainter(points: points),
+                            ),
+                            ...List.generate(displayLevels.length, (index) {
+                              final node = displayLevels[index];
+                              final point = points[index];
+                              return Positioned(
+                                left: point.dx - 40,
+                                top: point.dy - 40,
+                                child: _LevelBadge(
+                                  node: node,
+                                  onTap: () {
+                                    final messenger = ScaffoldMessenger.of(context);
+                                    messenger.hideCurrentSnackBar();
+                                    if (!node.isUnlocked) {
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Row(
+                                            children: [
+                                              const Icon(Icons.lock_rounded, color: Colors.white),
+                                              const SizedBox(width: 10),
+                                              const Expanded(
+                                                child: Text(
+                                                  'Oops! Finish the previous level first.',
+                                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          backgroundColor: const Color(0xFFFF8AB3),
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    messenger.showSnackBar(
+                                      SnackBar(
+                                        content: Row(
+                                          children: [
+                                            const Icon(Icons.play_circle_fill, color: Colors.white),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                'Great job! Start Level ${node.level}!',
+                                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        backgroundColor: const Color(0xFF7ED6FF),
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                      ),
+                                    );
+                                    context.go('/child/learn');
+                                  },
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatPill({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LevelNode {
+  const _LevelNode({
+    required this.level,
+    required this.stars,
+    required this.isCurrent,
+    required this.isUnlocked,
+  });
+
+  final int level;
+  final int stars;
+  final bool isCurrent;
+  final bool isUnlocked;
+}
+
+class _LevelBadge extends StatelessWidget {
+  const _LevelBadge({required this.node, required this.onTap});
+
+  final _LevelNode node;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final baseColor = node.isUnlocked
+        ? (node.isCurrent ? const Color(0xFFD53DF2) : const Color(0xFFFFC34A))
+        : const Color(0xFF8A8AA8);
+    final glowColor = baseColor.withValues(alpha: 0.45);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(3, (index) {
+              final active = index < node.stars;
+              return Icon(
+                active ? Icons.star : Icons.star_border,
+                color: active ? const Color(0xFFFFD36A) : Colors.white.withValues(alpha: 0.45),
+                size: 16,
+              );
+            }),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  baseColor,
+                  baseColor.withValues(alpha: 0.75),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: glowColor,
+                  blurRadius: 18,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+              border: Border.all(color: Colors.white.withValues(alpha: 0.65), width: 3),
+            ),
+            child: Center(
+              child: Text(
+                '${node.level}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(color: Colors.black26, blurRadius: 6),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LevelActionPill extends StatelessWidget {
+  const _LevelActionPill({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+        border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 2),
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PathPainter extends CustomPainter {
+  _PathPainter({required this.points});
+
+  final List<Offset> points;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2) return;
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.4)
+      ..strokeWidth = 20
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (var i = 1; i < points.length; i++) {
+      final prev = points[i - 1];
+      final current = points[i];
+      final mid = Offset((prev.dx + current.dx) / 2, (prev.dy + current.dy) / 2);
+      path.quadraticBezierTo(prev.dx, mid.dy, mid.dx, mid.dy);
+      path.quadraticBezierTo(current.dx, mid.dy, current.dx, current.dy);
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PathPainter oldDelegate) {
+    return oldDelegate.points != points;
   }
 }
 

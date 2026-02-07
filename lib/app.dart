@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:kinder_world/core/localization/app_localizations.dart'
     as custom_localizations;
 import 'package:kinder_world/core/theme/app_theme.dart';
 import 'package:kinder_world/core/storage/secure_storage.dart';
 import 'package:kinder_world/core/network/network_service.dart';
+import 'package:kinder_world/core/providers/connectivity_provider.dart';
 import 'package:kinder_world/router.dart';
 import 'package:logger/logger.dart';
 import 'package:kinder_world/core/providers/theme_provider.dart';
@@ -65,9 +68,68 @@ class KinderWorldApp extends ConsumerWidget {
 
         return Directionality(
           textDirection: isRTL ? TextDirection.rtl : TextDirection.ltr,
-          child: child!,
+          child: _ConnectivityGuard(child: child!),
         );
       },
     );
+  }
+}
+
+class _ConnectivityGuard extends ConsumerStatefulWidget {
+  const _ConnectivityGuard({required this.child});
+
+  final Widget child;
+
+  @override
+  ConsumerState<_ConnectivityGuard> createState() => _ConnectivityGuardState();
+}
+
+class _ConnectivityGuardState extends ConsumerState<_ConnectivityGuard> {
+  String? _lastLocation;
+  bool _isOffline = false;
+  late final ProviderSubscription<AsyncValue<ConnectivityResult>> _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = ref.listenManual<AsyncValue<ConnectivityResult>>(
+      connectivityProvider,
+      (previous, next) {
+      final result = next.asData?.value;
+      if (result == null) return;
+
+      final router = GoRouter.of(context);
+      final location = router.routerDelegate.currentConfiguration.uri.toString();
+      final onNoInternet = location == Routes.noInternet;
+      final isOffline = result == ConnectivityResult.none;
+
+      if (isOffline && !_isOffline) {
+        _isOffline = true;
+        if (!onNoInternet) {
+          _lastLocation = location;
+          router.go(Routes.noInternet);
+        }
+        return;
+      }
+
+      if (!isOffline && _isOffline) {
+        _isOffline = false;
+        if (onNoInternet) {
+          router.go(_lastLocation ?? Routes.welcome);
+        }
+      }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }
