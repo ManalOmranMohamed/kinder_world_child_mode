@@ -522,7 +522,8 @@ class ChildLevelsScreen extends StatelessWidget {
                       points.add(Offset(x, y));
                     }
                     return SingleChildScrollView(
-                      padding: const EdgeInsets.only(bottom: 90),
+                      reverse: true,
+                      padding: const EdgeInsets.only(bottom: 40),
                       child: SizedBox(
                         width: width,
                         height: height,

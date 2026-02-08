@@ -56,7 +56,7 @@ class _ChildHomeScreenState extends ConsumerState<ChildHomeScreen>
   void _onTap(int index) {
     widget.navigationShell.goBranch(
       index,
-      initialLocation: index == widget.navigationShell.currentIndex,
+      initialLocation: true,
     );
   }
 

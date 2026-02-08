@@ -196,50 +196,6 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               
               const SizedBox(height: 32),
               
-              // Billing Information
-              ThemedCard(
-                padding: const EdgeInsets.all(20),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: colors.shadow.withValues(alpha: 0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Billing Information',
-                      style: textTheme.titleMedium?.copyWith(
-                        fontSize: AppConstants.fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    _buildBillingRow(context, 'Next Payment', 'Dec 31, 2024'),
-                    _buildBillingRow(context, 'Amount', '\$9.99/month'),
-                    _buildBillingRow(context, 'Payment Method', '**** **** **** 1234'),
-                    
-                    const SizedBox(height: 20),
-                    
-                    OutlinedButton(
-                      onPressed: () {
-                        context.push(Routes.parentBilling);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 48),
-                      ),
-                      child: const Text('Manage Billing'),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 32),
-              
               // Available Plans
               Text(
                 'Available Plans',
@@ -273,7 +229,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 'Best for families',
                 [
                   'Unlimited activities',
-                  'Up to 3 children',
+                  'Up to 1 child',
                   'Advanced reports',
                   'AI insights',
                   'Offline downloads',

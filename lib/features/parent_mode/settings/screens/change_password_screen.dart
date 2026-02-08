@@ -178,7 +178,7 @@ class _ParentChangePasswordScreenState
                       // ignore: use_build_context_synchronously
                       messenger.showSnackBar(
                         const SnackBar(
-                          content: Text('تم تغيير كلمة المرور'),
+                          content: Text('Password updated successfully'),
                           duration: Duration(seconds: 3),
                         ),
                       );

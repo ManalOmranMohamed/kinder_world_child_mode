@@ -178,12 +178,12 @@ class _ParentRegisterScreenState extends ConsumerState<ParentRegisterScreen> {
                 ),
                 const SizedBox(height: 20),
                 
-                // Phone field (optional)
+                // Phone field
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
-                    labelText: 'Phone Number (Optional)',
+                    labelText: 'Phone Number',
                     hintText: 'Enter your phone number',
                     prefixIcon: Icon(Icons.phone),
                   ),
